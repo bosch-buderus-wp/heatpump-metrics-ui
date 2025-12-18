@@ -34,6 +34,7 @@ Thank you for your interest in contributing to Heatpump Metrics! This document p
 ### Good First Issues
 
 Look for issues labeled:
+
 - `good-first-issue` - Perfect for newcomers
 - `help-wanted` - We need community help
 - `documentation` - Documentation improvements
@@ -50,6 +51,7 @@ Look for issues labeled:
 ### Initial Setup
 
 1. **Fork the repository**
+
    ```bash
    # Click "Fork" on GitHub, then clone your fork
    git clone https://github.com/YOUR-USERNAME/metrics.git
@@ -57,17 +59,20 @@ Look for issues labeled:
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
 
 3. **Set up environment variables**
+
    ```bash
    cp .env.example .env.development
    # Edit .env.development with your Supabase credentials
    ```
 
 4. **Start development server**
+
    ```bash
    npm run dev
    ```
@@ -84,6 +89,7 @@ See [DEVELOPMENT.md](DEVELOPMENT.md) for detailed setup instructions.
 ### Branch Strategy
 
 1. **Create a feature branch**
+
    ```bash
    git checkout -b feature/your-feature-name
    # or
@@ -91,11 +97,13 @@ See [DEVELOPMENT.md](DEVELOPMENT.md) for detailed setup instructions.
    ```
 
 2. **Make your changes**
+
    - Write clean, readable code
    - Follow existing code style
    - Add comments for complex logic
 
 3. **Test your changes**
+
    ```bash
    npm run lint          # Check code style
    npm run format        # Format code
@@ -103,12 +111,14 @@ See [DEVELOPMENT.md](DEVELOPMENT.md) for detailed setup instructions.
    ```
 
 4. **Commit your changes**
+
    ```bash
    git add .
    git commit -m "feat: add new chart component"
    ```
 
    **Commit Message Format:**
+
    - `feat:` - New feature
    - `fix:` - Bug fix
    - `docs:` - Documentation changes
@@ -118,6 +128,7 @@ See [DEVELOPMENT.md](DEVELOPMENT.md) for detailed setup instructions.
    - `chore:` - Maintenance tasks
 
 5. **Push to your fork**
+
    ```bash
    git push origin feature/your-feature-name
    ```
@@ -157,7 +168,7 @@ function SystemForm(props: any) { ... }
 ```typescript
 // ✅ Good
 export function MyComponent({ title, onSave }: MyComponentProps) {
-  const [data, setData] = useState<string>('');
+  const [data, setData] = useState<string>("");
   // ...
 }
 
@@ -191,12 +202,20 @@ src/
 
 ```css
 /* ✅ Good */
-.section-header { ... }
-.action-btn-primary { ... }
+.section-header {
+  ...;
+}
+.action-btn-primary {
+  ...;
+}
 
 /* ❌ Bad */
-.btn1 { ... }
-.x { ... }
+.btn1 {
+  ...;
+}
+.x {
+  ...;
+}
 ```
 
 ### Naming Conventions
@@ -236,10 +255,12 @@ npm run build
 ### Pull Request Guidelines
 
 1. **Title**: Clear and descriptive
+
    - `feat: add monthly chart export feature`
    - `fix: resolve pagination issue in DataGrid`
 
 2. **Description**: Include:
+
    - What changes were made
    - Why the changes were needed
    - How to test the changes
@@ -278,6 +299,7 @@ A clear description of what the bug is.
 
 **To Reproduce**
 Steps to reproduce:
+
 1. Go to '...'
 2. Click on '...'
 3. See error
@@ -289,9 +311,10 @@ What you expected to happen.
 If applicable, add screenshots.
 
 **Environment:**
+
 - Browser: [e.g. Chrome 120]
 - OS: [e.g. Windows 11]
-- Version: [e.g. 1.0.0]
+- Version: [e.g. 1.0.2]
 
 **Additional context**
 Any other relevant information.

@@ -8,8 +8,7 @@ export default defineConfig({
     "process.env": {},
   },
   build: {
-    // outDir: "dist",
-    outDir: "../bosch-buderus-wp.github.io/assets/metrics",
+    outDir: "dist",
     emptyOutDir: true,
     minify: "terser",
     lib: {

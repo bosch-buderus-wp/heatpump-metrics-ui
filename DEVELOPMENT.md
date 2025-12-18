@@ -256,18 +256,18 @@ The app is distributed via jsDelivr using GitHub Releases:
 <!-- Usage in other websites -->
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/gh/bosch-buderus-wp/heatpump-metrics-ui@1.0.0/app.css"
+  href="https://cdn.jsdelivr.net/gh/bosch-buderus-wp/heatpump-metrics-ui@1.0.2/app.css"
 />
 <div id="root"></div>
 <script
   type="module"
-  src="https://cdn.jsdelivr.net/gh/bosch-buderus-wp/heatpump-metrics-ui@1.0.0/app.js"
+  src="https://cdn.jsdelivr.net/gh/bosch-buderus-wp/heatpump-metrics-ui@1.0.2/app.js"
 ></script>
 ```
 
 **How it works:**
 
-1. When you push a git tag (e.g., `v1.0.0`), GitHub Actions automatically builds the project
+1. When you push a git tag (e.g., `v1.0.2`), GitHub Actions automatically builds the project
 2. The built files (`app.js` and `app.css`) are attached to the GitHub Release
 3. jsDelivr serves these files from the release assets
 4. No need to commit build files to the repository!

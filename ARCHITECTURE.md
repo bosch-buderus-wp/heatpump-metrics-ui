@@ -58,34 +58,35 @@ Heatpump Metrics is a React-based single-page application (SPA) that provides vi
 
 ### Core Technologies
 
-| Category | Technology | Version | Purpose |
-|----------|-----------|---------|---------|
-| **Framework** | React | 19.x | UI framework |
-| **Language** | TypeScript | 5.x | Type safety |
-| **Build Tool** | Vite | 7.x | Fast builds, dev server |
-| **Router** | React Router | 7.x | Client-side routing |
-| **State** | TanStack Query | 5.x | Server state management |
-| **Backend** | Supabase | 2.x | Database, Auth, APIs |
+| Category       | Technology     | Version | Purpose                 |
+| -------------- | -------------- | ------- | ----------------------- |
+| **Framework**  | React          | 19.x    | UI framework            |
+| **Language**   | TypeScript     | 5.x     | Type safety             |
+| **Build Tool** | Vite           | 7.x     | Fast builds, dev server |
+| **Router**     | React Router   | 7.x     | Client-side routing     |
+| **State**      | TanStack Query | 5.x     | Server state management |
+| **Backend**    | Supabase       | 2.x     | Database, Auth, APIs    |
 
 ### UI Libraries
 
-| Library | Purpose |
-|---------|---------|
-| Material-UI (MUI) | Component library, DataGrid |
-| Nivo | Charts and data visualization |
-| Emotion | CSS-in-JS (MUI dependency) |
+| Library           | Purpose                       |
+| ----------------- | ----------------------------- |
+| Material-UI (MUI) | Component library, DataGrid   |
+| Nivo              | Charts and data visualization |
+| Emotion           | CSS-in-JS (MUI dependency)    |
 
 ### Development Tools
 
-| Tool | Purpose |
-|------|---------|
-| Biome | Linting and code formatting |
-| Terser | JavaScript minification |
-| TypeScript | Type checking |
+| Tool       | Purpose                     |
+| ---------- | --------------------------- |
+| Biome      | Linting and code formatting |
+| Terser     | JavaScript minification     |
+| TypeScript | Type checking               |
 
 ### Dependencies
 
 Key dependencies (see `package.json` for full list):
+
 - `@supabase/supabase-js` - Supabase client
 - `@tanstack/react-query` - Data fetching/caching
 - `@mui/material` & `@mui/x-data-grid` - UI components
@@ -172,7 +173,7 @@ Located in `src/pages/`, handle routing and top-level layout:
 // src/pages/Monthly.tsx
 export default function Monthly() {
   const { data, isLoading } = useQuery({ ... })
-  
+
   return (
     <PageLayout titleKey="monthly.title">
       <DataGridWrapper rows={data} columns={columns} />
@@ -189,16 +190,16 @@ Located in `src/components/features/`, contain domain logic:
 ```typescript
 // src/components/features/system/SystemSection.tsx
 export function SystemSection({ system, onSave, onDelete }) {
-  const [isSaving, setIsSaving] = useState(false)
-  
+  const [isSaving, setIsSaving] = useState(false);
+
   // Feature-specific logic
-  
+
   return (
     <section>
       <SystemForm system={system} onSubmit={handleSave} />
       <ActionBar actions={actions} />
     </section>
-  )
+  );
 }
 ```
 
@@ -209,11 +210,7 @@ Located in `src/components/ui/`, generic and reusable:
 ```typescript
 // src/components/ui/ConfirmDialog.tsx
 export function ConfirmDialog({ open, title, message, onConfirm }) {
-  return (
-    <Dialog open={open}>
-      {/* Generic dialog UI */}
-    </Dialog>
-  )
+  return <Dialog open={open}>{/* Generic dialog UI */}</Dialog>;
 }
 ```
 
@@ -226,28 +223,24 @@ We use **TanStack Query** for server state management:
 ```typescript
 // 1. Query hook
 const { data, isLoading, error } = useQuery({
-  queryKey: ['systems'],
+  queryKey: ["systems"],
   queryFn: async () => {
-    const { data, error } = await supabase
-      .from('heating_systems')
-      .select('*')
-    if (error) throw error
-    return data
-  }
-})
+    const { data, error } = await supabase.from("heating_systems").select("*");
+    if (error) throw error;
+    return data;
+  },
+});
 
 // 2. Mutation hook
 const mutation = useMutation({
   mutationFn: async (newSystem) => {
-    const { error } = await supabase
-      .from('heating_systems')
-      .insert(newSystem)
-    if (error) throw error
+    const { error } = await supabase.from("heating_systems").insert(newSystem);
+    if (error) throw error;
   },
   onSuccess: () => {
-    queryClient.invalidateQueries(['systems'])
-  }
-})
+    queryClient.invalidateQueries(["systems"]);
+  },
+});
 ```
 
 ### Data Flow Diagram
@@ -287,18 +280,21 @@ const mutation = useMutation({
 ### State Categories
 
 1. **Server State** (TanStack Query)
+
    - Database records
    - User data
    - Measurements
    - Cached and synchronized
 
 2. **UI State** (React useState/useReducer)
+
    - Form inputs
    - Modal visibility
    - Loading states
    - Temporary UI state
 
 3. **URL State** (React Router)
+
    - Current route
    - Query parameters
    - Navigation history
@@ -313,19 +309,19 @@ const mutation = useMutation({
 ```typescript
 // Server state (TanStack Query)
 const { data: systems } = useQuery({
-  queryKey: ['systems'],
-  queryFn: fetchSystems
-})
+  queryKey: ["systems"],
+  queryFn: fetchSystems,
+});
 
 // UI state (React)
-const [isModalOpen, setIsModalOpen] = useState(false)
+const [isModalOpen, setIsModalOpen] = useState(false);
 
 // Global state (Context)
-const { session } = useSession()
+const { session } = useSession();
 
 // URL state (Router)
-const navigate = useNavigate()
-const { systemId } = useParams()
+const navigate = useNavigate();
+const { systemId } = useParams();
 ```
 
 ## 🔐 Authentication & Authorization
@@ -341,30 +337,30 @@ const { systemId } = useParams()
 
 ```typescript
 // src/components/common/layout/Layout.tsx
-const SessionContext = createContext<SessionContextType>({ session: null })
+const SessionContext = createContext<SessionContextType>({ session: null });
 
 export function Layout({ children }) {
-  const [session, setSession] = useState<Session | null>(null)
-  
+  const [session, setSession] = useState<Session | null>(null);
+
   useEffect(() => {
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session)
-    })
-    
+      setSession(session);
+    });
+
     // Listen for auth changes
     const { data: listener } = supabase.auth.onAuthStateChange((_, session) => {
-      setSession(session)
-    })
-    
-    return () => listener.subscription.unsubscribe()
-  }, [])
-  
+      setSession(session);
+    });
+
+    return () => listener.subscription.unsubscribe();
+  }, []);
+
   return (
     <SessionContext.Provider value={{ session }}>
       {children}
     </SessionContext.Provider>
-  )
+  );
 }
 ```
 
@@ -399,7 +395,7 @@ export default defineConfig({
       },
     },
   },
-})
+});
 ```
 
 ### Output
@@ -410,9 +406,16 @@ export default defineConfig({
 ### Distribution
 
 **jsDelivr CDN:**
+
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/user/repo@1.0.0/assets/metrics/app.css">
-<script type="module" src="https://cdn.jsdelivr.net/gh/user/repo@1.0.0/assets/metrics/app.js"></script>
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/gh/user/repo@1.0.2/assets/metrics/app.css"
+/>
+<script
+  type="module"
+  src="https://cdn.jsdelivr.net/gh/user/repo@1.0.2/assets/metrics/app.js"
+></script>
 ```
 
 ### Versioning
@@ -426,24 +429,29 @@ export default defineConfig({
 ### Security Measures
 
 1. **XSS Protection**
+
    - React auto-escapes all text content
    - No `dangerouslySetInnerHTML` usage
    - No direct DOM manipulation with user data
 
 2. **SQL Injection Protection**
+
    - Supabase client uses parameterized queries
    - No raw SQL from user input
 
 3. **CSRF Protection**
+
    - Token-based auth (not cookie-based)
    - SameSite policies handled by Supabase
 
 4. **Authentication**
+
    - JWT tokens with expiration
    - Secure token storage
    - Automatic token refresh
 
 5. **Row Level Security (RLS)**
+
    - Database-enforced access control
    - Users can only modify their own data
    - Public read access for metrics
@@ -466,16 +474,19 @@ export default defineConfig({
 ### Current Optimizations
 
 1. **Build Optimization**
+
    - Terser minification
    - Tree shaking (dead code elimination)
    - Console/debugger removal in production
 
 2. **Caching Strategy**
+
    - TanStack Query caches server data
    - Supabase client caches session
    - Browser caches static assets
 
 3. **Code Organization**
+
    - Modular component structure
    - Reusable hooks and utilities
    - Efficient re-renders
@@ -519,15 +530,18 @@ export default defineConfig({
 ### Patterns Used
 
 1. **Container/Presentational Pattern**
+
    - Pages = Containers (logic + data)
    - Components = Presentational (UI only)
 
 2. **Custom Hooks Pattern**
+
    - Encapsulate business logic
    - Reusable across components
    - Single responsibility
 
 3. **Compound Components Pattern**
+
    - Form components with fields
    - Flexible and composable
 
