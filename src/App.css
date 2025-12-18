@@ -1,0 +1,256 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+/* MUI DataGrid overrides */
+.MuiDataGrid-root {
+  font-size: 0.7rem;
+}
+.MuiDataGrid-columnHeaders {
+  font-size: 0.7rem;
+}
+.MuiDataGrid-cell {
+  font-size: 0.7rem;
+}
+
+/* MUI Table Pagination overrides - increase specificity to override MUI defaults */
+.MuiDataGrid-root .MuiTablePagination-selectLabel,
+.MuiDataGrid-root .MuiTablePagination-displayedRows,
+p.MuiTablePagination-selectLabel,
+p.MuiTablePagination-displayedRows {
+  /* biome-ignore lint/complexity/noImportantStyles: required to override third-party styles */
+  margin: 0 !important;
+}
+
+.section-container {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Section Layout */
+.section-header {
+  padding-bottom: 0.75rem;
+}
+
+.section-header h2 {
+  margin: 0;
+  color: #333;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.section-info {
+  margin-bottom: 1rem;
+  padding: 0.8rem 0;
+  color: #666;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  max-width: 900px;
+}
+
+.section-info p {
+  margin: 0;
+}
+
+.section-content {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 0.7rem;
+  padding: 0.8rem;
+  background: rgba(0, 0, 0, 0.02);
+  width: 100%;
+  max-width: 900px;
+}
+
+.section-form {
+  margin-top: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 0.7rem;
+  padding: 0.8rem;
+  background: rgba(0, 0, 0, 0.02);
+  width: 100%;
+  max-width: 900px;
+}
+
+/* Action Bar Buttons */
+.action-btn {
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: inherit;
+}
+
+.action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.action-btn-primary {
+  background-color: #1976d2;
+  color: white;
+  box-shadow: 0 2px 4px rgba(25, 118, 210, 0.3);
+}
+
+.action-btn-primary:hover:not(:disabled) {
+  background-color: #1565c0;
+  box-shadow: 0 3px 6px rgba(25, 118, 210, 0.4);
+  transform: translateY(-1px);
+}
+
+.action-btn-secondary {
+  background-color: #90caf9;
+  color: #0d47a1;
+  border: 1px solid #64b5f6;
+}
+
+.action-btn-secondary:hover:not(:disabled) {
+  background-color: #64b5f6;
+  border-color: #42a5f5;
+}
+
+.action-btn-danger {
+  background-color: #ffcdd2;
+  color: #c62828;
+  border: 1px solid #ef9a9a;
+}
+
+.action-btn-danger:hover:not(:disabled) {
+  background-color: #ef9a9a;
+  border-color: #e57373;
+}
+
+.section-container h2 {
+  margin-top: 0px;
+}
+
+/* Modern app styles - Layout */
+.app-container {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.app-header {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+.brand {
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+.nav {
+  display: flex;
+  gap: 0.75rem;
+}
+.nav a {
+  padding: 0.4rem 0.6rem;
+  border-radius: 0.5rem;
+}
+.nav a.active {
+  background: rgba(100, 108, 255, 0.15);
+}
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+.app-main {
+  display: grid;
+  gap: 1rem;
+  justify-items: center;
+}
+.app-footer {
+  opacity: 0.6;
+  font-size: 0.85rem;
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.btn {
+  padding: 0.5rem 0.8rem;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: #1a1a1a;
+  color: #fff;
+  border-radius: 0.5rem;
+}
+.link {
+  background: transparent;
+  border: none;
+  color: #646cff;
+  cursor: pointer;
+}
+.muted {
+  opacity: 0.7;
+}
+.error {
+  color: #b00020;
+}
+
+.filters {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-end;
+  margin: 0.5rem 0 1rem;
+  flex-wrap: wrap;
+}
+.filters label {
+  display: grid;
+  gap: 0.25rem;
+  font-size: 0.9rem;
+}
+
+.card {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 0.7rem;
+  padding: 0.8rem;
+  background: rgba(0, 0, 0, 0.02);
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+}
+.grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 1rem;
+  align-items: start;
+  justify-content: center;
+}
+.row {
+  display: grid;
+  grid-template-columns: 260px 1fr auto;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+.row.wide {
+  grid-template-columns: 300px 1fr auto;
+}
+.row.picker {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+.row.picker label {
+  margin-left: 1rem;
+}
+.row.picker label:first-child {
+  margin-left: 0;
+}
+.copyfield .row {
+  grid-template-columns: 1fr auto;
+}
+.form {
+  display: grid;
+  gap: 0.5rem;
+}

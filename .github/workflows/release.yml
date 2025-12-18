@@ -1,0 +1,66 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build production bundle
+        run: npm run build
+
+      - name: Verify build output
+        run: |
+          echo "Build output:"
+          ls -lh dist/
+          echo "Total size:"
+          du -sh dist/
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            dist/app.js
+            dist/app.css
+          generate_release_notes: true
+          draft: false
+          prerelease: false
+          body: |
+            ## 🚀 Release ${{ github.ref_name }}
+
+            ### 📦 CDN Usage
+
+            Include the widget in your website:
+
+            ```html
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/bosch-buderus-wp/heatpump-metrics-ui@${{ github.ref_name }}/app.css">
+            <div id="root"></div>
+            <script type="module" src="https://cdn.jsdelivr.net/gh/bosch-buderus-wp/heatpump-metrics-ui@${{ github.ref_name }}/app.js"></script>
+            ```
+
+            ### 📄 Files
+            - `app.js` - Main application bundle
+            - `app.css` - Styles
+
+            ### 🔗 Documentation
+            - [README](https://github.com/bosch-buderus-wp/heatpump-metrics-ui/blob/main/README.md)
+            - [Contributing Guide](https://github.com/bosch-buderus-wp/heatpump-metrics-ui/blob/main/CONTRIBUTING.md)

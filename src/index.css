@@ -1,0 +1,8 @@
+/* 
+ * index.css - Global styles for index.html
+ * 
+ * This file is imported by main.tsx and should contain only global resets
+ * or base styles needed before the React app mounts.
+ * 
+ * All app-specific styles are in App.css
+ */
