@@ -3,8 +3,8 @@ import { supabase } from "../lib/supabaseClient";
 import { useNavigate, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
-const AUTH_METHOD = import.meta.env.VITE_AUTH_METHOD || "magic-link";
-const AUTH_CALLBACK_URL = import.meta.env.VITE_AUTH_CALLBACK_URL;
+const AUTH_METHOD = window.VITE_AUTH_METHOD || import.meta.env.VITE_AUTH_METHOD || "magic-link";
+const AUTH_CALLBACK_URL = window.VITE_AUTH_CALLBACK_URL || import.meta.env.VITE_AUTH_CALLBACK_URL;
 
 export default function Login() {
   const { t } = useTranslation();

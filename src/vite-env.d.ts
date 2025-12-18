@@ -2,9 +2,9 @@
 
 interface Window {
   HEAT_PUMP_METRICS_EMBEDDED?: boolean;
-  __SUPABASE_URL__?: string;
-  __SUPABASE_ANON_KEY__?: string;
-  VITE_AUTH_METHOD?: string;
+  VITE_SUPABASE_URL?: string;
+  VITE_SUPABASE_ANON_KEY?: string;
+  VITE_AUTH_METHOD?: "magic-link" | "password";
   VITE_AUTH_CALLBACK_URL?: string;
 }
 
