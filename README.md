@@ -1,6 +1,6 @@
 # Heatpump Metrics
 
-[![Version](https://img.shields.io/badge/version-1.0.2-blue.svg)](https://github.com/bosch-buderus-wp/heatpump-metrics-ui)
+[![Version](https://img.shields.io/badge/version-1.0.3-blue.svg)](https://github.com/bosch-buderus-wp/heatpump-metrics-ui)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
@@ -150,26 +150,26 @@ This application is built for CDN distribution via jsDelivr:
 <!-- Embed in any website -->
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/gh/bosch-buderus-wp/heatpump-metrics-ui@1.0.2/app.css"
+  href="https://cdn.jsdelivr.net/gh/bosch-buderus-wp/heatpump-metrics-ui@v1.0.2-release/app.css"
 />
 <div id="root"></div>
 <script
   type="module"
-  src="https://cdn.jsdelivr.net/gh/bosch-buderus-wp/heatpump-metrics-ui@1.0.2/app.js"
+  src="https://cdn.jsdelivr.net/gh/bosch-buderus-wp/heatpump-metrics-ui@v1.0.2-release/app.js"
 ></script>
 ```
 
-Or use `@latest` to always get the latest version:
+Or use `@release` to always get the latest version:
 
 ```html
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/gh/bosch-buderus-wp/heatpump-metrics-ui@latest/app.css"
+  href="https://cdn.jsdelivr.net/gh/bosch-buderus-wp/heatpump-metrics-ui@release/app.css"
 />
 <div id="root"></div>
 <script
   type="module"
-  src="https://cdn.jsdelivr.net/gh/bosch-buderus-wp/heatpump-metrics-ui@latest/app.js"
+  src="https://cdn.jsdelivr.net/gh/bosch-buderus-wp/heatpump-metrics-ui@release/app.js"
 ></script>
 ```
 

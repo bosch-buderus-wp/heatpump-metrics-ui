@@ -410,11 +410,11 @@ export default defineConfig({
 ```html
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/gh/user/repo@1.0.2/assets/metrics/app.css"
+  href="https://cdn.jsdelivr.net/gh/bosch-buderus-wp/heatpump-metrics-ui@release/app.css"
 />
 <script
   type="module"
-  src="https://cdn.jsdelivr.net/gh/user/repo@1.0.2/assets/metrics/app.js"
+  src="https://cdn.jsdelivr.net/gh/bosch-buderus-wp/heatpump-metrics-ui@release/app.js"
 ></script>
 ```
 

@@ -35,6 +35,20 @@ jobs:
           echo "Total size:"
           du -sh dist/
 
+      - name: Deploy to release branch
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: release
+          folder: dist
+          clean: true
+
+      - name: Tag the release branch
+        run: |
+          git fetch origin release
+          RELEASE_SHA=$(git rev-parse origin/release)
+          git tag "${{ github.ref_name }}-release" $RELEASE_SHA
+          git push origin "${{ github.ref_name }}-release"
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
@@ -47,14 +61,24 @@ jobs:
           body: |
             ## 🚀 Release ${{ github.ref_name }}
 
-            ### 📦 CDN Usage
+            This release is available via jsDelivr CDN.
 
-            Include the widget in your website:
+            ### 📦 CDN Usage (Recommended)
 
+            Use the stable link to always get the latest version, or the versioned link for a specific release.
+
+            #### Stable (Latest)
             ```html
-            <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/bosch-buderus-wp/heatpump-metrics-ui@${{ github.ref_name }}/app.css">
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/bosch-buderus-wp/heatpump-metrics-ui@release/app.css">
             <div id="root"></div>
-            <script type="module" src="https://cdn.jsdelivr.net/gh/bosch-buderus-wp/heatpump-metrics-ui@${{ github.ref_name }}/app.js"></script>
+            <script type="module" src="https://cdn.jsdelivr.net/gh/bosch-buderus-wp/heatpump-metrics-ui@release/app.js"></script>
+            ```
+
+            #### Versioned (${{ github.ref_name }})
+            ```html
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/bosch-buderus-wp/heatpump-metrics-ui@${{ github.ref_name }}-release/app.css">
+            <div id="root"></div>
+            <script type="module" src="https://cdn.jsdelivr.net/gh/bosch-buderus-wp/heatpump-metrics-ui@${{ github.ref_name }}-release/app.js"></script>
             ```
 
             ### 📄 Files

@@ -256,12 +256,12 @@ The app is distributed via jsDelivr using GitHub Releases:
 <!-- Usage in other websites -->
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/gh/bosch-buderus-wp/heatpump-metrics-ui@1.0.2/app.css"
+  href="https://cdn.jsdelivr.net/gh/bosch-buderus-wp/heatpump-metrics-ui@v1.0.2-release/app.css"
 />
 <div id="root"></div>
 <script
   type="module"
-  src="https://cdn.jsdelivr.net/gh/bosch-buderus-wp/heatpump-metrics-ui@1.0.2/app.js"
+  src="https://cdn.jsdelivr.net/gh/bosch-buderus-wp/heatpump-metrics-ui@v1.0.2-release/app.js"
 ></script>
 ```
 
