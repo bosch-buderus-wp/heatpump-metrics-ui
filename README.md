@@ -1,6 +1,6 @@
 # Heatpump Metrics
 
-[![Version](https://img.shields.io/badge/version-1.0.3-blue.svg)](https://github.com/bosch-buderus-wp/heatpump-metrics-ui)
+[![Version](https://img.shields.io/badge/version-1.0.4-blue.svg)](https://github.com/bosch-buderus-wp/heatpump-metrics-ui)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
