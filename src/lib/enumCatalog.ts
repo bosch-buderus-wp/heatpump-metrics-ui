@@ -101,7 +101,7 @@ export const MODEL_ODU_VALUES = ["4", "5", "7", "10", "12"];
 
 export const SW_IDU_VALUES = ["5.27", "5.35", "7.10.0", "9.6.1", "9.7.0", "12.11.1"];
 
-export const SW_ODU_VALUES = ["5.27", "5.35", "7.10.0", "9.6.0", "9.10.0", "9.15.0"];
+export const SW_ODU_VALUES = ["5.27", "5.35", "7.10.0", "9.6.0", "9.10.0", "9.12.0", "9.15.0"];
 
 export const BUILDING_TYPE_VALUES = [
   "single_family_detached",

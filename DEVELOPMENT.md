@@ -213,6 +213,36 @@ npm run build:prod       # Build for production (explicit)
 # Code Quality
 npm run lint             # Check code with Biome
 npm run format           # Auto-format code with Biome
+
+# TypeScript Type Checking
+npx tsc --noEmit         # Check TypeScript types without emitting files
+```
+
+### Pre-Commit Hooks
+
+The project uses **Husky** and **lint-staged** to automatically enforce code quality before commits.
+
+**What runs automatically on `git commit`:**
+
+- ✅ **Biome format** - Auto-formats staged `.ts`, `.tsx`, `.json`, and `.md` files
+- ✅ **Biome lint** - Lints and auto-fixes staged TypeScript files
+- ✅ **TypeScript check** - Validates types across the entire project
+
+**This ensures:**
+
+- Consistent code style
+- No lint errors in committed code
+- No TypeScript errors before commit
+
+**The hook only runs on staged files**, making it fast while maintaining quality:
+
+- **TypeScript files** (`.ts`, `.tsx`): format, lint, and type-check
+- **Documentation/Config files** (`.json`, `.md`): format only
+
+**To bypass the hook (emergency only):**
+
+```bash
+git commit --no-verify -m "Emergency commit"
 ```
 
 ## 🏗️ Build Process
@@ -220,20 +250,6 @@ npm run format           # Auto-format code with Biome
 ### Build Configuration
 
 The app uses **Vite** with **library mode** for CDN distribution via jsDelivr.
-
-**vite.config.ts** key settings:
-
-```typescript
-build: {
-  outDir: "../bosch-buderus-wp.github.io/assets/metrics",
-  minify: "terser",
-  lib: {
-    entry: "./src/main.tsx",
-    formats: ["es"],
-    fileName: () => "app.js",
-  }
-}
-```
 
 ### Build Output
 
@@ -247,23 +263,6 @@ Files are optimized with:
 - Terser minification
 - Console/debugger removal
 - Dead code elimination
-
-### Build for CDN
-
-The app is distributed via jsDelivr using GitHub Releases:
-
-```html
-<!-- Usage in other websites -->
-<link
-  rel="stylesheet"
-  href="https://cdn.jsdelivr.net/gh/bosch-buderus-wp/heatpump-metrics-ui@v1.0.2-release/app.css"
-/>
-<div id="root"></div>
-<script
-  type="module"
-  src="https://cdn.jsdelivr.net/gh/bosch-buderus-wp/heatpump-metrics-ui@v1.0.2-release/app.js"
-></script>
-```
 
 **How it works:**
 

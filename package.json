@@ -1,6 +1,6 @@
 {
   "name": "heatpump-metrics-ui",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -14,7 +14,8 @@
     "build:prod": "vite build --mode production",
     "lint": "biome lint .",
     "format": "biome format --write .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "prepare": "husky"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -39,9 +40,21 @@
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
     "rollup-plugin-visualizer": "^6.0.5",
     "terser": "^5.44.1",
     "typescript": "^5.9.3",
     "vite": "^7.2.4"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "biome format --write",
+      "biome lint --write",
+      "bash -c 'tsc --noEmit'"
+    ],
+    "*.{json,md}": [
+      "biome format --write"
+    ]
   }
 }
