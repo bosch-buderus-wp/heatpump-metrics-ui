@@ -244,7 +244,7 @@ const resources = {
         softwareOutdoor: "Software Außeneinheit",
         heatingId: "Anlagen-ID",
         buildingConstructionYear: "Baujahr",
-        designOutdoorTemp: "Auslegungstemperatur",
+        designOutdoorTemp: "Normaußentemperatur",
         buildingType: "Gebäudetyp",
         country: "Land",
         buildingEnergyStandard: "Energiestandard",
@@ -271,7 +271,8 @@ const resources = {
         outdoorTempMin: "Außentemperatur min",
         outdoorTempMax: "Außentemperatur max",
         flowTempAvg: "Vorlauftemperatur Ø",
-        errorCopLessThanOne: "Arbeitszahl < 1 (Wärmeenergie muss ≥ el. Energie sein)",
+        errorCopLessThanOne:
+          "Arbeitszahl < 1 (Wärmeenergie muss ≥ el. Energie sein)",
         errorHeatingExceedsTotal: "Heizung kann nicht größer als Gesamt sein",
       },
     },
@@ -378,7 +379,8 @@ const resources = {
         deleteSystem: "Delete heating system",
         deleteSystemMessage:
           "Do you really want to delete this heating system? This will also permanently delete {{monthlyCount}} monthly values and {{measurementCount}} measurements.",
-        deleteSystemMessage_zero: "Do you really want to delete this heating system?",
+        deleteSystemMessage_zero:
+          "Do you really want to delete this heating system?",
         deleteAccount: "Delete account",
         deleteAccountMessage:
           "Do you really want to delete your account? This will permanently delete {{systemCount}} heating system(s), {{monthlyCount}} monthly values and {{measurementCount}} measurements. This action cannot be undone!",
@@ -553,7 +555,8 @@ const resources = {
         outdoorTempMin: "Outdoor temperature min",
         outdoorTempMax: "Outdoor temperature max",
         flowTempAvg: "Flow temperature avg",
-        errorCopLessThanOne: "COP < 1 (thermal energy must be ≥ electrical energy)",
+        errorCopLessThanOne:
+          "COP < 1 (thermal energy must be ≥ electrical energy)",
         errorHeatingExceedsTotal: "Heating cannot exceed total",
       },
     },
