@@ -44,10 +44,8 @@ export default function Daily() {
       cols.usedForHeating,
       cols.usedForDhw,
       cols.usedForCooling,
-      cols.thermalEnergy,
-      cols.electricalEnergy,
-      cols.thermalEnergyHeating,
-      cols.electricalEnergyHeating,
+      cols.az,
+      cols.azHeating,
       cols.outdoorTemperature,
       cols.flowTemperature,
     ];
@@ -219,7 +217,6 @@ export default function Daily() {
             "23",
           ]}
           aggregateData={true}
-          averageAz={true}
         />
       }
     >

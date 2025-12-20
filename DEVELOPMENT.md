@@ -271,6 +271,52 @@ Files are optimized with:
 3. jsDelivr serves these files from the release assets
 4. No need to commit build files to the repository!
 
+## 📦 Release Process
+
+### Creating a Release
+
+The version number is defined in `package.json`.
+To create a new release:
+
+```bash
+# 1. Update version in package.json (e.g., "1.0.7")
+# 2. Commit the version change
+git add package.json
+git commit -m "chore: bump version to 1.0.7"
+
+# 3. Create and push the tag automatically
+npm run release
+```
+
+This will:
+
+- Create a git tag using the version from `package.json` (e.g., `v1.0.7`)
+- Push the tag to GitHub
+- Trigger GitHub Actions to build and create a release
+
+### What Happens After Tagging
+
+1. **GitHub Actions** automatically:
+
+   - Runs `npm run build`
+   - Creates a GitHub Release with the tag name
+   - Attaches `app.js` and `app.css` to the release
+   - Generates release notes
+
+2. **jsDelivr CDN** automatically:
+   - Mirrors the release files within minutes
+   - Makes them available at:
+     - Latest: `https://cdn.jsdelivr.net/gh/bosch-buderus-wp/heatpump-metrics-ui@latest/app.js`
+     - Specific: `https://cdn.jsdelivr.net/gh/bosch-buderus-wp/heatpump-metrics-ui@v1.0.7/app.js`
+
+### Version Numbering
+
+Follow [Semantic Versioning](https://semver.org/):
+
+- **Major** (1.x.x): Breaking changes
+- **Minor** (x.1.x): New features (backward compatible)
+- **Patch** (x.x.1): Bug fixes
+
 ## 🗄️ Database Setup
 
 ### Schema

@@ -7,10 +7,6 @@ export interface ChartDataRow {
   [key: string]: string | number | null | undefined;
   az?: number | null;
   az_heating?: number | null;
-  electrical_energy_kwh?: number | null;
-  thermal_energy_kwh?: number | null;
-  electrical_energy_heating_kwh?: number | null;
-  thermal_energy_heating_kwh?: number | null;
 }
 
 interface AzBarChartProps {
@@ -19,8 +15,7 @@ interface AzBarChartProps {
   indexLabel: string; // e.g., "common.month" or "common.date"
   indexValues?: string[]; // Optional: predefined index values like ["1", "2", ..., "12"] for months
   indexFormatter?: (value: string) => string; // Optional: format index labels (e.g., date formatting)
-  aggregateData?: boolean; // If true, aggregate across multiple systems
-  averageAz?: boolean; // If true, average AZ values instead of summing energies
+  aggregateData?: boolean; // If true, aggregate (average) AZ values across multiple systems
   barColor?: string; // Optional: custom bar color (default: '#f47560')
 }
 
@@ -31,7 +26,6 @@ export default function AzBarChart({
   indexValues,
   indexFormatter,
   aggregateData = true,
-  averageAz = false,
   barColor = "#23a477ff",
 }: AzBarChartProps) {
   const { t } = useTranslation();
@@ -44,7 +38,7 @@ export default function AzBarChart({
     if (!data || data.length === 0) return [];
 
     if (!aggregateData) {
-      // Direct mapping without aggregation
+      // Direct mapping without aggregation - pass through AZ values as-is
       return data.map((item) => {
         const indexValue = item[indexField];
         const formattedIndex =
@@ -57,75 +51,12 @@ export default function AzBarChart({
       });
     }
 
-    if (averageAz) {
-      // Average AZ values across systems for each index
-      const grouped: Record<
-        string,
-        {
-          az_values: number[];
-          az_heating_values: number[];
-        }
-      > = {};
-
-      for (const r of data) {
-        const indexValue = r[indexField];
-        if (indexValue == null) continue; // Skip null/undefined index values
-        const key = String(indexValue);
-
-        if (!grouped[key]) {
-          grouped[key] = { az_values: [], az_heating_values: [] };
-        }
-
-        if (r.az !== undefined && r.az !== null && r.az > 0) {
-          grouped[key].az_values.push(r.az);
-        }
-        if (r.az_heating !== undefined && r.az_heating !== null && r.az_heating > 0) {
-          grouped[key].az_heating_values.push(r.az_heating);
-        }
-      }
-
-      // Use provided index values or extract from grouped data
-      const indices = indexValues || Object.keys(grouped).sort();
-
-      return indices
-        .map((idx) => {
-          const d = grouped[idx];
-          if (!d || (d.az_values.length === 0 && d.az_heating_values.length === 0)) {
-            return {
-              [indexField]: indexFormatter ? indexFormatter(idx) : idx,
-              [azTotalKey]: 0,
-              [azHeatingKey]: 0,
-            };
-          }
-
-          const azAvg =
-            d.az_values.length > 0
-              ? d.az_values.reduce((sum, val) => sum + val, 0) / d.az_values.length
-              : 0;
-          const azHeatingAvg =
-            d.az_heating_values.length > 0
-              ? d.az_heating_values.reduce((sum, val) => sum + val, 0) / d.az_heating_values.length
-              : 0;
-
-          return {
-            [indexField]: indexFormatter ? indexFormatter(idx) : idx,
-            [azTotalKey]: azAvg ? Number(azAvg.toFixed(2)) : 0,
-            [azHeatingKey]: azHeatingAvg ? Number(azHeatingAvg.toFixed(2)) : 0,
-          };
-        })
-        .filter(
-          (d) => ((d[azTotalKey] as number) || 0) > 0 || ((d[azHeatingKey] as number) || 0) > 0,
-        );
-    }
-
-    // Aggregate across multiple systems by summing energies
+    // Aggregate data: average AZ values across multiple systems for each index
     const grouped: Record<
       string,
       {
-        e_cons_total: number;
-        e_prod_total: number;
-        e_cons_h: number;
-        e_prod_h: number;
+        az_values: number[];
+        az_heating_values: number[];
       }
     > = {};
 
@@ -135,18 +66,15 @@ export default function AzBarChart({
       const key = String(indexValue);
 
       if (!grouped[key]) {
-        grouped[key] = { e_cons_total: 0, e_prod_total: 0, e_cons_h: 0, e_prod_h: 0 };
+        grouped[key] = { az_values: [], az_heating_values: [] };
       }
 
-      const e_cons_h = r.electrical_energy_heating_kwh ?? 0;
-      const e_prod_h = r.thermal_energy_heating_kwh ?? 0;
-      const e_cons_total = r.electrical_energy_kwh ?? 0;
-      const e_prod_total = r.thermal_energy_kwh ?? 0;
-
-      grouped[key].e_cons_h += e_cons_h;
-      grouped[key].e_prod_h += e_prod_h;
-      grouped[key].e_cons_total += e_cons_total;
-      grouped[key].e_prod_total += e_prod_total;
+      if (r.az !== undefined && r.az !== null && r.az > 0) {
+        grouped[key].az_values.push(r.az);
+      }
+      if (r.az_heating !== undefined && r.az_heating !== null && r.az_heating > 0) {
+        grouped[key].az_heating_values.push(r.az_heating);
+      }
     }
 
     // Use provided index values or extract from grouped data
@@ -155,35 +83,33 @@ export default function AzBarChart({
     return indices
       .map((idx) => {
         const d = grouped[idx];
-        if (!d)
+        if (!d || (d.az_values.length === 0 && d.az_heating_values.length === 0)) {
           return {
             [indexField]: indexFormatter ? indexFormatter(idx) : idx,
             [azTotalKey]: 0,
             [azHeatingKey]: 0,
           };
+        }
 
-        const az = d.e_cons_total > 0 ? d.e_prod_total / d.e_cons_total : 0;
-        const azHeating = d.e_cons_h > 0 ? d.e_prod_h / d.e_cons_h : 0;
+        const azAvg =
+          d.az_values.length > 0
+            ? d.az_values.reduce((sum, val) => sum + val, 0) / d.az_values.length
+            : 0;
+        const azHeatingAvg =
+          d.az_heating_values.length > 0
+            ? d.az_heating_values.reduce((sum, val) => sum + val, 0) / d.az_heating_values.length
+            : 0;
 
         return {
           [indexField]: indexFormatter ? indexFormatter(idx) : idx,
-          [azTotalKey]: az ? Number(az.toFixed(2)) : 0,
-          [azHeatingKey]: azHeating ? Number(azHeating.toFixed(2)) : 0,
+          [azTotalKey]: azAvg ? Number(azAvg.toFixed(2)) : 0,
+          [azHeatingKey]: azHeatingAvg ? Number(azHeatingAvg.toFixed(2)) : 0,
         };
       })
       .filter(
         (d) => ((d[azTotalKey] as number) || 0) > 0 || ((d[azHeatingKey] as number) || 0) > 0,
       );
-  }, [
-    data,
-    indexField,
-    indexValues,
-    indexFormatter,
-    aggregateData,
-    averageAz,
-    azTotalKey,
-    azHeatingKey,
-  ]);
+  }, [data, indexField, indexValues, indexFormatter, aggregateData, azTotalKey, azHeatingKey]);
 
   const handleLegendClick = (datum: { id: string }) => {
     // Toggle to the clicked key
