@@ -67,88 +67,72 @@ export default function Daily() {
     },
   });
 
-  // Sort data (not used)
+  // Sort data
+  // Calculate AZ from differences for each measurement
   const sortedData = useMemo(() => {
     if (!data) return [];
-    return data;
-  }, [data]);
 
-  // Calculate hourly aggregated data with AZ from differences
-  const hourlyData = useMemo(() => {
-    if (!filteredData || filteredData.length === 0) return [];
-
-    // Group data by heating system and hour
-    const grouped: Record<string, Record<number, MeasurementRow[]>> = {};
-
-    for (const row of filteredData) {
+    // Group by heating_id and sort by time
+    const grouped: Record<string, MeasurementRow[]> = {};
+    for (const row of data) {
       const heatingId = row.heating_id;
-      const hour = dayjs(row.created_at).hour();
-
       if (!grouped[heatingId]) {
-        grouped[heatingId] = {};
+        grouped[heatingId] = [];
       }
-      if (!grouped[heatingId][hour]) {
-        grouped[heatingId][hour] = [];
-      }
-      grouped[heatingId][hour].push(row);
+      grouped[heatingId].push(row);
     }
 
-    // Calculate AZ for each heating system and hour based on differences
-    const hourlyResults: Array<Record<string, unknown>> = [];
+    // Calculate AZ for each row based on difference from previous measurement
+    const enrichedData: Array<
+      MeasurementRow & { az?: number; az_heating?: number; hour?: string }
+    > = [];
 
     for (const heatingId of Object.keys(grouped)) {
-      const hours = Object.keys(grouped[heatingId])
-        .map(Number)
-        .sort((a, b) => a - b);
+      const measurements = grouped[heatingId].sort(
+        (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
+      );
 
-      for (let i = 0; i < hours.length; i++) {
-        const currentHour = hours[i];
-        const currentMeasurements = grouped[heatingId][currentHour];
+      for (let i = 0; i < measurements.length; i++) {
+        const current = measurements[i];
+        const enriched: MeasurementRow & { az?: number; az_heating?: number; hour?: string } = {
+          ...current,
+        };
 
-        // Get last measurement of current hour
-        const currentLast = currentMeasurements[currentMeasurements.length - 1];
+        // Add hour field for chart grouping
+        enriched.hour = dayjs(current.created_at).hour().toString();
 
-        // Find previous hour's last measurement
-        let previousLast = null;
-        for (let j = i - 1; j >= 0; j--) {
-          const prevHourMeasurements = grouped[heatingId][hours[j]];
-          if (prevHourMeasurements && prevHourMeasurements.length > 0) {
-            previousLast = prevHourMeasurements[prevHourMeasurements.length - 1];
-            break;
-          }
-        }
+        if (i > 0) {
+          const previous = measurements[i - 1];
 
-        if (previousLast && currentLast) {
           // Calculate differences
           const deltaETotal =
-            (currentLast.electrical_energy_kwh || 0) - (previousLast.electrical_energy_kwh || 0);
+            (current.electrical_energy_kwh || 0) - (previous.electrical_energy_kwh || 0);
           const deltaTTotal =
-            (currentLast.thermal_energy_kwh || 0) - (previousLast.thermal_energy_kwh || 0);
+            (current.thermal_energy_kwh || 0) - (previous.thermal_energy_kwh || 0);
           const deltaEHeating =
-            (currentLast.electrical_energy_heating_kwh || 0) -
-            (previousLast.electrical_energy_heating_kwh || 0);
+            (current.electrical_energy_heating_kwh || 0) -
+            (previous.electrical_energy_heating_kwh || 0);
           const deltaTHeating =
-            (currentLast.thermal_energy_heating_kwh || 0) -
-            (previousLast.thermal_energy_heating_kwh || 0);
+            (current.thermal_energy_heating_kwh || 0) - (previous.thermal_energy_heating_kwh || 0);
 
-          // Calculate AZ
-          const az = deltaETotal > 0 ? deltaTTotal / deltaETotal : 0;
-          const azHeating = deltaEHeating > 0 ? deltaTHeating / deltaEHeating : 0;
-
-          hourlyResults.push({
-            hour: currentHour.toString(),
-            heating_id: heatingId,
-            az: az,
-            az_heating: azHeating,
-            outdoor_temperature_c: currentLast.outdoor_temperature_c,
-            flow_temperature_c: currentLast.flow_temperature_c,
-          });
+          // Calculate AZ from differences
+          enriched.az = deltaETotal > 0 ? deltaTTotal / deltaETotal : undefined;
+          enriched.az_heating = deltaEHeating > 0 ? deltaTHeating / deltaEHeating : undefined;
+        } else {
+          // First measurement has no previous data
+          enriched.az = undefined;
+          enriched.az_heating = undefined;
         }
+
+        enrichedData.push(enriched);
       }
     }
 
-    return hourlyResults;
-  }, [filteredData]);
+    // Sort by date descending (newest first) for display
+    return enrichedData.sort(
+      (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+    );
+  }, [data]);
 
   return (
     <PageLayout
@@ -187,7 +171,7 @@ export default function Daily() {
       }
       chart={
         <AzBarChart
-          data={hourlyData as ChartDataRow[]}
+          data={filteredData as ChartDataRow[]}
           indexField="hour"
           indexLabel="common.hour"
           indexValues={[

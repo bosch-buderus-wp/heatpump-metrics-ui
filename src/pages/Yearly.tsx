@@ -6,7 +6,7 @@ import { supabase } from "../lib/supabaseClient";
 import { AzBarChart, type ChartDataRow } from "../components/common/charts";
 import { PageLayout } from "../components/common/layout";
 import { DataGridWrapper } from "../components/common/data-grid";
-import { getAllDataGridColumns, commonHiddenColumns } from "../lib/tableHelpers";
+import { getAllDataGridColumns, commonHiddenColumns, computeAz } from "../lib/tableHelpers";
 
 export default function Yearly() {
   const { t } = useTranslation();
@@ -68,10 +68,19 @@ export default function Yearly() {
     return y;
   }, []);
 
-  // Sort data (not used)
+  // Calculate AZ values from energy data and prepare for display
   const sortedData = useMemo(() => {
     if (!data) return [];
-    return data;
+
+    // Add calculated AZ values to each row using the shared computeAz function
+    return data.map((row) => {
+      const { az, azHeating } = computeAz(row);
+      return {
+        ...row,
+        az,
+        az_heating: azHeating,
+      };
+    });
   }, [data]);
 
   return (
