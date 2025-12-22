@@ -210,6 +210,61 @@ p.MuiTablePagination-displayedRows {
   font-size: 0.9rem;
 }
 
+/* Chart Tooltip Styles */
+.chart-tooltip {
+  background: white;
+  padding: 9px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  min-width: 200px;
+}
+
+.chart-tooltip-header {
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.chart-tooltip-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
+  white-space: nowrap;
+}
+
+.chart-tooltip-item:last-child {
+  margin-bottom: 0;
+}
+
+.chart-tooltip-indicator {
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+.chart-tooltip-indicator-bar {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+
+.chart-tooltip-indicator-line {
+  width: 12px;
+  height: 2px;
+}
+
+.chart-tooltip-indicator-outdoor {
+  background-color: #3b82f6;
+}
+
+.chart-tooltip-indicator-flow {
+  background-color: #ef4444;
+}
+
+.chart-tooltip-text {
+  font-size: 13px;
+  white-space: nowrap;
+}
+
 .card {
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 0.7rem;

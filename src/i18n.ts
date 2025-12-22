@@ -51,6 +51,9 @@ const resources = {
         az: "Arbeitszahl",
         azTotal: "Arbeitszahl (gesamt)",
         azHeating: "Arbeitszahl (Heizung)",
+        temperature: "Temperatur",
+        outdoorTemperature: "Außentemperatur",
+        flowTemperature: "Vorlauftemperatur",
       },
       toolbar: {
         columns: "Spalten",
@@ -342,6 +345,9 @@ const resources = {
         az: "COP",
         azTotal: "COP (total)",
         azHeating: "COP (heating)",
+        temperature: "Temperature",
+        outdoorTemperature: "Outdoor Temperature",
+        flowTemperature: "Flow Temperature",
       },
       toolbar: {
         columns: "Columns",

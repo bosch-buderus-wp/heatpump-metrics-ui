@@ -79,7 +79,7 @@ export function getAllDataGridColumns(t: TFunction): Record<string, GridColDef> 
     name: {
       field: "name",
       headerName: t("tableHeaders.system"),
-      width: 150,
+      width: 170,
       valueGetter: (_value, row) => row.heating_systems?.name ?? row.name ?? "-",
     },
     heatingType: {
