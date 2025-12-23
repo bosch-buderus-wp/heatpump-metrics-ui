@@ -181,6 +181,7 @@ export default function AzBarChart({
   }, [chartData]);
 
   // Wrapper for the temperature line layer that passes necessary props
+  // biome-ignore lint/suspicious/noExplicitAny: Nivo's layer props are complex and not well-typed
   const temperatureLineLayer = (props: any) => (
     <TemperatureLineLayer
       {...props}
@@ -196,6 +197,7 @@ export default function AzBarChart({
   const currentActiveKey = activeKey || defaultActiveKey;
 
   // Custom tooltip to show AZ and temperature values
+  // biome-ignore lint/suspicious/noExplicitAny: Nivo's tooltip props are complex and not well-typed
   const customTooltip = ({ id, value, color, indexValue }: any) => {
     // Find the data point for this bar
     const dataPoint = chartData.find((d) => d[indexField] === indexValue);

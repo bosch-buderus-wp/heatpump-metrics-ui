@@ -1,12 +1,16 @@
 import { useTranslation } from "react-i18next";
 
 interface TemperatureLineLayerProps {
+  // biome-ignore lint/suspicious/noExplicitAny: Nivo's bar type is complex and not exported
   bars: any[];
+  // biome-ignore lint/suspicious/noExplicitAny: Nivo's scale types are complex and not exported
   xScale: any;
+  // biome-ignore lint/suspicious/noExplicitAny: Nivo's scale types are complex and not exported
   yScale: any;
   innerWidth: number;
   innerHeight: number;
   chartData: Array<{
+    // biome-ignore lint/suspicious/noExplicitAny: Flexible data structure for chart data with dynamic fields
     [key: string]: any;
     outdoor_temp?: number | null;
     flow_temp?: number | null;

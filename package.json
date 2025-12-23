@@ -56,7 +56,7 @@
       "biome lint --write",
       "bash -c 'tsc --noEmit'"
     ],
-    "*.{json,md}": [
+    "*.{json}": [
       "biome format --write"
     ]
   }

@@ -53,7 +53,7 @@ A community-driven platform for visualizing and analyzing heat pump efficiency m
 
 ### For End Users
 
-Visit the live application: [Heatpump Metrics](https://bosch-buderus-wp.github.io/heatpump-metrics-ui)
+Visit the live application: [Heatpump Metrics](https://bosch-buderus-wp.github.io/metrics)
 
 ### For Developers
 
@@ -186,8 +186,8 @@ Output: Single-file bundle (`app.js` + `app.css`) optimized for CDN distribution
 
 ### Planned Features
 
-- [ ] Outdoor temperature in charts
 - [ ] Allow users to filter for similar heating_systems
+- [ ] Gain automatic insights from data, e.g. average COP/AZ dependency on outdoor/flow temperature
 - [ ] Average/min/max temperature from weather APIs
 - [ ] Standard outdoor temperature (NAT) from waermepumpe.de
 - [ ] COP/AZ histogram visualization
