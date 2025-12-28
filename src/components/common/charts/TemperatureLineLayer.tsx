@@ -106,7 +106,11 @@ export default function TemperatureLineLayer({
     const tickMin = Math.ceil(min / niceStep) * niceStep;
 
     for (let tick = tickMin; tick <= max; tick += niceStep) {
-      ticks.push(Math.round(tick));
+      const roundedTick = Math.round(tick);
+      // Only add if it's not already in the array (prevent duplicates)
+      if (!ticks.includes(roundedTick)) {
+        ticks.push(roundedTick);
+      }
     }
 
     return ticks;

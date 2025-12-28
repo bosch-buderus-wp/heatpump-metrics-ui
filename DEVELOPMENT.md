@@ -185,13 +185,21 @@ metrics/
    npm run lint      # Check for issues
    ```
 
-6. **Test the build**
+6. **Run tests**
+
+   ```bash
+   npm test          # Run all tests
+   ```
+
+   **Important:** Always run tests before committing to ensure your changes don't break existing functionality.
+
+7. **Test the build**
 
    ```bash
    npm run build     # Production build
    ```
 
-7. **Commit and push**
+8. **Commit and push**
    ```bash
    git add .
    git commit -m "feat: add new feature"
@@ -213,6 +221,11 @@ npm run build:prod       # Build for production (explicit)
 # Code Quality
 npm run lint             # Check code with Biome
 npm run format           # Auto-format code with Biome
+
+# Testing
+npm test                 # Run all tests once
+npm run test:ui          # Run tests with interactive UI
+npm run test:coverage    # Run tests with coverage report
 
 # TypeScript Type Checking
 npx tsc --noEmit         # Check TypeScript types without emitting files
@@ -244,6 +257,63 @@ The project uses **Husky** and **lint-staged** to automatically enforce code qua
 ```bash
 git commit --no-verify -m "Emergency commit"
 ```
+
+### Testing
+
+The project uses **Vitest** for unit and integration testing.
+
+**Running Tests:**
+
+```bash
+npm test                 # Run all tests once (used in CI/CD)
+npm run test:ui          # Run tests with interactive UI (great for development)
+npm run test:coverage    # Run tests with coverage report
+```
+
+**Test Structure:**
+
+Tests are located next to the components they test in `__tests__` directories:
+
+```
+src/
+├── components/
+│   ├── form/
+│   │   ├── MonthYearPicker.tsx
+│   │   └── __tests__/
+│   │       └── MonthYearPicker.test.tsx
+│   └── ui/
+│       ├── ActionBar.tsx
+│       └── __tests__/
+│           └── ActionBar.test.tsx
+```
+
+**When to Run Tests:**
+
+- ✅ **Before committing** - Ensure your changes don't break existing functionality
+- ✅ **After making changes** - Verify your code works as expected
+- ✅ **Before creating a PR** - All tests must pass
+- ✅ **During development** - Use `test:ui` for interactive testing
+
+**Writing Tests:**
+
+Use React Testing Library and Vitest. Example:
+
+```typescript
+import { render, screen } from '@testing-library/react';
+import { describe, it, expect } from 'vitest';
+import MyComponent from '../MyComponent';
+
+describe('MyComponent', () => {
+  it('renders correctly', () => {
+    render(<MyComponent />);
+    expect(screen.getByText('Hello')).toBeInTheDocument();
+  });
+});
+```
+
+**CI/CD:**
+
+Tests run automatically in the release workflow. If tests fail, the release will not be created.
 
 ## 🏗️ Build Process
 
