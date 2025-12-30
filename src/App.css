@@ -337,6 +337,8 @@ p.MuiTablePagination-displayedRows {
   text-align: center;
   padding: 1.5rem;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  max-width: none;
+  margin: 0;
 }
 
 .stats-card.clickable {
@@ -346,6 +348,11 @@ p.MuiTablePagination-displayedRows {
 .stats-card.clickable:hover {
   transform: translateY(-4px);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.stats-card.clickable:focus-visible {
+  outline: 2px solid #646cff;
+  outline-offset: 2px;
 }
 
 .stats-card-count {
