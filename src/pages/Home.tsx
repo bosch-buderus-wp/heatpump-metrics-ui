@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabaseClient";
 import { useTranslation, Trans } from "react-i18next";
 
@@ -7,14 +8,36 @@ interface StatsCardProps {
   count?: number;
   isLoading: boolean;
   error?: Error | null;
+  onClick?: () => void;
 }
 
-function StatsCard({ label, count, isLoading, error }: StatsCardProps) {
+function StatsCard({ label, count, isLoading, error, onClick }: StatsCardProps) {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (onClick && (e.key === "Enter" || e.key === " ")) {
+      e.preventDefault();
+      onClick();
+    }
+  };
+
+  if (onClick) {
+    return (
+      // biome-ignore lint/a11y/useSemanticElements: card component requires div for styling
+      <div
+        className="card stats-card clickable"
+        onClick={onClick}
+        onKeyDown={handleKeyDown}
+        role="button"
+        tabIndex={0}
+      >
+        <h3 className="stats-card-count">{isLoading ? "..." : error ? "-" : count}</h3>
+        <div className="muted">{label}</div>
+      </div>
+    );
+  }
+
   return (
-    <div className="card" style={{ textAlign: "center", padding: "1.5rem" }}>
-      <h3 style={{ margin: 0, fontSize: "2.5rem", fontWeight: "bold" }}>
-        {isLoading ? "..." : error ? "-" : count}
-      </h3>
+    <div className="card stats-card">
+      <h3 className="stats-card-count">{isLoading ? "..." : error ? "-" : count}</h3>
       <div className="muted">{label}</div>
     </div>
   );
@@ -22,6 +45,7 @@ function StatsCard({ label, count, isLoading, error }: StatsCardProps) {
 
 export default function Home() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   const statsQ = useQuery({
     queryKey: ["homeStats"],
@@ -41,34 +65,34 @@ export default function Home() {
   });
 
   return (
-    <div style={{ maxWidth: 800, margin: "0 auto", display: "grid", gap: "2rem" }}>
-      <section style={{ textAlign: "center" }}>
+    <div className="home-container">
+      <section className="home-intro">
         <h1>{t("home.title")}</h1>
-        <p style={{ fontSize: "1.2rem", lineHeight: 1.6 }}>{t("home.intro")}</p>
+        <p>{t("home.intro")}</p>
       </section>
 
-      <section
-        className="grid"
-        style={{ gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))" }}
-      >
+      <section className="home-stats-grid">
         <StatsCard
           label={t("home.stats.systems")}
           count={statsQ.data?.systems}
           isLoading={statsQ.isLoading}
+          onClick={() => navigate("/systems")}
         />
         <StatsCard
           label={t("home.stats.monthly")}
           count={statsQ.data?.monthly}
           isLoading={statsQ.isLoading}
+          onClick={() => navigate("/monthly")}
         />
         <StatsCard
           label={t("home.stats.measurements")}
           count={statsQ.data?.measurements}
           isLoading={statsQ.isLoading}
+          onClick={() => navigate("/daily")}
         />
       </section>
 
-      <div style={{ textAlign: "center", marginTop: "2rem" }}>
+      <div className="home-footer">
         <p className="muted">
           <Trans
             i18nKey="home.footer"

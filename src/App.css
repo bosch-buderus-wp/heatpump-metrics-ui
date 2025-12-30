@@ -309,3 +309,52 @@ p.MuiTablePagination-displayedRows {
   display: grid;
   gap: 0.5rem;
 }
+
+/* Home Page Styles */
+.home-container {
+  max-width: 800px;
+  margin: 0 auto;
+  display: grid;
+  gap: 2rem;
+}
+
+.home-intro {
+  text-align: center;
+}
+
+.home-intro p {
+  font-size: 1.2rem;
+  line-height: 1.6;
+}
+
+.home-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.stats-card {
+  text-align: center;
+  padding: 1.5rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stats-card.clickable {
+  cursor: pointer;
+}
+
+.stats-card.clickable:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.stats-card-count {
+  margin: 0;
+  font-size: 2.5rem;
+  font-weight: bold;
+}
+
+.home-footer {
+  text-align: center;
+  margin-top: 2rem;
+}
