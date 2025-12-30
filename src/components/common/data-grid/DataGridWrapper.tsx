@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { DataGrid, type GridColDef, useGridApiRef } from "@mui/x-data-grid";
+import { DataGrid, type GridColDef, useGridApiRef, type GridFilterModel } from "@mui/x-data-grid";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { deDE } from "@mui/x-data-grid/locales";
 import { useSession } from "../layout/Layout";
@@ -13,6 +13,16 @@ interface DataGridWrapperProps<T = Record<string, unknown>> {
   getRowId: (row: T) => string | number;
   columnVisibilityModel?: Record<string, boolean>;
   onFilterChange?: (filteredData: T[]) => void;
+  // Comparison mode props
+  comparisonMode?: boolean;
+  activeGroup?: 1 | 2;
+  activeFilterModel?: GridFilterModel;
+  filterGroup1Count?: number;
+  filterGroup2Count?: number;
+  onFilterModelChange?: (model: GridFilterModel) => void;
+  onUpdateFilterGroup?: (group: 1 | 2, model: GridFilterModel) => void;
+  onSetActiveGroup?: (group: 1 | 2) => void;
+  onClearFilterGroup2?: () => void;
 }
 
 export function DataGridWrapper<T = Record<string, unknown>>({
@@ -22,6 +32,15 @@ export function DataGridWrapper<T = Record<string, unknown>>({
   getRowId,
   columnVisibilityModel,
   onFilterChange,
+  comparisonMode = false,
+  activeGroup = 1,
+  activeFilterModel,
+  filterGroup1Count = 0,
+  filterGroup2Count = 0,
+  onFilterModelChange: onFilterModelChangeFromProps,
+  onUpdateFilterGroup,
+  onSetActiveGroup,
+  onClearFilterGroup2,
 }: DataGridWrapperProps<T>) {
   const { session } = useSession();
   const apiRef = useGridApiRef();
@@ -37,6 +56,64 @@ export function DataGridWrapper<T = Record<string, unknown>>({
       onFilterChange(filteredData);
     }
   }, [filteredData, onFilterChange]);
+
+  // Handle filter model changes - always use comparison mode handler if provided
+  const handleFilterChange = (model: GridFilterModel) => {
+    // Always call the hook's handler to update filtered data for charts
+    handleFilterModelChange(model);
+
+    // Also call the comparison mode handler if provided
+    if (onFilterModelChangeFromProps) {
+      onFilterModelChangeFromProps(model);
+    }
+  };
+
+  // Sync filter model when switching groups or when activeFilterModel changes
+  // biome-ignore lint/correctness/useExhaustiveDependencies: activeGroup is needed to trigger on group switch
+  useEffect(() => {
+    if (apiRef.current && activeFilterModel) {
+      apiRef.current.setFilterModel(activeFilterModel);
+    }
+  }, [comparisonMode, activeGroup, activeFilterModel, apiRef]);
+
+  // Handle filter group button clicks
+  const handleFilterGroup1Click = () => {
+    if (apiRef.current && onSetActiveGroup) {
+      const currentModel = apiRef.current.state.filter.filterModel;
+
+      // Save current filter model to the CURRENT active group before switching
+      if (onUpdateFilterGroup && activeGroup !== 1) {
+        onUpdateFilterGroup(activeGroup, currentModel);
+      }
+
+      // Always switch to group 1 immediately - the sync effect will handle applying filters
+      onSetActiveGroup(1);
+
+      // Open filter panel after a brief delay to allow state update and sync
+      setTimeout(() => {
+        apiRef.current?.showFilterPanel();
+      }, 100);
+    }
+  };
+
+  const handleFilterGroup2Click = () => {
+    if (apiRef.current && onSetActiveGroup) {
+      const currentModel = apiRef.current.state.filter.filterModel;
+
+      // Save current filter model to the CURRENT active group before switching
+      if (onUpdateFilterGroup && activeGroup !== 2) {
+        onUpdateFilterGroup(activeGroup, currentModel);
+      }
+
+      // Always switch to group 2 immediately - the sync effect will handle applying filters
+      onSetActiveGroup(2);
+
+      // Open filter panel after a brief delay to allow state update and sync
+      setTimeout(() => {
+        apiRef.current?.showFilterPanel();
+      }, 100);
+    }
+  };
 
   const theme = createTheme(
     {
@@ -62,7 +139,7 @@ export function DataGridWrapper<T = Record<string, unknown>>({
               columnVisibilityModel: columnVisibilityModel || {},
             },
           }}
-          onFilterModelChange={handleFilterModelChange}
+          onFilterModelChange={handleFilterChange}
           pageSizeOptions={[10, 25, 50, 100]}
           disableRowSelectionOnClick
           showCellVerticalBorder
@@ -73,8 +150,17 @@ export function DataGridWrapper<T = Record<string, unknown>>({
             toolbar: DataGridToolbar as any,
           }}
           slotProps={{
-            // biome-ignore lint/suspicious/noExplicitAny: Custom userId prop not in MUI's type definition
-            toolbar: { userId: session?.user?.id } as any,
+            toolbar: {
+              userId: session?.user?.id,
+              comparisonMode,
+              activeGroup,
+              filterGroup1Count,
+              filterGroup2Count,
+              onFilterGroup1Click: handleFilterGroup1Click,
+              onFilterGroup2Click: handleFilterGroup2Click,
+              onClearFilterGroup2,
+              // biome-ignore lint/suspicious/noExplicitAny: Custom comparison props not in MUI's type definition
+            } as any,
           }}
           sx={{ border: "none" }}
         />

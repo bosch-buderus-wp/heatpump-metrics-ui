@@ -7,6 +7,8 @@ import { AzBarChart, type ChartDataRow } from "../components/common/charts";
 import { PageLayout } from "../components/common/layout";
 import { DataGridWrapper } from "../components/common/data-grid";
 import { getAllDataGridColumns, commonHiddenColumns, computeAz } from "../lib/tableHelpers";
+import { useComparisonMode } from "../hooks/useComparisonMode";
+import { flattenHeatingSystemsFields } from "../lib/dataTransformers";
 
 export default function Yearly() {
   const { t } = useTranslation();
@@ -73,15 +75,24 @@ export default function Yearly() {
     if (!data) return [];
 
     // Add calculated AZ values to each row using the shared computeAz function
+    // Also flatten heating_systems fields to top level for filtering
     return data.map((row) => {
       const { az, azHeating } = computeAz(row);
-      return {
+      return flattenHeatingSystemsFields({
         ...row,
         az,
         az_heating: azHeating,
-      };
+      });
     });
   }, [data]);
+
+  // Comparison mode hook - handles all filter logic
+  const {
+    comparisonMode,
+    comparisonGroupsForChart,
+    filteredDataForChart,
+    dataGridComparisonProps,
+  } = useComparisonMode(sortedData);
 
   return (
     <PageLayout
@@ -107,7 +118,8 @@ export default function Yearly() {
       }
       chart={
         <AzBarChart
-          data={filteredData as ChartDataRow[]}
+          data={comparisonMode ? [] : ((filteredDataForChart || filteredData) as ChartDataRow[])}
+          comparisonGroups={comparisonGroupsForChart}
           indexField="month"
           indexLabel="common.month"
           indexValues={["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]}
@@ -126,6 +138,7 @@ export default function Yearly() {
         }
         columnVisibilityModel={commonHiddenColumns}
         onFilterChange={handleFilterChange}
+        {...dataGridComparisonProps}
       />
     </PageLayout>
   );

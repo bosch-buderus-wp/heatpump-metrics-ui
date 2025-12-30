@@ -4,7 +4,6 @@ import {
   Toolbar,
   ToolbarButton,
   ColumnsPanelTrigger,
-  FilterPanelTrigger,
   ExportCsv,
   ExportPrint,
   QuickFilter,
@@ -13,7 +12,17 @@ import {
   QuickFilterTrigger,
   useGridApiContext,
 } from "@mui/x-data-grid";
-import { Tooltip, Menu, MenuItem, Badge, Divider, TextField, InputAdornment } from "@mui/material";
+import {
+  Tooltip,
+  Menu,
+  MenuItem,
+  Badge,
+  Divider,
+  TextField,
+  InputAdornment,
+  Box,
+  Typography,
+} from "@mui/material";
 import ViewColumnIcon from "@mui/icons-material/ViewColumn";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
@@ -21,9 +30,18 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import SearchIcon from "@mui/icons-material/Search";
 import PersonIcon from "@mui/icons-material/Person";
 import { useTranslation } from "react-i18next";
+import { COMPARISON_COLORS } from "../../../hooks/useComparisonFilters";
 
 interface DataGridToolbarInternalProps {
   userId?: string | null;
+  // Comparison mode props
+  comparisonMode?: boolean;
+  activeGroup?: 1 | 2;
+  filterGroup1Count?: number;
+  filterGroup2Count?: number;
+  onFilterGroup1Click?: () => void;
+  onFilterGroup2Click?: () => void;
+  onClearFilterGroup2?: () => void;
 }
 
 type OwnerState = {
@@ -57,7 +75,16 @@ const StyledTextField = styled(TextField)<{
   transition: theme.transitions.create(["width", "opacity"]),
 }));
 
-function DataGridToolbarInternal({ userId }: DataGridToolbarInternalProps) {
+function DataGridToolbarInternal({
+  userId,
+  comparisonMode = false,
+  activeGroup = 1,
+  filterGroup1Count = 0,
+  filterGroup2Count = 0,
+  onFilterGroup1Click,
+  onFilterGroup2Click,
+  onClearFilterGroup2,
+}: DataGridToolbarInternalProps) {
   const { t } = useTranslation();
   const apiRef = useGridApiContext();
   const [exportMenuOpen, setExportMenuOpen] = useState(false);
@@ -123,17 +150,65 @@ function DataGridToolbarInternal({ userId }: DataGridToolbarInternalProps) {
         </ColumnsPanelTrigger>
       </Tooltip>
 
-      <Tooltip title={t("toolbar.filters")}>
-        <FilterPanelTrigger
-          render={(props, state) => (
-            <ToolbarButton {...props} color="default">
-              <Badge badgeContent={state.filterCount} color="primary" variant="dot">
-                <FilterListIcon fontSize="small" />
-              </Badge>
-            </ToolbarButton>
-          )}
-        />
+      {/* Comparison Filter Groups */}
+      <Tooltip title={comparisonMode ? t("toolbar.filter1") : t("toolbar.filters")}>
+        <Box
+          sx={{
+            border: activeGroup === 1 ? `2px solid ${COMPARISON_COLORS.group1}` : "none",
+            borderRadius: 1,
+            display: "inline-flex",
+          }}
+        >
+          <ToolbarButton onClick={onFilterGroup1Click}>
+            <Badge badgeContent={filterGroup1Count} color="success" variant="dot">
+              <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                <FilterListIcon fontSize="small" sx={{ color: COMPARISON_COLORS.group1 }} />
+                {comparisonMode && (
+                  <Typography
+                    variant="caption"
+                    sx={{ color: COMPARISON_COLORS.group1, fontWeight: "bold" }}
+                  >
+                    1
+                  </Typography>
+                )}
+              </Box>
+            </Badge>
+          </ToolbarButton>
+        </Box>
       </Tooltip>
+
+      <Tooltip title={t("toolbar.filter2")}>
+        <Box
+          sx={{
+            border: activeGroup === 2 ? `2px solid ${COMPARISON_COLORS.group2}` : "none",
+            borderRadius: 1,
+            opacity: comparisonMode ? 1 : 0.5,
+            display: "inline-flex",
+          }}
+        >
+          <ToolbarButton onClick={onFilterGroup2Click}>
+            <Badge badgeContent={filterGroup2Count} color="success" variant="dot">
+              <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                <FilterListIcon fontSize="small" sx={{ color: COMPARISON_COLORS.group2 }} />
+                <Typography
+                  variant="caption"
+                  sx={{ color: COMPARISON_COLORS.group2, fontWeight: "bold" }}
+                >
+                  2
+                </Typography>
+              </Box>
+            </Badge>
+          </ToolbarButton>
+        </Box>
+      </Tooltip>
+
+      {comparisonMode && onClearFilterGroup2 && (
+        <Tooltip title={t("toolbar.clearFilter2")}>
+          <ToolbarButton onClick={onClearFilterGroup2} size="small">
+            <CancelIcon fontSize="small" sx={{ color: COMPARISON_COLORS.group2 }} />
+          </ToolbarButton>
+        </Tooltip>
+      )}
 
       <Divider orientation="vertical" variant="middle" flexItem sx={{ mx: 0.5 }} />
 
@@ -246,6 +321,6 @@ function DataGridToolbarInternal({ userId }: DataGridToolbarInternalProps) {
 }
 
 // Export the toolbar component directly with proper typing
-export const DataGridToolbar: React.FC<DataGridToolbarInternalProps> = ({ userId }) => {
-  return <DataGridToolbarInternal userId={userId} />;
+export const DataGridToolbar: React.FC<DataGridToolbarInternalProps> = (props) => {
+  return <DataGridToolbarInternal {...props} />;
 };

@@ -32,6 +32,14 @@ import {
   getSwOduLabel,
   getBuildingTypeLabel,
   getBuildingEnergyStandardLabel,
+  HEATING_TYPE_VALUES,
+  MODEL_IDU_VALUES,
+  MODEL_ODU_VALUES,
+  SW_IDU_VALUES,
+  SW_ODU_VALUES,
+  BUILDING_TYPE_VALUES,
+  BUILDING_ENERGY_STANDARD_VALUES,
+  getEnumOptions,
 } from "./enumCatalog";
 
 interface EnergyRow {
@@ -86,22 +94,28 @@ export function getAllDataGridColumns(t: TFunction): Record<string, GridColDef> 
       field: "heating_type",
       headerName: t("tableHeaders.heatingType"),
       width: 130,
-      valueGetter: (_value, row) =>
-        getHeatingTypeLabel(t, row.heating_systems?.heating_type ?? row.heating_type),
+      valueGetter: (_value, row) => row.heating_systems?.heating_type ?? row.heating_type,
+      valueFormatter: (value: string) => getHeatingTypeLabel(t, value),
+      type: "singleSelect",
+      valueOptions: getEnumOptions(t, "models.heating_type", HEATING_TYPE_VALUES),
     },
     modelIdu: {
       field: "model_idu",
       headerName: t("tableHeaders.modelIdu"),
       width: 160,
-      valueGetter: (_value, row) =>
-        getModelIduLabel(t, row.heating_systems?.model_idu ?? row.model_idu),
+      valueGetter: (_value, row) => row.heating_systems?.model_idu ?? row.model_idu,
+      valueFormatter: (value: string) => getModelIduLabel(t, value),
+      type: "singleSelect",
+      valueOptions: getEnumOptions(t, "models.model_idu", MODEL_IDU_VALUES),
     },
     modelOdu: {
       field: "model_odu",
       headerName: t("tableHeaders.modelOdu"),
       width: 60,
-      valueGetter: (_value, row) =>
-        getModelOduLabel(t, row.heating_systems?.model_odu ?? row.model_odu),
+      valueGetter: (_value, row) => row.heating_systems?.model_odu ?? row.model_odu,
+      valueFormatter: (value: string) => getModelOduLabel(t, value),
+      type: "singleSelect",
+      valueOptions: getEnumOptions(t, "models.model_odu", MODEL_ODU_VALUES),
     },
 
     // Time-based columns
@@ -211,13 +225,19 @@ export function getAllDataGridColumns(t: TFunction): Record<string, GridColDef> 
       field: "sw_idu",
       headerName: t("tableHeaders.swIdu"),
       width: 120,
-      valueGetter: (_value, row) => getSwIduLabel(t, row.heating_systems?.sw_idu ?? row.sw_idu),
+      valueGetter: (_value, row) => row.heating_systems?.sw_idu ?? row.sw_idu,
+      valueFormatter: (value: string) => getSwIduLabel(t, value),
+      type: "singleSelect",
+      valueOptions: getEnumOptions(t, "models.sw_idu", SW_IDU_VALUES),
     },
     swOdu: {
       field: "sw_odu",
       headerName: t("tableHeaders.swOdu"),
       width: 80,
-      valueGetter: (_value, row) => getSwOduLabel(t, row.heating_systems?.sw_odu ?? row.sw_odu),
+      valueGetter: (_value, row) => row.heating_systems?.sw_odu ?? row.sw_odu,
+      valueFormatter: (value: string) => getSwOduLabel(t, value),
+      type: "singleSelect",
+      valueOptions: getEnumOptions(t, "models.sw_odu", SW_ODU_VALUES),
     },
     heatingLoad: {
       field: "heating_load_kw",
@@ -258,8 +278,10 @@ export function getAllDataGridColumns(t: TFunction): Record<string, GridColDef> 
       field: "building_type",
       headerName: t("systemForm.buildingType"),
       width: 180,
-      valueGetter: (_value, row) =>
-        getBuildingTypeLabel(t, row.heating_systems?.building_type ?? row.building_type),
+      valueGetter: (_value, row) => row.heating_systems?.building_type ?? row.building_type,
+      valueFormatter: (value: string) => getBuildingTypeLabel(t, value),
+      type: "singleSelect",
+      valueOptions: getEnumOptions(t, "models.building_type", BUILDING_TYPE_VALUES),
     },
     country: {
       field: "country",
@@ -272,10 +294,14 @@ export function getAllDataGridColumns(t: TFunction): Record<string, GridColDef> 
       headerName: t("systemForm.buildingEnergyStandard"),
       width: 180,
       valueGetter: (_value, row) =>
-        getBuildingEnergyStandardLabel(
-          t,
-          row.heating_systems?.building_energy_standard ?? row.building_energy_standard,
-        ),
+        row.heating_systems?.building_energy_standard ?? row.building_energy_standard,
+      valueFormatter: (value: string) => getBuildingEnergyStandardLabel(t, value),
+      type: "singleSelect",
+      valueOptions: getEnumOptions(
+        t,
+        "models.building_energy_standard",
+        BUILDING_ENERGY_STANDARD_VALUES,
+      ),
     },
     usedForHeating: {
       field: "used_for_heating",

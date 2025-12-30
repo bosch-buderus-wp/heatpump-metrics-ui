@@ -9,6 +9,7 @@ import { PageLayout } from "../components/common/layout";
 import { DataGridWrapper } from "../components/common/data-grid";
 import { getAllDataGridColumns, commonHiddenColumns } from "../lib/tableHelpers";
 import { MonthYearPicker } from "../components/form";
+import { useComparisonMode } from "../hooks/useComparisonMode";
 
 type DailyValue = Database["public"]["Views"]["daily_values"]["Row"];
 
@@ -78,6 +79,14 @@ export default function Monthly() {
     setYear(val.year);
   }, []);
 
+  // Comparison mode hook - handles all filter logic
+  const {
+    comparisonMode,
+    comparisonGroupsForChart,
+    filteredDataForChart,
+    dataGridComparisonProps,
+  } = useComparisonMode(data);
+
   // Sort data (not used)
   const sortedData = useMemo(() => {
     if (!data) return [];
@@ -93,7 +102,8 @@ export default function Monthly() {
       filters={<MonthYearPicker month={month} year={year} onChange={handleMonthYearChange} />}
       chart={
         <AzBarChart
-          data={filteredData as ChartDataRow[]}
+          data={comparisonMode ? [] : ((filteredDataForChart || filteredData) as ChartDataRow[])}
+          comparisonGroups={comparisonGroupsForChart}
           indexField="date"
           indexLabel="common.date"
           indexFormatter={(date) => dayjs(date).format("DD")}
@@ -108,6 +118,7 @@ export default function Monthly() {
         getRowId={(row) => `${row.heating_id}-${row.date}`}
         columnVisibilityModel={commonHiddenColumns}
         onFilterChange={handleFilterChange}
+        {...dataGridComparisonProps}
       />
     </PageLayout>
   );

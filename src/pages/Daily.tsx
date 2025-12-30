@@ -8,6 +8,8 @@ import { AzBarChart, type ChartDataRow } from "../components/common/charts";
 import { PageLayout } from "../components/common/layout";
 import { DataGridWrapper } from "../components/common/data-grid";
 import { getAllDataGridColumns, commonHiddenColumns } from "../lib/tableHelpers";
+import { useComparisonMode } from "../hooks/useComparisonMode";
+import { flattenHeatingSystemsFields } from "../lib/dataTransformers";
 
 type MeasurementRow = Database["public"]["Tables"]["measurements"]["Row"];
 
@@ -124,7 +126,9 @@ export default function Daily() {
           enriched.az_heating = undefined;
         }
 
-        enrichedData.push(enriched);
+        // Flatten heating_systems fields to top level for filtering
+        const flattenedEnriched = flattenHeatingSystemsFields(enriched);
+        enrichedData.push(flattenedEnriched);
       }
     }
 
@@ -133,6 +137,14 @@ export default function Daily() {
       (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
     );
   }, [data]);
+
+  // Comparison mode hook - handles all filter logic
+  const {
+    comparisonMode,
+    comparisonGroupsForChart,
+    filteredDataForChart,
+    dataGridComparisonProps,
+  } = useComparisonMode(sortedData);
 
   return (
     <PageLayout
@@ -171,7 +183,8 @@ export default function Daily() {
       }
       chart={
         <AzBarChart
-          data={filteredData as ChartDataRow[]}
+          data={comparisonMode ? [] : ((filteredDataForChart || filteredData) as ChartDataRow[])}
+          comparisonGroups={comparisonGroupsForChart}
           indexField="hour"
           indexLabel="common.hour"
           indexValues={[
@@ -211,6 +224,7 @@ export default function Daily() {
         getRowId={(row) => row.id}
         columnVisibilityModel={commonHiddenColumns}
         onFilterChange={handleFilterChange}
+        {...dataGridComparisonProps}
       />
     </PageLayout>
   );
