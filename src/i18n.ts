@@ -55,6 +55,20 @@ const resources = {
         outdoorTemperature: "Außentemperatur",
         flowTemperature: "Vorlauftemperatur",
       },
+      charts: {
+        noData: "Keine Daten verfügbar",
+        azValue: "Arbeitszahl",
+        systems: "Anlagen",
+        mean: "Durchschnitt",
+        median: "Median",
+        viewMode: "Ansicht",
+        timeSeries: "Zeitverlauf",
+        distribution: "Verteilung",
+        temperatureDelta: "Temperaturdifferenz (Vorlauf - Außen)",
+        dailyCopStats: "Tagesarbeitszahl",
+        monthlyCopStats: "Monatsarbeitszahl",
+        yearlyCopStats: "Jahresarbeitszahl",
+      },
       toolbar: {
         columns: "Spalten anzeigen/verbergen",
         filters: "Füge einen Filter hinzu, um die Daten in Tabelle und Diagramm zu filtern.",
@@ -106,6 +120,10 @@ const resources = {
       daily: {
         title: "Tagesübersicht",
         info: "Alle stündlichen Werte aller in der Tabelle ausgewählten Heizungsanlagen.",
+      },
+      azTempEvaluation: {
+        title: "Arbeitszahl-Temperatur-Analyse",
+        info: "Streudiagramm zur Visualisierung des Zusammenhangs zwischen Arbeitszahl und Temperatur.",
       },
       auth: {
         email: "E-Mail",
@@ -326,6 +344,10 @@ const resources = {
         title: "Daily Overview",
         info: "All hourly values of all heating systems selected in the table.",
       },
+      azTempEvaluation: {
+        title: "COP-Temperature Analysis",
+        info: "Scatter plot visualizing the relationship between COP and temperature.",
+      },
       common: {
         date: "Date",
         time: "Time",
@@ -352,6 +374,20 @@ const resources = {
         temperature: "Temperature",
         outdoorTemperature: "Outdoor Temperature",
         flowTemperature: "Flow Temperature",
+      },
+      charts: {
+        noData: "No data available",
+        azValue: "COP Value",
+        systems: "Systems",
+        mean: "Mean",
+        median: "Median",
+        viewMode: "View Mode",
+        timeSeries: "Time Series",
+        distribution: "Distribution",
+        temperatureDelta: "Temperature Delta (Flow - Outdoor)",
+        dailyCopStats: "Daily COP",
+        monthlyCopStats: "Monthly COP",
+        yearlyCopStats: "Yearly COP",
       },
       toolbar: {
         columns: "Show/hide columns",

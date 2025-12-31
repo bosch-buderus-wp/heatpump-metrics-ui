@@ -2,21 +2,27 @@ import { useMemo, useState, useCallback } from "react";
 import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
+import { Button, ButtonGroup } from "@mui/material";
+import TimelineIcon from "@mui/icons-material/Timeline";
+import BarChartIcon from "@mui/icons-material/BarChart";
 import { supabase } from "../lib/supabaseClient";
 import type { Database } from "../types/database.types";
-import { AzBarChart, type ChartDataRow } from "../components/common/charts";
+import { AzBarChart, type ChartDataRow, HistogramChart } from "../components/common/charts";
 import { PageLayout } from "../components/common/layout";
 import { DataGridWrapper } from "../components/common/data-grid";
 import { getAllDataGridColumns, commonHiddenColumns } from "../lib/tableHelpers";
 import { useComparisonMode } from "../hooks/useComparisonMode";
 import { flattenHeatingSystemsFields } from "../lib/dataTransformers";
+import { calculateDailyTaz, createHistogramBins } from "../lib/chartDataProcessing";
 
 type MeasurementRow = Database["public"]["Tables"]["measurements"]["Row"];
+type ViewMode = "timeSeries" | "distribution";
 
 export default function Daily() {
   const { t } = useTranslation();
   const [date, setDate] = useState(dayjs().format("YYYY-MM-DD"));
   const [filteredData, setFilteredData] = useState<MeasurementRow[]>([]);
+  const [viewMode, setViewMode] = useState<ViewMode>("timeSeries");
 
   // Wrap setFilteredData in useCallback to prevent infinite loops in DataGridWrapper
   const handleFilterChange = useCallback((data: MeasurementRow[]) => {
@@ -146,6 +152,36 @@ export default function Daily() {
     dataGridComparisonProps,
   } = useComparisonMode(sortedData);
 
+  // Calculate histogram data for distribution view (Daily AZ) (lazy - only when needed)
+  const histogramData = useMemo(() => {
+    // Only calculate if we're in distribution mode
+    if (viewMode !== "distribution") return null;
+    if (!sortedData) return null;
+
+    // Use filtered data if available, otherwise use all data
+    const dataToUse = (filteredDataForChart || filteredData || sortedData) as Array<{
+      heating_id: string;
+      thermal_energy_kwh?: number | null;
+      electrical_energy_kwh?: number | null;
+      thermal_energy_heating_kwh?: number | null;
+      electrical_energy_heating_kwh?: number | null;
+    }>;
+
+    // Calculate TAZ (daily AZ) for each system using difference between first and last measurement
+    const systemAzData = calculateDailyTaz(dataToUse);
+
+    // Create histogram bins for total AZ
+    const azHistogram = createHistogramBins(systemAzData, "az", 0.5);
+
+    // Create histogram bins for heating AZ
+    const azHeatingHistogram = createHistogramBins(systemAzData, "azHeating", 0.5);
+
+    return {
+      az: azHistogram,
+      azHeating: azHeatingHistogram,
+    };
+  }, [viewMode, sortedData, filteredData, filteredDataForChart]);
+
   return (
     <PageLayout
       titleKey="daily.title"
@@ -153,68 +189,97 @@ export default function Daily() {
       error={error}
       isLoading={isLoading}
       filters={
-        <div className="row picker">
-          <label htmlFor="daily-date-picker">{t("common.date")}</label>
-          <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-            <button
-              type="button"
-              onClick={() => setDate(dayjs(date).subtract(1, "day").format("YYYY-MM-DD"))}
-              title={t("common.previousDay") || "Previous day"}
-              style={{ padding: "0px 2px", cursor: "pointer" }}
-            >
-              ◀
-            </button>
-            <input
-              id="daily-date-picker"
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-            />
-            <button
-              type="button"
-              onClick={() => setDate(dayjs(date).add(1, "day").format("YYYY-MM-DD"))}
-              title={t("common.nextDay") || "Next day"}
-              style={{ padding: "0px 2px", cursor: "pointer" }}
-            >
-              ▶
-            </button>
+        <div className="filter-container">
+          <div className="row picker">
+            <label htmlFor="daily-date-picker">{t("common.date")}</label>
+            <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+              <button
+                type="button"
+                onClick={() => setDate(dayjs(date).subtract(1, "day").format("YYYY-MM-DD"))}
+                title={t("common.previousDay") || "Previous day"}
+                className="nav-button"
+              >
+                ◀
+              </button>
+              <input
+                id="daily-date-picker"
+                type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                className="form-input"
+              />
+              <button
+                type="button"
+                onClick={() => setDate(dayjs(date).add(1, "day").format("YYYY-MM-DD"))}
+                title={t("common.nextDay") || "Next day"}
+                className="nav-button"
+              >
+                ▶
+              </button>
+            </div>
           </div>
+          <ButtonGroup size="small" variant="outlined">
+            <Button
+              onClick={() => setViewMode("timeSeries")}
+              variant={viewMode === "timeSeries" ? "contained" : "outlined"}
+              startIcon={<TimelineIcon />}
+            >
+              {t("charts.timeSeries")}
+            </Button>
+            <Button
+              onClick={() => setViewMode("distribution")}
+              variant={viewMode === "distribution" ? "contained" : "outlined"}
+              startIcon={<BarChartIcon />}
+            >
+              {t("charts.distribution")}
+            </Button>
+          </ButtonGroup>
         </div>
       }
       chart={
-        <AzBarChart
-          data={comparisonMode ? [] : ((filteredDataForChart || filteredData) as ChartDataRow[])}
-          comparisonGroups={comparisonGroupsForChart}
-          indexField="hour"
-          indexLabel="common.hour"
-          indexValues={[
-            "0",
-            "1",
-            "2",
-            "3",
-            "4",
-            "5",
-            "6",
-            "7",
-            "8",
-            "9",
-            "10",
-            "11",
-            "12",
-            "13",
-            "14",
-            "15",
-            "16",
-            "17",
-            "18",
-            "19",
-            "20",
-            "21",
-            "22",
-            "23",
-          ]}
-          aggregateData={true}
-        />
+        viewMode === "timeSeries" ? (
+          <AzBarChart
+            data={comparisonMode ? [] : ((filteredDataForChart || filteredData) as ChartDataRow[])}
+            comparisonGroups={comparisonGroupsForChart}
+            indexField="hour"
+            indexLabel="common.hour"
+            indexValues={[
+              "0",
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7",
+              "8",
+              "9",
+              "10",
+              "11",
+              "12",
+              "13",
+              "14",
+              "15",
+              "16",
+              "17",
+              "18",
+              "19",
+              "20",
+              "21",
+              "22",
+              "23",
+            ]}
+            aggregateData={true}
+          />
+        ) : (
+          <HistogramChart
+            azBins={histogramData?.az.bins || []}
+            azHeatingBins={histogramData?.azHeating.bins || []}
+            azStats={histogramData?.az.stats || { mean: 0, median: 0 }}
+            azHeatingStats={histogramData?.azHeating.stats || { mean: 0, median: 0 }}
+            statsTitle={t("charts.dailyCopStats")}
+          />
+        )
       }
     >
       <DataGridWrapper

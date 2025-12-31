@@ -2,16 +2,21 @@ import { useMemo, useState, useCallback } from "react";
 import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
+import { Button, ButtonGroup } from "@mui/material";
+import TimelineIcon from "@mui/icons-material/Timeline";
+import BarChartIcon from "@mui/icons-material/BarChart";
 import { supabase } from "../lib/supabaseClient";
 import type { Database } from "../types/database.types";
-import { AzBarChart, type ChartDataRow } from "../components/common/charts";
+import { AzBarChart, type ChartDataRow, HistogramChart } from "../components/common/charts";
 import { PageLayout } from "../components/common/layout";
 import { DataGridWrapper } from "../components/common/data-grid";
 import { getAllDataGridColumns, commonHiddenColumns } from "../lib/tableHelpers";
 import { MonthYearPicker } from "../components/form";
 import { useComparisonMode } from "../hooks/useComparisonMode";
+import { calculateSystemAz, createHistogramBins } from "../lib/chartDataProcessing";
 
 type DailyValue = Database["public"]["Views"]["daily_values"]["Row"];
+type ViewMode = "timeSeries" | "distribution";
 
 export default function Monthly() {
   const { t } = useTranslation();
@@ -20,6 +25,7 @@ export default function Monthly() {
   const [month, setMonth] = useState(defaultMonth);
   const [year, setYear] = useState(defaultYear);
   const [filteredData, setFilteredData] = useState<DailyValue[]>([]);
+  const [viewMode, setViewMode] = useState<ViewMode>("timeSeries");
 
   // Wrap setFilteredData in useCallback to prevent infinite loops in DataGridWrapper
   const handleFilterChange = useCallback((data: DailyValue[]) => {
@@ -93,22 +99,82 @@ export default function Monthly() {
     return data;
   }, [data]);
 
+  // Calculate histogram data for distribution view (MAZ - Monthly AZ) (lazy - only when needed)
+  const histogramData = useMemo(() => {
+    // Only calculate if we're in distribution mode
+    if (viewMode !== "distribution") return null;
+    if (!data) return null;
+
+    // Use filtered data if available, otherwise use all data
+    const dataToUse = (filteredDataForChart || filteredData || data) as Array<{
+      heating_id: string;
+      thermal_energy_kwh?: number | null;
+      electrical_energy_kwh?: number | null;
+      thermal_energy_heating_kwh?: number | null;
+      electrical_energy_heating_kwh?: number | null;
+    }>;
+
+    // Calculate MAZ (monthly AZ) for each system
+    const systemAzData = calculateSystemAz(dataToUse);
+
+    // Create histogram bins for total AZ
+    const azHistogram = createHistogramBins(systemAzData, "az", 0.5);
+
+    // Create histogram bins for heating AZ
+    const azHeatingHistogram = createHistogramBins(systemAzData, "azHeating", 0.5);
+
+    return {
+      az: azHistogram,
+      azHeating: azHeatingHistogram,
+    };
+  }, [viewMode, data, filteredData, filteredDataForChart]);
+
   return (
     <PageLayout
       titleKey="monthly.title"
       infoKey="monthly.info"
       error={error}
       isLoading={isLoading}
-      filters={<MonthYearPicker month={month} year={year} onChange={handleMonthYearChange} />}
+      filters={
+        <div className="filter-container">
+          <MonthYearPicker month={month} year={year} onChange={handleMonthYearChange} />
+          <ButtonGroup size="small" variant="outlined">
+            <Button
+              onClick={() => setViewMode("timeSeries")}
+              variant={viewMode === "timeSeries" ? "contained" : "outlined"}
+              startIcon={<TimelineIcon />}
+            >
+              {t("charts.timeSeries")}
+            </Button>
+            <Button
+              onClick={() => setViewMode("distribution")}
+              variant={viewMode === "distribution" ? "contained" : "outlined"}
+              startIcon={<BarChartIcon />}
+            >
+              {t("charts.distribution")}
+            </Button>
+          </ButtonGroup>
+        </div>
+      }
       chart={
-        <AzBarChart
-          data={comparisonMode ? [] : ((filteredDataForChart || filteredData) as ChartDataRow[])}
-          comparisonGroups={comparisonGroupsForChart}
-          indexField="date"
-          indexLabel="common.date"
-          indexFormatter={(date) => dayjs(date).format("DD")}
-          aggregateData={true}
-        />
+        viewMode === "timeSeries" ? (
+          <AzBarChart
+            data={comparisonMode ? [] : ((filteredDataForChart || filteredData) as ChartDataRow[])}
+            comparisonGroups={comparisonGroupsForChart}
+            indexField="date"
+            indexLabel="common.date"
+            indexFormatter={(date) => dayjs(date).format("DD")}
+            aggregateData={true}
+          />
+        ) : (
+          <HistogramChart
+            azBins={histogramData?.az.bins || []}
+            azHeatingBins={histogramData?.azHeating.bins || []}
+            azStats={histogramData?.az.stats || { mean: 0, median: 0 }}
+            azHeatingStats={histogramData?.azHeating.stats || { mean: 0, median: 0 }}
+            statsTitle={t("charts.monthlyCopStats")}
+          />
+        )
       }
     >
       <DataGridWrapper

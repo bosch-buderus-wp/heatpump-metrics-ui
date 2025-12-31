@@ -35,6 +35,7 @@ export function MonthYearPicker({ month, year, onChange }: MonthYearPickerProps)
         id="month-picker"
         value={month}
         onChange={(e) => onChange({ month: Number(e.target.value), year })}
+        className="form-select"
       >
         {availableMonths.map((m) => (
           <option key={m} value={m}>
@@ -47,6 +48,7 @@ export function MonthYearPicker({ month, year, onChange }: MonthYearPickerProps)
         id="year-picker"
         value={year}
         onChange={(e) => onChange({ month, year: Number(e.target.value) })}
+        className="form-select"
       >
         {years.map((y) => (
           <option key={y} value={y}>

@@ -55,6 +55,7 @@ export function Layout({ children }: LayoutProps) {
               <NavLink to="/daily">{t("nav.daily")}</NavLink>
               <NavLink to="/measurements">{t("nav.measurements")}</NavLink>
               <NavLink to="/systems">{t("nav.systems")}</NavLink>
+              <NavLink to="/az-temp-evaluation">{t("nav.azTempEvaluation")}</NavLink>
               <NavLink to="/my-account">{t("nav.myAccount")}</NavLink>
             </nav>
             <div className="actions">

@@ -11,6 +11,7 @@ import MyAccount from "./pages/MyAccount";
 import AuthCallback from "./pages/AuthCallback";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
+import AzTempEvaluation from "./pages/AzTempEvaluation";
 
 import Home from "./pages/Home";
 
@@ -23,6 +24,7 @@ export default function App() {
         <Route path="/monthly" element={<Monthly />} />
         <Route path="/daily" element={<Daily />} />
         <Route path="/systems" element={<Systems />} />
+        <Route path="/az-temp-evaluation" element={<AzTempEvaluation />} />
         <Route path="/login" element={<Login />} />
         <Route path="/my-account" element={<MyAccount />} />
         <Route path="/auth/callback" element={<AuthCallback />} />

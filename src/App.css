@@ -336,7 +336,9 @@ p.MuiTablePagination-displayedRows {
 .stats-card {
   text-align: center;
   padding: 1.5rem;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
   max-width: none;
   margin: 0;
 }
@@ -364,4 +366,117 @@ p.MuiTablePagination-displayedRows {
 .home-footer {
   text-align: center;
   margin-top: 2rem;
+}
+
+/* Filter Controls */
+.filter-container {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+/* Form Control Styles */
+.form-select,
+.form-input {
+  padding: 6px 12px;
+  font-size: 0.875rem;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.23);
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease;
+  cursor: pointer;
+}
+
+.form-select {
+  min-width: 80px;
+}
+
+.form-input {
+  min-width: 150px;
+}
+
+.form-select:hover,
+.form-input:hover {
+  border-color: rgba(0, 0, 0, 0.87);
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+/* Navigation Buttons */
+.nav-button {
+  padding: 0;
+  cursor: pointer;
+  font-size: 0.875rem;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.23);
+  background-color: transparent;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease;
+  min-width: 32px;
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-button:hover {
+  border-color: rgba(0, 0, 0, 0.87);
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+/* Chart Statistics Display */
+.chart-stats {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  margin-left: auto;
+  margin-right: 1rem;
+  padding: 0.75rem 1rem;
+  background-color: white;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  width: fit-content;
+  position: relative;
+  z-index: 10;
+}
+
+.chart-stats-title {
+  font-size: 0.875rem;
+  font-weight: bold;
+  color: rgba(0, 0, 0, 0.7);
+  margin: 0 0 0.25rem 0;
+  align-self: stretch;
+  text-align: center;
+}
+
+.chart-stats > div:not(.chart-stats-title) {
+  display: flex;
+  gap: 2rem;
+}
+
+.chart-stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.chart-stat-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: rgba(0, 0, 0, 0.6);
+  font-weight: 500;
+}
+
+.chart-stat-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #23a477ff;
 }

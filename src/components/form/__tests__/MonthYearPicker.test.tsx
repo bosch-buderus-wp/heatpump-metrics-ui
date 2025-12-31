@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { MonthYearPicker } from "../MonthYearPicker";
 
-describe.skip("MonthYearPicker", () => {
+describe("MonthYearPicker", () => {
   let originalDate: DateConstructor;
 
   beforeEach(() => {
@@ -11,13 +11,15 @@ describe.skip("MonthYearPicker", () => {
 
     // Mock Date to return a fixed date: January 15, 2025
     const mockDate = new Date(2025, 0, 15); // Month is 0-indexed
-    const MockDateConstructor: any = (...args: any[]) => {
+    // biome-ignore lint/complexity/useArrowFunction: Constructor function needs to be a regular function
+    const MockDateConstructor: any = function (...args: any[]) {
       if (args.length === 0) {
         return mockDate;
       }
       // @ts-expect-error - Mocking Date constructor with spread args
       return new originalDate(...args);
     };
+    MockDateConstructor.prototype = originalDate.prototype;
     vi.spyOn(global, "Date").mockImplementation(MockDateConstructor);
   });
 
@@ -51,13 +53,15 @@ describe.skip("MonthYearPicker", () => {
     // Mock to June 2025 so we have multiple months to select
     vi.restoreAllMocks();
     const mockDate = new Date(2025, 5, 15); // June 2025
-    const MockDateConstructor: any = (...args: any[]) => {
+    // biome-ignore lint/complexity/useArrowFunction: Constructor function needs to be a regular function
+    const MockDateConstructor: any = function (...args: any[]) {
       if (args.length === 0) {
         return mockDate;
       }
       // @ts-expect-error - Mocking Date constructor with spread args
       return new originalDate(...args);
     };
+    MockDateConstructor.prototype = originalDate.prototype;
     vi.spyOn(global, "Date").mockImplementation(MockDateConstructor);
 
     const handleChange = vi.fn();
@@ -104,13 +108,15 @@ describe.skip("MonthYearPicker", () => {
     // Mock to a future date so 2025 is in the past
     vi.restoreAllMocks();
     const futureDate = new Date(2026, 5, 15); // June 2026
-    const MockDateConstructor: any = (...args: any[]) => {
+    // biome-ignore lint/complexity/useArrowFunction: Constructor function needs to be a regular function
+    const MockDateConstructor: any = function (...args: any[]) {
       if (args.length === 0) {
         return futureDate;
       }
       // @ts-expect-error - Mocking Date constructor with spread args
       return new originalDate(...args);
     };
+    MockDateConstructor.prototype = originalDate.prototype;
     vi.spyOn(global, "Date").mockImplementation(MockDateConstructor);
 
     render(<MonthYearPicker month={1} year={2025} onChange={vi.fn()} />);
@@ -133,13 +139,15 @@ describe.skip("MonthYearPicker", () => {
     // Mock to June 2025 so we have multiple months
     vi.restoreAllMocks();
     const mockDate = new Date(2025, 5, 15); // June 2025
-    const MockDateConstructor: any = (...args: any[]) => {
+    // biome-ignore lint/complexity/useArrowFunction: Constructor function needs to be a regular function
+    const MockDateConstructor: any = function (...args: any[]) {
       if (args.length === 0) {
         return mockDate;
       }
       // @ts-expect-error - Mocking Date constructor with spread args
       return new originalDate(...args);
     };
+    MockDateConstructor.prototype = originalDate.prototype;
     vi.spyOn(global, "Date").mockImplementation(MockDateConstructor);
 
     render(<MonthYearPicker month={1} year={2025} onChange={vi.fn()} />);
@@ -147,5 +155,53 @@ describe.skip("MonthYearPicker", () => {
     expect(screen.getByRole("option", { name: "1" })).toBeInTheDocument();
     expect(screen.getByRole("option", { name: "2" })).toBeInTheDocument();
     expect(screen.getByRole("option", { name: "3" })).toBeInTheDocument();
+  });
+
+  it("adjusts future month to current month automatically", () => {
+    // Mock to March 2025 (month 3)
+    vi.restoreAllMocks();
+    const mockDate = new Date(2025, 2, 15); // March 2025
+    // biome-ignore lint/complexity/useArrowFunction: Constructor function needs to be a regular function
+    const MockDateConstructor: any = function (...args: any[]) {
+      if (args.length === 0) {
+        return mockDate;
+      }
+      // @ts-expect-error - Mocking Date constructor with spread args
+      return new originalDate(...args);
+    };
+    MockDateConstructor.prototype = originalDate.prototype;
+    vi.spyOn(global, "Date").mockImplementation(MockDateConstructor);
+
+    const handleChange = vi.fn();
+
+    // Try to render with a future month (June = 6) for current year
+    render(<MonthYearPicker month={6} year={2025} onChange={handleChange} />);
+
+    // Should automatically call onChange to adjust to current month (3)
+    expect(handleChange).toHaveBeenCalledWith({ month: 3, year: 2025 });
+  });
+
+  it("does not adjust month for past years", () => {
+    // Mock to March 2026 so 2025 is in the past
+    vi.restoreAllMocks();
+    const mockDate = new Date(2026, 2, 15); // March 2026
+    // biome-ignore lint/complexity/useArrowFunction: Constructor function needs to be a regular function
+    const MockDateConstructor: any = function (...args: any[]) {
+      if (args.length === 0) {
+        return mockDate;
+      }
+      // @ts-expect-error - Mocking Date constructor with spread args
+      return new originalDate(...args);
+    };
+    MockDateConstructor.prototype = originalDate.prototype;
+    vi.spyOn(global, "Date").mockImplementation(MockDateConstructor);
+
+    const handleChange = vi.fn();
+
+    // Try to render with December 2025 (past year)
+    render(<MonthYearPicker month={12} year={2025} onChange={handleChange} />);
+
+    // Should NOT call onChange since 2025 is a past year
+    expect(handleChange).not.toHaveBeenCalled();
   });
 });
