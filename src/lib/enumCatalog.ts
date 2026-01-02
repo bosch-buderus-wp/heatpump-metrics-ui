@@ -127,6 +127,7 @@ export const BUILDING_ENERGY_STANDARD_VALUES = [
   "kfw_115",
   "kfw_denkmalschutz",
   "old_building_unrenovated",
+  "old_building_partially_renovated",
   "energetically_renovated",
   "nearly_zero_energy_building",
   "minergie",
