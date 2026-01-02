@@ -359,7 +359,7 @@ describe("AzScatterChart", () => {
       const { container } = render(<AzScatterChart data={mockData} />);
 
       // Regression stats title should be visible (even when collapsed)
-      expect(screen.getByText("Regression Analysis")).toBeInTheDocument();
+      expect(screen.getByText("COPs")).toBeInTheDocument();
 
       // Stats box is collapsed by default, so temperatures should NOT be visible initially
       expect(screen.queryByText("-7°C")).not.toBeInTheDocument();
