@@ -63,10 +63,10 @@ jobs:
           
           if [ -z "$PREV_TAG" ]; then
             echo "No previous tag found, showing all commits"
-            COMMITS=$(git log --pretty=format:"- %s (%h)" ${{ github.ref_name }})
+            COMMITS=$(git log --oneline --pretty=format:"- %s (%h)" ${{ github.ref_name }})
           else
             echo "Previous tag: $PREV_TAG"
-            COMMITS=$(git log --pretty=format:"- %s (%h)" $PREV_TAG..${{ github.ref_name }})
+            COMMITS=$(git log --oneline --pretty=format:"- %s (%h)" $PREV_TAG..${{ github.ref_name }})
           fi
           
           # Save to environment variable using delimiter
