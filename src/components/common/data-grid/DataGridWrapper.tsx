@@ -1,10 +1,10 @@
-import { useEffect } from "react";
-import { DataGrid, type GridColDef, useGridApiRef, type GridFilterModel } from "@mui/x-data-grid";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { DataGrid, type GridColDef, type GridFilterModel, useGridApiRef } from "@mui/x-data-grid";
 import { deDE } from "@mui/x-data-grid/locales";
+import { useEffect } from "react";
+import { useDataGridFilter } from "../../../hooks/useDataGridFilter";
 import { useSession } from "../layout/Layout";
 import { DataGridToolbar } from "./DataGridToolbar";
-import { useDataGridFilter } from "../../../hooks/useDataGridFilter";
 
 interface DataGridWrapperProps<T = Record<string, unknown>> {
   rows: T[];
@@ -78,7 +78,10 @@ export function DataGridWrapper<T = Record<string, unknown>>({
 
   // Handle filter group button clicks
   const handleFilterGroup1Click = () => {
-    if (apiRef.current && onSetActiveGroup) {
+    if (!apiRef.current) return;
+
+    // If in comparison mode, handle group switching
+    if (comparisonMode && onSetActiveGroup) {
       const currentModel = apiRef.current.state.filter.filterModel;
 
       // Save current filter model to the CURRENT active group before switching
@@ -93,6 +96,9 @@ export function DataGridWrapper<T = Record<string, unknown>>({
       setTimeout(() => {
         apiRef.current?.showFilterPanel();
       }, 100);
+    } else {
+      // Simple mode: just open the filter panel
+      apiRef.current.showFilterPanel();
     }
   };
 

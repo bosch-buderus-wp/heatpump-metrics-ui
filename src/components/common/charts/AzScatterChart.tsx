@@ -1,8 +1,12 @@
-import { useMemo, useState } from "react";
+import { ExpandLess, ExpandMore } from "@mui/icons-material";
+import { Button, ButtonGroup, IconButton, Tooltip } from "@mui/material";
 import { ResponsiveScatterPlot } from "@nivo/scatterplot";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ButtonGroup, Button } from "@mui/material";
 import { useChartLegend } from "../../../hooks/useChartLegend";
+import { computeAzTemperatureRegression } from "../../../lib/chartDataProcessing";
+import type { RegressionResult } from "../../../lib/regressionUtils";
+import { generateCurvePoints } from "../../../lib/regressionUtils";
 
 export interface ScatterDataPoint {
   az?: number | null;
@@ -39,6 +43,28 @@ export function AzScatterChart({ data }: AzScatterChartProps) {
   // Track which temperature mode is active
   const [temperatureMode, setTemperatureMode] = useState<TemperatureMode>("outdoor");
 
+  // Stats box collapse state
+  const [statsExpanded, setStatsExpanded] = useState(false);
+
+  // Get reference temperatures based on temperature mode
+  const getReferenceTemperatures = (mode: TemperatureMode) => {
+    switch (mode) {
+      case "outdoor":
+        return [-10, -7, 2, 7]; // Common outdoor temps in heat pump specs
+      case "flow":
+        return [30, 35, 40, 45]; // Typical flow temperatures
+      case "delta":
+        return [25, 30, 35, 40]; // Typical temperature deltas
+      default:
+        return [-10, -7, 2, 7];
+    }
+  };
+
+  // Calculate predicted COP at given temperature
+  const predictCOP = (regression: RegressionResult, temperature: number): number => {
+    return regression.slope * temperature + regression.intercept;
+  };
+
   // Use the chart legend hook (same as AzBarChart)
   const { activeKey, legendItems, handleLegendClick } = useChartLegend({
     azTotalKey,
@@ -49,8 +75,8 @@ export function AzScatterChart({ data }: AzScatterChartProps) {
   });
 
   // Transform data for scatter plot - create both series but only populate the active one
-  const scatterData = useMemo(() => {
-    if (!data || data.length === 0) return [];
+  const { scatterData, regression } = useMemo(() => {
+    if (!data || data.length === 0) return { scatterData: [], activePoints: [], regression: null };
 
     // Determine which AZ values to use based on active key
     const useAzHeating = activeKey === azHeatingKey;
@@ -88,9 +114,21 @@ export function AzScatterChart({ data }: AzScatterChartProps) {
       })
       .filter((p) => p !== null);
 
-    // Return both series - active one has data, inactive one is empty
-    // This ensures both legend items are visible
-    return [
+    // Compute regression on the active points
+    const regressionResult = computeAzTemperatureRegression(points);
+
+    // Generate curve points if regression is valid
+    let curveData: ScatterPointData[] = [];
+    if (regressionResult && points.length > 0) {
+      const xValues = points.map((p) => p.x);
+      const xMin = Math.min(...xValues);
+      const xMax = Math.max(...xValues);
+      const curvePoints = generateCurvePoints(regressionResult, xMin, xMax, 50);
+      curveData = curvePoints.map((p) => ({ x: p.x, y: p.y }));
+    }
+
+    // Return scatter series with curve overlay
+    const scatterSeries = [
       {
         id: azTotalKey,
         data: activeKey === azTotalKey ? points : [],
@@ -100,7 +138,26 @@ export function AzScatterChart({ data }: AzScatterChartProps) {
         data: activeKey === azHeatingKey ? points : [],
       },
     ];
-  }, [data, activeKey, azHeatingKey, azTotalKey, temperatureMode]);
+
+    // Add curve as a separate series if available (use translation key)
+    if (curveData.length > 0) {
+      scatterSeries.push({
+        id: t("charts.regressionCurve"),
+        data: curveData.map((p) => ({
+          ...p,
+          heating_id: undefined,
+          name: undefined,
+          date: undefined,
+        })),
+      });
+    }
+
+    return {
+      scatterData: scatterSeries,
+      activePoints: points as ScatterPointData[],
+      regression: regressionResult,
+    };
+  }, [data, activeKey, azHeatingKey, azTotalKey, temperatureMode, t]);
 
   // Filter legend items to only show AZ toggles (not temperature lines)
   // Temperature line items have IDs "outdoor_temp" and "flow_temp"
@@ -154,7 +211,10 @@ export function AzScatterChart({ data }: AzScatterChartProps) {
           </Button>
         </ButtonGroup>
       </div>
-      <div style={{ height: 400, marginTop: 10, marginBottom: 10 }} className="card">
+      <div
+        style={{ height: 400, marginTop: 10, marginBottom: 10, position: "relative" }}
+        className="card"
+      >
         <ResponsiveScatterPlot
           // biome-ignore lint/suspicious/noExplicitAny: Nivo's ScatterPlot type is complex
           data={scatterData as any}
@@ -164,12 +224,21 @@ export function AzScatterChart({ data }: AzScatterChartProps) {
           blendMode="normal"
           colors={(node) => {
             // Color nodes based on which series they belong to
+            if (node.serieId === t("charts.regressionCurve")) {
+              return "#ff6b6b"; // Red color for regression line
+            }
             if (node.serieId === activeKey) {
               return barColor;
             }
             return "#cccccc"; // Shouldn't happen since inactive series has no data
           }}
-          nodeSize={8}
+          nodeSize={(node) => {
+            // Make regression curve points visible
+            if (node.serieId === t("charts.regressionCurve")) {
+              return 6;
+            }
+            return 8;
+          }}
           axisTop={null}
           axisRight={null}
           axisBottom={{
@@ -247,6 +316,62 @@ export function AzScatterChart({ data }: AzScatterChartProps) {
             },
           ]}
         />
+        {regression && (
+          <div
+            className="chart-stats"
+            style={{
+              position: "absolute",
+              top: 0,
+              right: 0,
+              transition: "all 0.3s ease",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <h3 className="chart-stats-title" style={{ margin: 0 }}>
+                {t("charts.azTempStats")}
+              </h3>
+              <Tooltip title={statsExpanded ? t("charts.hideStats") : t("charts.showStats")}>
+                <IconButton
+                  size="small"
+                  onClick={() => setStatsExpanded(!statsExpanded)}
+                  sx={{ ml: 1, p: 0.5 }}
+                >
+                  {statsExpanded ? (
+                    <ExpandLess fontSize="small" />
+                  ) : (
+                    <ExpandMore fontSize="small" />
+                  )}
+                </IconButton>
+              </Tooltip>
+            </div>
+            {statsExpanded && (
+              <div style={{ marginTop: 8 }}>
+                {/* Reference temperature predictions */}
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(4, 1fr)",
+                    gap: "8px",
+                  }}
+                >
+                  {getReferenceTemperatures(temperatureMode).map((temp) => {
+                    const predictedCOP = predictCOP(regression, temp);
+                    return (
+                      <Tooltip key={temp} title={t("charts.predictedCopTooltip")} placement="top">
+                        <div className="chart-stat-item">
+                          <span className="chart-stat-label">
+                            {t("common.az_short")} {temp}°C
+                          </span>
+                          <span className="chart-stat-value">{predictedCOP.toFixed(2)}</span>
+                        </div>
+                      </Tooltip>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </>
   );

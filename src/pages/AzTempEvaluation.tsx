@@ -1,12 +1,13 @@
-import { useMemo, useState, useCallback, useRef } from "react";
-import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "../lib/supabaseClient";
-import type { Database } from "../types/database.types";
+import { useCallback, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { AzScatterChart, type ScatterDataPoint } from "../components/common/charts";
-import { PageLayout } from "../components/common/layout";
 import { DataGridWrapper } from "../components/common/data-grid";
-import { getAllDataGridColumns, commonHiddenColumns } from "../lib/tableHelpers";
+import { PageLayout } from "../components/common/layout";
+import { useComparisonMode } from "../hooks/useComparisonMode";
+import { supabase } from "../lib/supabaseClient";
+import { commonHiddenColumns, getAllDataGridColumns } from "../lib/tableHelpers";
+import type { Database } from "../types/database.types";
 
 type DailyValue = Database["public"]["Views"]["daily_values"]["Row"];
 
@@ -72,6 +73,9 @@ export default function AzTempEvaluation() {
     },
   });
 
+  // Use comparison mode hook
+  const { dataGridComparisonProps } = useComparisonMode(data);
+
   // Prepare scatter plot data (use filtered data if available)
   const scatterData: ScatterDataPoint[] = useMemo(() => {
     const dataToUse = filteredData !== null ? filteredData : data || [];
@@ -106,6 +110,7 @@ export default function AzTempEvaluation() {
         getRowId={(row) => `${row.heating_id}-${row.date}`}
         columnVisibilityModel={commonHiddenColumns}
         onFilterChange={handleFilterChange}
+        {...dataGridComparisonProps}
       />
     </PageLayout>
   );

@@ -1,5 +1,5 @@
-import { render, screen, fireEvent } from "@testing-library/react";
-import { describe, it, expect, vi } from "vitest";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
 import { AzScatterChart, type ScatterDataPoint } from "../AzScatterChart";
 
 // Mock the translation hook
@@ -13,6 +13,20 @@ vi.mock("react-i18next", () => ({
         "common.flowTemperature": "Flow Temperature",
         "charts.noData": "No data available",
         "charts.temperatureDelta": "Temperature Delta (Flow - Outdoor)",
+        "charts.azValue": "COP Value",
+        "charts.azTempStats": "COPs",
+        "charts.slope": "Slope",
+        "charts.interceptAt0C": "COP at 0°C",
+        "charts.mae": "Mean Abs. Error",
+        "charts.showStats": "Show Statistics",
+        "charts.hideStats": "Hide Statistics",
+        "charts.regressionCurve": "Fitted Curve",
+        "charts.slopeTooltip": "How much COP changes per degree temperature change",
+        "charts.interceptTooltip": "Predicted COP at 0°C outdoor temperature",
+        "charts.rSquaredTooltip": "Goodness of fit (1.0 = perfect fit, closer to 1 is better)",
+        "charts.sampleSizeTooltip": "Number of data points used for regression",
+        "charts.maeTooltip": "Average prediction error (lower is better)",
+        "charts.predictedCopTooltip": "Predicted COP at this temperature based on regression",
       };
       return translations[key] || key;
     },
@@ -329,6 +343,79 @@ describe("AzScatterChart", () => {
 
       const chartContainer = container.querySelector(".card");
       expect(chartContainer).toBeTruthy();
+    });
+  });
+
+  describe("Regression Analysis Features", () => {
+    it("should display regression stats when sufficient data is available", async () => {
+      const mockData: ScatterDataPoint[] = [
+        { az_heating: 2.5, outdoor_temperature_c: -10 },
+        { az_heating: 2.8, outdoor_temperature_c: -5 },
+        { az_heating: 3.2, outdoor_temperature_c: 0 },
+        { az_heating: 3.6, outdoor_temperature_c: 5 },
+        { az_heating: 4.0, outdoor_temperature_c: 10 },
+      ];
+
+      const { container } = render(<AzScatterChart data={mockData} />);
+
+      // Regression stats title should be visible (even when collapsed)
+      expect(screen.getByText("Regression Analysis")).toBeInTheDocument();
+
+      // Stats box is collapsed by default, so temperatures should NOT be visible initially
+      expect(screen.queryByText("-7°C")).not.toBeInTheDocument();
+
+      // Find and click the expand button
+      const expandButtons = screen.getAllByRole("button");
+      const statsExpandButton = expandButtons.find((btn) => btn.closest(".chart-stats") !== null);
+
+      expect(statsExpandButton).toBeDefined();
+
+      if (statsExpandButton) {
+        fireEvent.click(statsExpandButton);
+
+        // After clicking, wait for the content to appear
+        await waitFor(() => {
+          // Check if any temperature label is now visible
+          const temps = container.querySelectorAll(".chart-stat-label");
+          expect(temps.length).toBeGreaterThan(0);
+        });
+      }
+    });
+
+    it("should not display regression stats with insufficient data", () => {
+      const mockData: ScatterDataPoint[] = [{ az_heating: 3.0, outdoor_temperature_c: 0 }];
+
+      render(<AzScatterChart data={mockData} />);
+
+      // Should not show regression stats with only 1 point
+      expect(screen.queryByText("Regression Analysis")).not.toBeInTheDocument();
+    });
+
+    it("should handle data with null values gracefully", () => {
+      const mockData: ScatterDataPoint[] = [
+        { az: 3.0, az_heating: null, outdoor_temperature_c: -5 },
+        { az: null, az_heating: 3.5, outdoor_temperature_c: 0 },
+        { az: 4.0, az_heating: 4.2, outdoor_temperature_c: null },
+      ];
+
+      render(<AzScatterChart data={mockData} />);
+
+      // Should render without crashing
+      expect(screen.getByText("Outdoor Temperature")).toBeInTheDocument();
+    });
+
+    it("should filter out invalid AZ values (zero or negative)", () => {
+      const mockData: ScatterDataPoint[] = [
+        { az_heating: 0, outdoor_temperature_c: -5 },
+        { az_heating: -1, outdoor_temperature_c: 0 },
+        { az_heating: 3.5, outdoor_temperature_c: 5 },
+        { az_heating: 4.0, outdoor_temperature_c: 10 },
+      ];
+
+      render(<AzScatterChart data={mockData} />);
+
+      // Should still render with valid points only
+      expect(screen.getByText("Outdoor Temperature")).toBeInTheDocument();
     });
   });
 });

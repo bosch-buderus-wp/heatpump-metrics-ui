@@ -4,6 +4,7 @@
  */
 
 import type { ChartDataRow } from "../components/common/charts/AzBarChart";
+import { robustLinearRegression } from "./regressionUtils";
 
 interface AggregatedGroup {
   az_values: number[];
@@ -403,6 +404,23 @@ export interface HistogramStats {
   min: number;
   max: number;
   count: number;
+}
+
+/**
+ * Compute regression for AZ vs temperature data.
+ * Filters valid points and applies robust linear regression.
+ */
+export function computeAzTemperatureRegression(
+  data: Array<{ x: number; y: number }>,
+): ReturnType<typeof robustLinearRegression> {
+  // Filter valid points (positive AZ, finite values)
+  const validPoints = data.filter((p) => Number.isFinite(p.x) && Number.isFinite(p.y) && p.y > 0);
+
+  if (validPoints.length < 2) {
+    return null;
+  }
+
+  return robustLinearRegression(validPoints);
 }
 
 export function createHistogramBins(
