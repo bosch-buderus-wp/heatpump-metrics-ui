@@ -55,6 +55,25 @@ jobs:
           git tag "${{ github.ref_name }}-release" $RELEASE_SHA
           git push origin "${{ github.ref_name }}-release"
 
+      - name: Generate release notes
+        id: release_notes
+        run: |
+          # Get the previous tag
+          PREV_TAG=$(git tag --sort=-v:refname | grep -v "release$" | sed -n '2p')
+          
+          if [ -z "$PREV_TAG" ]; then
+            echo "No previous tag found, showing all commits"
+            COMMITS=$(git log --pretty=format:"- %s (%h)" ${{ github.ref_name }})
+          else
+            echo "Previous tag: $PREV_TAG"
+            COMMITS=$(git log --pretty=format:"- %s (%h)" $PREV_TAG..${{ github.ref_name }})
+          fi
+          
+          # Save to environment variable using delimiter
+          echo "COMMITS<<EOF" >> $GITHUB_ENV
+          echo "$COMMITS" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
@@ -68,6 +87,9 @@ jobs:
             ## 🚀 Release ${{ github.ref_name }}
 
             This release is available via jsDelivr CDN.
+
+            ### 📝 Changes
+            ${{ env.COMMITS }}
 
             ### 📦 CDN Usage (Recommended)
 
