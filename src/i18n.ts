@@ -166,7 +166,7 @@ const resources = {
         systemsInfo:
           "Hier kannst du Daten deiner Heizungsanlage eintragen. Es gibt keine Pflichtfelder. Trage nur die Daten ein, die du veröffentlichen möchtest, um anderen Nutzern beim Vergleich oder dem Umstieg auf eine Wärmepumpe zu helfen.",
         monthlyValuesInfo:
-          "Pflege hier deine monatlichen Verbrauchswerte. Diese werden automatisch berechnet, wenn du stündliche Messwerte hochlädst (siehe Mitmach-Guide im Menü), oder können hier manuell eingetragen werden. Sobald du einen Monatswert manuell speicherst, wird die automatische Berechnung für diesen Monat deaktiviert.",
+          "Pflege hier deine monatlichen Verbrauchswerte. Diese werden automatisch berechnet, wenn du stündliche Messwerte hochlädst (siehe Mitmach-Guide), oder können hier manuell eingetragen werden. Deine monatlichen Werte kannst du von deiner Bosch- und Buderus-App unter Energiemonitoring --> Detailansicht übertragen. Sobald du einen Monatswert manuell speicherst, wird die automatische Berechnung für diesen Monat deaktiviert.",
       },
       deleteConfirm: {
         deleteSystem: "Anlage löschen",

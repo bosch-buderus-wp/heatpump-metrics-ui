@@ -177,36 +177,6 @@ export function SystemForm({ system, onSubmit }: SystemFormProps) {
         translationPrefix="models.building_energy_standard"
       />
 
-      <div className="row">
-        <span>{t("systemForm.usageLabel")}</span>
-        <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
-          <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", minWidth: "auto" }}>
-            <input
-              type="checkbox"
-              checked={form.used_for_heating ?? false}
-              onChange={(e) => set("used_for_heating", e.target.checked)}
-            />
-            {t("systemForm.usedForHeating")}
-          </label>
-          <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", minWidth: "auto" }}>
-            <input
-              type="checkbox"
-              checked={form.used_for_dhw ?? false}
-              onChange={(e) => set("used_for_dhw", e.target.checked)}
-            />
-            {t("systemForm.usedForDhw")}
-          </label>
-          <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", minWidth: "auto" }}>
-            <input
-              type="checkbox"
-              checked={form.used_for_cooling ?? false}
-              onChange={(e) => set("used_for_cooling", e.target.checked)}
-            />
-            {t("systemForm.usedForCooling")}
-          </label>
-        </div>
-      </div>
-
       <SelectField
         label={t("systemForm.heatingSystem")}
         value={form.heating_type}
@@ -243,14 +213,6 @@ export function SystemForm({ system, onSubmit }: SystemFormProps) {
         />
       </div>
 
-      <TextAreaField
-        label={t("systemForm.notes")}
-        value={form.notes}
-        onChange={(v) => set("notes", v)}
-        placeholder={t("systemForm.notesPlaceholder")}
-        rows={3}
-      />
-
       <SelectField
         label={t("systemForm.indoorUnit")}
         value={form.model_idu}
@@ -281,6 +243,44 @@ export function SystemForm({ system, onSubmit }: SystemFormProps) {
         onChange={(v) => set("sw_odu", (v as typeof form.sw_odu) ?? null)}
         options={swOduOptions}
         emptyOption={false}
+      />
+
+      <div className="row">
+        <span>{t("systemForm.usageLabel")}</span>
+        <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
+          <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", minWidth: "auto" }}>
+            <input
+              type="checkbox"
+              checked={form.used_for_heating ?? false}
+              onChange={(e) => set("used_for_heating", e.target.checked)}
+            />
+            {t("systemForm.usedForHeating")}
+          </label>
+          <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", minWidth: "auto" }}>
+            <input
+              type="checkbox"
+              checked={form.used_for_dhw ?? false}
+              onChange={(e) => set("used_for_dhw", e.target.checked)}
+            />
+            {t("systemForm.usedForDhw")}
+          </label>
+          <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", minWidth: "auto" }}>
+            <input
+              type="checkbox"
+              checked={form.used_for_cooling ?? false}
+              onChange={(e) => set("used_for_cooling", e.target.checked)}
+            />
+            {t("systemForm.usedForCooling")}
+          </label>
+        </div>
+      </div>
+
+      <TextAreaField
+        label={t("systemForm.notes")}
+        value={form.notes}
+        onChange={(v) => set("notes", v)}
+        placeholder={t("systemForm.notesPlaceholder")}
+        rows={3}
       />
     </form>
   );
