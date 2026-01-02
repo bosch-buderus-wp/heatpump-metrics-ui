@@ -1,5 +1,5 @@
-import { describe, it, expect } from "vitest";
-import { calculateSystemAz, calculateDailyTaz, createHistogramBins } from "../chartDataProcessing";
+import { describe, expect, it } from "vitest";
+import { calculateDailyTaz, calculateSystemAz, createHistogramBins } from "../chartDataProcessing";
 
 describe("calculateSystemAz", () => {
   it("should calculate AZ correctly for a single system", () => {

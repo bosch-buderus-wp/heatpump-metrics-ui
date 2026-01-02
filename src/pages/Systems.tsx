@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "../lib/supabaseClient";
 import { useTranslation } from "react-i18next";
-import { PageLayout } from "../components/common/layout";
 import { DataGridWrapper } from "../components/common/data-grid";
+import { PageLayout } from "../components/common/layout";
+import { supabase } from "../lib/supabaseClient";
 import { getAllDataGridColumns } from "../lib/tableHelpers";
 
 export default function Systems() {

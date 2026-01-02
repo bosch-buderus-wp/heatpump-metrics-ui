@@ -1,6 +1,6 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { HistogramChart, type HistogramBin } from "../HistogramChart";
+import { type HistogramBin, HistogramChart } from "../HistogramChart";
 
 // Mock @nivo/bar
 vi.mock("@nivo/bar", () => ({

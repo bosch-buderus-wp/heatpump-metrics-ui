@@ -105,8 +105,8 @@ See [DEVELOPMENT.md](DEVELOPMENT.md) for detailed setup instructions.
 3. **Test your changes**
 
    ```bash
-   npm run lint          # Check code style
-   npm run format        # Format code
+   npm run check         # Check code style and linting
+   npm run check:write   # Auto-fix code style and linting issues
    npm run build         # Test production build
    ```
 
@@ -233,11 +233,8 @@ src/
 Run these commands:
 
 ```bash
-# Format code
-npm run format
-
-# Check for linting issues
-npm run lint
+# Check and auto-fix code formatting and linting
+npm run check:write
 
 # Build to check for errors
 npm run build

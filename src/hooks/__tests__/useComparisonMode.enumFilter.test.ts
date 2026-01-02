@@ -1,5 +1,5 @@
-import { describe, it, expect } from "vitest";
 import type { GridFilterModel } from "@mui/x-data-grid";
+import { describe, expect, it } from "vitest";
 
 /**
  * Integration test for enum filter support in comparison mode

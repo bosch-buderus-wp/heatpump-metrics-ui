@@ -1,14 +1,14 @@
+import { ResponsiveBar } from "@nivo/bar";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { ResponsiveBar } from "@nivo/bar";
-import TemperatureLineLayer from "./TemperatureLineLayer";
-import ChartTooltip from "./ChartTooltip";
-import {
-  processDataset,
-  mergeComparisonDatasets,
-  calculateTemperatureScale,
-} from "../../../lib/chartDataProcessing";
 import { useChartLegend } from "../../../hooks/useChartLegend";
+import {
+  calculateTemperatureScale,
+  mergeComparisonDatasets,
+  processDataset,
+} from "../../../lib/chartDataProcessing";
+import ChartTooltip from "./ChartTooltip";
+import TemperatureLineLayer from "./TemperatureLineLayer";
 
 // Interface for data that can be displayed in the AZ chart
 export interface ChartDataRow {

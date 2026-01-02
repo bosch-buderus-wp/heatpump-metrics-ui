@@ -1,8 +1,8 @@
-import { Link, NavLink } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-import { useEffect, useState, createContext, useContext } from "react";
-import { supabase } from "../../../lib/supabaseClient";
 import type { Session } from "@supabase/supabase-js";
+import { createContext, useContext, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { Link, NavLink } from "react-router-dom";
+import { supabase } from "../../../lib/supabaseClient";
 
 interface SessionContextType {
   session: Session | null;

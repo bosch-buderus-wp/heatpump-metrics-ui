@@ -1,18 +1,18 @@
-import { useMemo, useState, useCallback } from "react";
-import dayjs from "dayjs";
-import { useTranslation } from "react-i18next";
-import { useQuery } from "@tanstack/react-query";
-import { Button, ButtonGroup } from "@mui/material";
-import TimelineIcon from "@mui/icons-material/Timeline";
 import BarChartIcon from "@mui/icons-material/BarChart";
-import { supabase } from "../lib/supabaseClient";
+import TimelineIcon from "@mui/icons-material/Timeline";
+import { Button, ButtonGroup } from "@mui/material";
+import { useQuery } from "@tanstack/react-query";
+import dayjs from "dayjs";
+import { useCallback, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { AzBarChart, type ChartDataRow, HistogramChart } from "../components/common/charts";
-import { PageLayout } from "../components/common/layout";
 import { DataGridWrapper } from "../components/common/data-grid";
-import { getAllDataGridColumns, commonHiddenColumns, computeAz } from "../lib/tableHelpers";
+import { PageLayout } from "../components/common/layout";
 import { useComparisonMode } from "../hooks/useComparisonMode";
-import { flattenHeatingSystemsFields } from "../lib/dataTransformers";
 import { calculateSystemAz, createHistogramBins } from "../lib/chartDataProcessing";
+import { flattenHeatingSystemsFields } from "../lib/dataTransformers";
+import { supabase } from "../lib/supabaseClient";
+import { commonHiddenColumns, computeAz, getAllDataGridColumns } from "../lib/tableHelpers";
 
 type ViewMode = "timeSeries" | "distribution";
 

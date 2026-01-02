@@ -1,5 +1,5 @@
-import { useMemo, useState, useCallback } from "react";
 import { ResponsiveBar } from "@nivo/bar";
+import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 export interface HistogramBin {

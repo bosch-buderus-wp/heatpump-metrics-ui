@@ -1,7 +1,7 @@
-import { renderHook, act } from "@testing-library/react";
-import { describe, it, expect, beforeEach } from "vitest";
-import { useComparisonFilters } from "../../../../hooks/useComparisonFilters";
 import type { GridFilterModel } from "@mui/x-data-grid";
+import { act, renderHook } from "@testing-library/react";
+import { beforeEach, describe, expect, it } from "vitest";
+import { useComparisonFilters } from "../../../../hooks/useComparisonFilters";
 
 /**
  * These tests verify the filter switching behavior

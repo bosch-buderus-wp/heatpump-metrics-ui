@@ -178,11 +178,11 @@ metrics/
    - Browser auto-reloads
    - Check console for errors
 
-5. **Format and lint**
+5. **Check code quality**
 
    ```bash
-   npm run format    # Auto-format code
-   npm run lint      # Check for issues
+   npm run check         # Check for formatting and linting issues
+   npm run check:write   # Auto-fix formatting and linting issues
    ```
 
 6. **Run tests**
@@ -219,8 +219,8 @@ npm run build:dev        # Build for development
 npm run build:prod       # Build for production (explicit)
 
 # Code Quality
-npm run lint             # Check code with Biome
-npm run format           # Auto-format code with Biome
+npm run check            # Check code with Biome (formatting + linting)
+npm run check:write      # Auto-fix code with Biome (formatting + linting)
 
 # Testing
 npm test                 # Run all tests once
@@ -237,8 +237,7 @@ The project uses **Husky** and **lint-staged** to automatically enforce code qua
 
 **What runs automatically on `git commit`:**
 
-- ✅ **Biome format** - Auto-formats staged `.ts`, `.tsx`, `.json`, and `.md` files
-- ✅ **Biome lint** - Lints and auto-fixes staged TypeScript files
+- ✅ **Biome check** - Formats, lints, and auto-fixes staged `.ts`, `.tsx`, and `.json` files
 - ✅ **TypeScript check** - Validates types across the entire project
 
 **This ensures:**
@@ -249,8 +248,8 @@ The project uses **Husky** and **lint-staged** to automatically enforce code qua
 
 **The hook only runs on staged files**, making it fast while maintaining quality:
 
-- **TypeScript files** (`.ts`, `.tsx`): format, lint, and type-check
-- **Documentation/Config files** (`.json`, `.md`): format only
+- **TypeScript files** (`.ts`, `.tsx`): check (format + lint) and type-check
+- **Configuration files** (`.json`): check (format + lint)
 
 **To bypass the hook (emergency only):**
 

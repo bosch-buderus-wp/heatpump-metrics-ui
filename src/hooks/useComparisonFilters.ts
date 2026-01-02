@@ -1,5 +1,5 @@
-import { useState, useMemo } from "react";
 import type { GridFilterModel } from "@mui/x-data-grid";
+import { useMemo, useState } from "react";
 
 export interface ComparisonGroup {
   id: 1 | 2;

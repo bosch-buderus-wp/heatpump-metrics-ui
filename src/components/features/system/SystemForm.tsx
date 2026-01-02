@@ -1,23 +1,23 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-  TextField,
-  NumberField,
-  SelectField,
-  EnumSelectField,
-  TextAreaField,
-  NumberInputWithUnit,
-} from "../../form";
-import {
+  BUILDING_ENERGY_STANDARD_VALUES,
+  BUILDING_TYPE_VALUES,
   getEnumOptions,
   MODEL_IDU_VALUES,
   MODEL_ODU_VALUES,
   SW_IDU_VALUES,
   SW_ODU_VALUES,
-  BUILDING_TYPE_VALUES,
-  BUILDING_ENERGY_STANDARD_VALUES,
 } from "../../../lib/enumCatalog";
 import type { Database } from "../../../types/database.types";
+import {
+  EnumSelectField,
+  NumberField,
+  NumberInputWithUnit,
+  SelectField,
+  TextAreaField,
+  TextField,
+} from "../../form";
 
 type HeatingSystem = Database["public"]["Tables"]["heating_systems"]["Row"];
 type HeatingSystemInsert = Database["public"]["Tables"]["heating_systems"]["Insert"];

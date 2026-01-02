@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import type { ComparisonDataGroup } from "../components/common/charts/AzBarChart";
 
 interface LegendItem {

@@ -1,19 +1,18 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import "./App.css";
 import "./i18n";
 import { Layout } from "./components/common/layout";
-import Monthly from "./pages/Monthly";
-import Yearly from "./pages/Yearly";
-import Daily from "./pages/Daily";
-import Systems from "./pages/Systems";
-import Login from "./pages/Login";
-import MyAccount from "./pages/MyAccount";
 import AuthCallback from "./pages/AuthCallback";
-import Terms from "./pages/Terms";
-import Privacy from "./pages/Privacy";
 import AzTempEvaluation from "./pages/AzTempEvaluation";
-
+import Daily from "./pages/Daily";
 import Home from "./pages/Home";
+import Login from "./pages/Login";
+import Monthly from "./pages/Monthly";
+import MyAccount from "./pages/MyAccount";
+import Privacy from "./pages/Privacy";
+import Systems from "./pages/Systems";
+import Terms from "./pages/Terms";
+import Yearly from "./pages/Yearly";
 
 export default function App() {
   return (

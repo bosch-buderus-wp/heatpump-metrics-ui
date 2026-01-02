@@ -1,34 +1,34 @@
-import { useState, useRef, useEffect } from "react";
+import CancelIcon from "@mui/icons-material/Cancel";
+import FileDownloadIcon from "@mui/icons-material/FileDownload";
+import FilterListIcon from "@mui/icons-material/FilterList";
+import PersonIcon from "@mui/icons-material/Person";
+import SearchIcon from "@mui/icons-material/Search";
+import ViewColumnIcon from "@mui/icons-material/ViewColumn";
+import {
+  Badge,
+  Box,
+  Divider,
+  InputAdornment,
+  Menu,
+  MenuItem,
+  TextField,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import { styled } from "@mui/material/styles";
 import {
-  Toolbar,
-  ToolbarButton,
   ColumnsPanelTrigger,
   ExportCsv,
   ExportPrint,
   QuickFilter,
-  QuickFilterControl,
   QuickFilterClear,
+  QuickFilterControl,
   QuickFilterTrigger,
+  Toolbar,
+  ToolbarButton,
   useGridApiContext,
 } from "@mui/x-data-grid";
-import {
-  Tooltip,
-  Menu,
-  MenuItem,
-  Badge,
-  Divider,
-  TextField,
-  InputAdornment,
-  Box,
-  Typography,
-} from "@mui/material";
-import ViewColumnIcon from "@mui/icons-material/ViewColumn";
-import FilterListIcon from "@mui/icons-material/FilterList";
-import FileDownloadIcon from "@mui/icons-material/FileDownload";
-import CancelIcon from "@mui/icons-material/Cancel";
-import SearchIcon from "@mui/icons-material/Search";
-import PersonIcon from "@mui/icons-material/Person";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { COMPARISON_COLORS } from "../../../hooks/useComparisonFilters";
 

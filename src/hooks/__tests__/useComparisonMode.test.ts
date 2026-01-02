@@ -1,7 +1,7 @@
-import { renderHook } from "@testing-library/react";
-import { describe, it, expect, beforeEach, vi } from "vitest";
-import { useComparisonMode } from "../useComparisonMode";
 import type { GridFilterModel } from "@mui/x-data-grid";
+import { renderHook } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { useComparisonMode } from "../useComparisonMode";
 
 // Mock the useComparisonFilters hook
 vi.mock("../useComparisonFilters", () => ({

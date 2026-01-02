@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
+import { Trans, useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabaseClient";
-import { useTranslation, Trans } from "react-i18next";
 
 interface StatsCardProps {
   label: string;

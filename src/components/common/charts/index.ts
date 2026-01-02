@@ -1,6 +1,6 @@
-export { default as AzBarChart } from "./AzBarChart";
 export type { ChartDataRow, ComparisonDataGroup } from "./AzBarChart";
-export { HistogramChart } from "./HistogramChart";
-export type { HistogramBin } from "./HistogramChart";
-export { AzScatterChart } from "./AzScatterChart";
+export { default as AzBarChart } from "./AzBarChart";
 export type { ScatterDataPoint } from "./AzScatterChart";
+export { AzScatterChart } from "./AzScatterChart";
+export type { HistogramBin } from "./HistogramChart";
+export { HistogramChart } from "./HistogramChart";

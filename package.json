@@ -15,8 +15,8 @@
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "build:prod": "vite build --mode production",
-    "lint": "biome lint .",
-    "format": "biome format --write .",
+    "check": "biome check .",
+    "check:write": "biome check --write .",
     "preview": "vite preview",
     "prepare": "husky",
     "release": "npm run release:tag && npm run release:push",
@@ -64,12 +64,11 @@
   },
   "lint-staged": {
     "*.{ts,tsx}": [
-      "biome format --write",
-      "biome lint --write",
+      "biome check --write",
       "bash -c 'tsc --noEmit'"
     ],
     "*.{json}": [
-      "biome format --write"
+      "biome check --write"
     ]
   }
 }

@@ -1,7 +1,7 @@
-import { useCallback, useMemo } from "react";
 import type { GridFilterModel } from "@mui/x-data-grid";
-import { useComparisonFilters } from "./useComparisonFilters";
+import { useCallback, useMemo } from "react";
 import type { ChartDataRow, ComparisonDataGroup } from "../components/common/charts";
+import { useComparisonFilters } from "./useComparisonFilters";
 
 /**
  * Custom hook that encapsulates all comparison mode logic.

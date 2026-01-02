@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "../lib/supabaseClient";
-import { useTranslation } from "react-i18next";
 
 export default function AuthCallback() {
   const { t } = useTranslation();

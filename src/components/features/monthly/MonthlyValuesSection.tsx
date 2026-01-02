@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { MonthlyEditor } from "./MonthlyEditor";
-import { ConfirmDialog } from "../../ui/ConfirmDialog";
 import type { Database } from "../../../types/database.types";
+import { ConfirmDialog } from "../../ui/ConfirmDialog";
+import { MonthlyEditor } from "./MonthlyEditor";
 
 type HeatingSystem = Database["public"]["Tables"]["heating_systems"]["Row"];
 type MonthlyValue = Database["public"]["Tables"]["monthly_values"]["Row"];

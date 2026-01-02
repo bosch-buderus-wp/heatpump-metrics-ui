@@ -1,7 +1,7 @@
-import { renderHook, act } from "@testing-library/react";
-import { describe, it, expect } from "vitest";
-import { useComparisonFilters } from "../useComparisonFilters";
 import type { GridFilterModel } from "@mui/x-data-grid";
+import { act, renderHook } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
+import { useComparisonFilters } from "../useComparisonFilters";
 
 describe("useComparisonFilters", () => {
   it("should initialize with empty filter groups", () => {

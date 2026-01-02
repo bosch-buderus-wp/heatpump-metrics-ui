@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { CopyField } from "../../ui/CopyField";
+import type { Profile } from "../../../hooks/useProfile";
 import { ActionBar, type ActionButton } from "../../ui/ActionBar";
 import { ConfirmDialog } from "../../ui/ConfirmDialog";
-import type { Profile } from "../../../hooks/useProfile";
+import { CopyField } from "../../ui/CopyField";
 
 interface ProfileSectionProps {
   profile: Profile;
