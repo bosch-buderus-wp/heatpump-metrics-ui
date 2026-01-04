@@ -91,10 +91,10 @@ export const MODEL_IDU_VALUES = [
   "CS6800i_M",
   "WLW176i_E",
   "WLW176i_TP70",
-  "WLW176i_TP180",
+  "WLW176i_T180",
   "WLW186i_E",
   "WLW186i_TP70",
-  "WLW186i_TP180",
+  "WLW186i_T180",
 ];
 
 export const MODEL_ODU_VALUES = ["4", "5", "7", "10", "12"];
