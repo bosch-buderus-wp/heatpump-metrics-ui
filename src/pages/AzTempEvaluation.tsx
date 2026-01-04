@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AzScatterChart, type ScatterDataPoint } from "../components/common/charts";
 import { DataGridWrapper } from "../components/common/data-grid";
@@ -14,7 +14,15 @@ type DailyValue = Database["public"]["Views"]["daily_values"]["Row"];
 export default function AzTempEvaluation() {
   const { t } = useTranslation();
   const [filteredData, setFilteredData] = useState<DailyValue[] | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Get current user's ID
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setCurrentUserId(session?.user?.id ?? null);
+    });
+  }, []);
 
   // Debounced filter change handler to prevent rapid updates
   const handleFilterChange = useCallback((data: DailyValue[]) => {
@@ -87,13 +95,14 @@ export default function AzTempEvaluation() {
       heating_id: row.heating_id,
       name: row.name,
       date: row.date,
+      user_id: row.user_id,
     }));
   }, [data, filteredData]);
 
   // Memoize the chart component to prevent unnecessary re-renders
   const chartComponent = useMemo(() => {
-    return <AzScatterChart data={scatterData} />;
-  }, [scatterData]);
+    return <AzScatterChart data={scatterData} currentUserId={currentUserId} />;
+  }, [scatterData, currentUserId]);
 
   return (
     <PageLayout

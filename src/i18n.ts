@@ -74,6 +74,7 @@ const resources = {
         hideStats: "Statistiken ausblenden",
         regressionCurve: "Trendlinie",
         predictedCopTooltip: "Vorhergesagte AZ bei dieser Temperatur basierend auf Regression",
+        myPrefix: "Meine ",
       },
       toolbar: {
         columns: "Spalten anzeigen/verbergen",
@@ -401,6 +402,7 @@ const resources = {
         hideStats: "Hide Statistics",
         regressionCurve: "Fitted Curve",
         predictedCopTooltip: "Predicted COP at this temperature based on regression",
+        myPrefix: "My ",
       },
       toolbar: {
         columns: "Show/hide columns",

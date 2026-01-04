@@ -418,4 +418,87 @@ describe("AzScatterChart", () => {
       expect(screen.getByText("Outdoor Temperature")).toBeInTheDocument();
     });
   });
+
+  describe("User Highlighting", () => {
+    it("should render without currentUserId prop", () => {
+      const mockData: ScatterDataPoint[] = [
+        {
+          az: 3.0,
+          az_heating: 3.2,
+          outdoor_temperature_c: -5,
+          flow_temperature_c: 35,
+          heating_id: "heating-1",
+          name: "System 1",
+          date: "2024-01-01",
+          user_id: "user-123",
+        },
+      ];
+
+      const { container } = render(<AzScatterChart data={mockData} />);
+      expect(container).toBeInTheDocument();
+    });
+
+    it("should accept currentUserId prop", () => {
+      const mockData: ScatterDataPoint[] = [
+        {
+          az: 3.0,
+          az_heating: 3.2,
+          outdoor_temperature_c: -5,
+          flow_temperature_c: 35,
+          heating_id: "heating-1",
+          name: "System 1",
+          date: "2024-01-01",
+          user_id: "user-123",
+        },
+        {
+          az: 3.5,
+          az_heating: 3.7,
+          outdoor_temperature_c: 0,
+          flow_temperature_c: 40,
+          heating_id: "heating-2",
+          name: "System 2",
+          date: "2024-01-02",
+          user_id: "user-456",
+        },
+      ];
+
+      const { container } = render(<AzScatterChart data={mockData} currentUserId="user-123" />);
+      expect(container).toBeInTheDocument();
+    });
+
+    it("should handle null currentUserId", () => {
+      const mockData: ScatterDataPoint[] = [
+        {
+          az: 3.0,
+          az_heating: 3.2,
+          outdoor_temperature_c: -5,
+          flow_temperature_c: 35,
+          heating_id: "heating-1",
+          name: "System 1",
+          date: "2024-01-01",
+          user_id: "user-123",
+        },
+      ];
+
+      const { container } = render(<AzScatterChart data={mockData} currentUserId={null} />);
+      expect(container).toBeInTheDocument();
+    });
+
+    it("should handle data points without user_id", () => {
+      const mockData: ScatterDataPoint[] = [
+        {
+          az: 3.0,
+          az_heating: 3.2,
+          outdoor_temperature_c: -5,
+          flow_temperature_c: 35,
+          heating_id: "heating-1",
+          name: "System 1",
+          date: "2024-01-01",
+        },
+      ];
+
+      const { container } = render(<AzScatterChart data={mockData} currentUserId="user-123" />);
+      expect(container).toBeInTheDocument();
+    });
+  });
 });

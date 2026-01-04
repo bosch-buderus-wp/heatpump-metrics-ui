@@ -15,6 +15,7 @@ interface UseChartLegendOptions {
   comparisonGroups?: ComparisonDataGroup[];
   outdoorTempLabel: string;
   flowTempLabel: string;
+  clickableIds?: string[]; // Optional: restrict which legend items are clickable (default: all)
 }
 
 /**
@@ -29,6 +30,7 @@ export function useChartLegend(options: UseChartLegendOptions) {
     comparisonGroups,
     outdoorTempLabel,
     flowTempLabel,
+    clickableIds,
   } = options;
 
   const [activeKey, setActiveKey] = useState<string>("");
@@ -38,19 +40,29 @@ export function useChartLegend(options: UseChartLegendOptions) {
   const currentActiveKey = activeKey || azHeatingKey;
 
   // Handle legend item clicks
-  const handleLegendClick = useCallback((datum: { id: string }) => {
-    // Handle temperature line toggles
-    if (datum.id === "outdoor_temp") {
-      setShowOutdoorTemp((prev) => !prev);
-      return;
-    }
-    if (datum.id === "flow_temp") {
-      setShowFlowTemp((prev) => !prev);
-      return;
-    }
-    // Toggle to the clicked key for AZ bars
-    setActiveKey(datum.id);
-  }, []);
+  const handleLegendClick = useCallback(
+    (datum: { id: string }) => {
+      const id = typeof datum.id === "string" ? datum.id : String(datum.id);
+
+      // If clickableIds is specified, only handle clicks for those IDs
+      if (clickableIds && !clickableIds.includes(id)) {
+        return;
+      }
+
+      // Handle temperature line toggles
+      if (id === "outdoor_temp") {
+        setShowOutdoorTemp((prev) => !prev);
+        return;
+      }
+      if (id === "flow_temp") {
+        setShowFlowTemp((prev) => !prev);
+        return;
+      }
+      // Toggle to the clicked key for AZ bars
+      setActiveKey(id);
+    },
+    [clickableIds],
+  );
 
   // Generate legend items based on mode
   const legendItems = useMemo<LegendItem[]>(() => {

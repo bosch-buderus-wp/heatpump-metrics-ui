@@ -16,6 +16,7 @@ export interface ScatterDataPoint {
   heating_id?: string | null;
   name?: string | null;
   date?: string | null;
+  user_id?: string | null;
 }
 
 // Extended type for scatter plot points with custom data
@@ -25,17 +26,20 @@ interface ScatterPointData {
   heating_id?: string | null;
   name?: string | null;
   date?: string | null;
+  user_id?: string | null;
 }
 
 type TemperatureMode = "outdoor" | "flow" | "delta";
 
 interface AzScatterChartProps {
   data: ScatterDataPoint[];
+  currentUserId?: string | null;
 }
 
-export function AzScatterChart({ data }: AzScatterChartProps) {
+export function AzScatterChart({ data, currentUserId }: AzScatterChartProps) {
   const { t } = useTranslation();
   const barColor = "#23a477ff";
+  const userColor = "#ff9800"; // Orange color for current user's data points
 
   const azTotalKey = t("common.azTotal");
   const azHeatingKey = t("common.azHeating");
@@ -65,13 +69,15 @@ export function AzScatterChart({ data }: AzScatterChartProps) {
     return regression.slope * temperature + regression.intercept;
   };
 
-  // Use the chart legend hook (same as AzBarChart)
+  // Use the chart legend hook - restrict clicks to only AZ toggles
+  // (regression curve and user data series should not be clickable)
   const { activeKey, legendItems, handleLegendClick } = useChartLegend({
     azTotalKey,
     azHeatingKey,
     barColor,
     outdoorTempLabel: t("common.outdoorTemperature"),
     flowTempLabel: t("common.flowTemperature"),
+    clickableIds: [azTotalKey, azHeatingKey],
   });
 
   // Transform data for scatter plot - create both series but only populate the active one
@@ -108,6 +114,7 @@ export function AzScatterChart({ data }: AzScatterChartProps) {
             heating_id: row.heating_id,
             name: row.name,
             date: row.date,
+            user_id: row.user_id,
           };
         }
         return null;
@@ -127,17 +134,36 @@ export function AzScatterChart({ data }: AzScatterChartProps) {
       curveData = curvePoints.map((p) => ({ x: p.x, y: p.y }));
     }
 
+    // Separate user's data from other users' data for the active series
+    const userPoints = currentUserId ? points.filter((p) => p.user_id === currentUserId) : [];
+    const otherPoints = currentUserId ? points.filter((p) => p.user_id !== currentUserId) : points;
+
     // Return scatter series with curve overlay
+    // Always include both azTotalKey and azHeatingKey series (empty if not active)
     const scatterSeries = [
       {
         id: azTotalKey,
-        data: activeKey === azTotalKey ? points : [],
+        data: activeKey === azTotalKey ? otherPoints : [],
       },
       {
         id: azHeatingKey,
-        data: activeKey === azHeatingKey ? points : [],
+        data: activeKey === azHeatingKey ? otherPoints : [],
       },
     ];
+
+    // Add user's data as separate series (if any)
+    const myPrefix = t("charts.myPrefix");
+    if (activeKey === azTotalKey && userPoints.length > 0) {
+      scatterSeries.push({
+        id: `${myPrefix}${azTotalKey}`,
+        data: userPoints,
+      });
+    } else if (activeKey === azHeatingKey && userPoints.length > 0) {
+      scatterSeries.push({
+        id: `${myPrefix}${azHeatingKey}`,
+        data: userPoints,
+      });
+    }
 
     // Add curve as a separate series if available (use translation key)
     if (curveData.length > 0) {
@@ -148,6 +174,7 @@ export function AzScatterChart({ data }: AzScatterChartProps) {
           heating_id: undefined,
           name: undefined,
           date: undefined,
+          user_id: undefined,
         })),
       });
     }
@@ -157,13 +184,7 @@ export function AzScatterChart({ data }: AzScatterChartProps) {
       activePoints: points as ScatterPointData[],
       regression: regressionResult,
     };
-  }, [data, activeKey, azHeatingKey, azTotalKey, temperatureMode, t]);
-
-  // Filter legend items to only show AZ toggles (not temperature lines)
-  // Temperature line items have IDs "outdoor_temp" and "flow_temp"
-  const azLegendItems = useMemo(() => {
-    return legendItems.filter((item) => item.id !== "outdoor_temp" && item.id !== "flow_temp");
-  }, [legendItems]);
+  }, [data, activeKey, azHeatingKey, azTotalKey, temperatureMode, t, currentUserId]);
 
   // Get x-axis label based on temperature mode
   const getXAxisLabel = () => {
@@ -227,10 +248,20 @@ export function AzScatterChart({ data }: AzScatterChartProps) {
             if (node.serieId === t("charts.regressionCurve")) {
               return "#ff6b6b"; // Red color for regression line
             }
-            if (node.serieId === activeKey) {
-              return barColor;
+            // Check if this is the user's series (starts with translated myPrefix)
+            const myPrefix = t("charts.myPrefix");
+            if (typeof node.serieId === "string" && node.serieId.startsWith(myPrefix)) {
+              return userColor; // Orange color for user's own data points
             }
-            return "#cccccc"; // Shouldn't happen since inactive series has no data
+            // For base series, use gray if inactive, green if active
+            if (node.serieId === azTotalKey) {
+              return activeKey === azTotalKey ? barColor : "#cccccc";
+            }
+            if (node.serieId === azHeatingKey) {
+              return activeKey === azHeatingKey ? barColor : "#cccccc";
+            }
+            // Fallback
+            return barColor;
           }}
           nodeSize={(node) => {
             // Make regression curve points visible
@@ -259,8 +290,10 @@ export function AzScatterChart({ data }: AzScatterChartProps) {
           }}
           tooltip={({ node }) => {
             const pointData = node.data as ScatterPointData;
-            const xValue = typeof pointData.x === "number" ? pointData.x : 0;
-            const yValue = typeof pointData.y === "number" ? pointData.y : 0;
+            const xValue = typeof pointData?.x === "number" ? pointData.x : 0;
+            const yValue = typeof pointData?.y === "number" ? pointData.y : 0;
+            const isCurrentUser = currentUserId && pointData && pointData.user_id === currentUserId;
+            const dotColor = isCurrentUser ? userColor : barColor;
 
             return (
               <div className="chart-tooltip">
@@ -278,7 +311,7 @@ export function AzScatterChart({ data }: AzScatterChartProps) {
                 <div className="chart-tooltip-item">
                   <div
                     className="chart-tooltip-indicator chart-tooltip-indicator-bar"
-                    style={{ backgroundColor: barColor }}
+                    style={{ backgroundColor: dotColor }}
                   />
                   <span className="chart-tooltip-text">
                     {activeKey}: <strong>{yValue.toFixed(2)}</strong>
@@ -295,13 +328,13 @@ export function AzScatterChart({ data }: AzScatterChartProps) {
               translateX: 0,
               translateY: 60,
               itemsSpacing: 20,
-              itemWidth: 200,
+              itemWidth: 180,
               itemHeight: 20,
               itemDirection: "left-to-right",
               itemOpacity: 0.85,
               symbolSize: 20,
               symbolShape: "circle",
-              data: azLegendItems,
+              data: legendItems,
               toggleSerie: false,
               // biome-ignore lint/suspicious/noExplicitAny: Nivo's onClick type expects MouseEvent parameter we don't need
               onClick: handleLegendClick as any,

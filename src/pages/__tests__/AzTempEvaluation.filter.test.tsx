@@ -23,6 +23,7 @@ vi.mock("../../lib/supabaseClient", () => ({
               az_heating: 3.7,
               outdoor_temperature_c: -5,
               flow_temperature_c: 35,
+              user_id: "user-123",
             },
             {
               heating_id: "system-2",
@@ -37,6 +38,7 @@ vi.mock("../../lib/supabaseClient", () => ({
               az_heating: 4.4,
               outdoor_temperature_c: 2,
               flow_temperature_c: 32,
+              user_id: "user-456",
             },
             {
               heating_id: "system-1",
@@ -51,12 +53,26 @@ vi.mock("../../lib/supabaseClient", () => ({
               az_heating: 4.0,
               outdoor_temperature_c: 5,
               flow_temperature_c: 30,
+              user_id: "user-123",
             },
           ],
           error: null,
         })),
       })),
     })),
+    auth: {
+      getSession: vi.fn(() =>
+        Promise.resolve({
+          data: {
+            session: {
+              user: {
+                id: "user-123",
+              },
+            },
+          },
+        }),
+      ),
+    },
   },
 }));
 
