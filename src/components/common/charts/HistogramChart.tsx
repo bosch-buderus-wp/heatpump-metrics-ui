@@ -1,6 +1,7 @@
 import { ResponsiveBar } from "@nivo/bar";
-import { useCallback, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { useChartLegend } from "../../../hooks/useChartLegend";
 
 export interface HistogramBin {
   binLabel: string;
@@ -33,38 +34,23 @@ export function HistogramChart({
   const azTotalKey = t("common.azTotal");
   const azHeatingKey = t("common.azHeating");
 
-  // Track which AZ type is active (default to azHeating like in AzBarChart)
-  const [activeKey, setActiveKey] = useState<string>("");
-  const currentActiveKey = activeKey || azHeatingKey;
+  // Use the chart legend hook (histogram doesn't need temperature lines, only AZ toggles)
+  const { activeKey, legendItems, handleLegendClick } = useChartLegend({
+    azTotalKey,
+    azHeatingKey,
+    barColor,
+    outdoorTempLabel: t("common.outdoorTemperature"),
+    flowTempLabel: t("common.flowTemperature"),
+    showTemperatureLines: false, // Histogram doesn't show temperature lines
+  });
 
   // Determine which data to show based on active key
   const { chartData, stats } = useMemo(() => {
-    if (currentActiveKey === azTotalKey) {
+    if (activeKey === azTotalKey) {
       return { chartData: azBins, stats: azStats };
     }
     return { chartData: azHeatingBins, stats: azHeatingStats };
-  }, [currentActiveKey, azBins, azHeatingBins, azStats, azHeatingStats, azTotalKey]);
-
-  // Handle legend clicks
-  const handleLegendClick = useCallback((datum: { id: string }) => {
-    setActiveKey(datum.id);
-  }, []);
-
-  // Generate legend items
-  const legendItems = useMemo(() => {
-    return [
-      {
-        id: azTotalKey,
-        label: azTotalKey,
-        color: currentActiveKey === azTotalKey ? barColor : "#cccccc",
-      },
-      {
-        id: azHeatingKey,
-        label: azHeatingKey,
-        color: currentActiveKey === azHeatingKey ? barColor : "#cccccc",
-      },
-    ];
-  }, [azTotalKey, azHeatingKey, currentActiveKey]);
+  }, [activeKey, azBins, azHeatingBins, azStats, azHeatingStats, azTotalKey]);
 
   if (!chartData || chartData.length === 0) {
     return (

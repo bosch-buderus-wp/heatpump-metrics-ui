@@ -16,6 +16,7 @@ interface UseChartLegendOptions {
   outdoorTempLabel: string;
   flowTempLabel: string;
   clickableIds?: string[]; // Optional: restrict which legend items are clickable (default: all)
+  showTemperatureLines?: boolean; // Optional: whether to show temperature line legend items (default: true)
 }
 
 /**
@@ -31,6 +32,7 @@ export function useChartLegend(options: UseChartLegendOptions) {
     outdoorTempLabel,
     flowTempLabel,
     clickableIds,
+    showTemperatureLines = true,
   } = options;
 
   const [activeKey, setActiveKey] = useState<string>("");
@@ -83,18 +85,20 @@ export function useChartLegend(options: UseChartLegendOptions) {
         currentActiveKey === azHeatingKey ? (isComparisonMode ? "#23a477ff" : barColor) : "#cccccc",
     });
 
-    // Temperature lines
-    items.push({
-      id: "outdoor_temp",
-      label: outdoorTempLabel,
-      color: showOutdoorTemp ? "#3b82f6" : "#cccccc",
-    });
+    // Temperature lines (only if enabled)
+    if (showTemperatureLines) {
+      items.push({
+        id: "outdoor_temp",
+        label: outdoorTempLabel,
+        color: showOutdoorTemp ? "#3b82f6" : "#cccccc",
+      });
 
-    items.push({
-      id: "flow_temp",
-      label: flowTempLabel,
-      color: showFlowTemp ? "#ef4444" : "#cccccc",
-    });
+      items.push({
+        id: "flow_temp",
+        label: flowTempLabel,
+        color: showFlowTemp ? "#ef4444" : "#cccccc",
+      });
+    }
 
     return items;
   }, [
@@ -107,6 +111,7 @@ export function useChartLegend(options: UseChartLegendOptions) {
     showFlowTemp,
     outdoorTempLabel,
     flowTempLabel,
+    showTemperatureLines,
   ]);
 
   // Generate chart keys based on mode
