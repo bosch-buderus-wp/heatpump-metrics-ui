@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useChartLegend } from "../../../hooks/useChartLegend";
 import { computeAzTemperatureRegression } from "../../../lib/chartDataProcessing";
+import { CHART_COLORS } from "../../../lib/chartTheme";
 import type { RegressionResult } from "../../../lib/regressionUtils";
 import { generateCurvePoints } from "../../../lib/regressionUtils";
 
@@ -38,8 +39,8 @@ interface AzScatterChartProps {
 
 export function AzScatterChart({ data, currentUserId }: AzScatterChartProps) {
   const { t } = useTranslation();
-  const barColor = "#23a477ff";
-  const userColor = "#ff9800"; // Orange color for current user's data points
+  const barColor = CHART_COLORS.primary;
+  const userColor = CHART_COLORS.user;
 
   const azTotalKey = t("common.azTotal");
   const azHeatingKey = t("common.azHeating");
@@ -246,19 +247,19 @@ export function AzScatterChart({ data, currentUserId }: AzScatterChartProps) {
           colors={(node) => {
             // Color nodes based on which series they belong to
             if (node.serieId === t("charts.regressionCurve")) {
-              return "#ff6b6b"; // Red color for regression line
+              return CHART_COLORS.regression;
             }
             // Check if this is the user's series (starts with translated myPrefix)
             const myPrefix = t("charts.myPrefix");
             if (typeof node.serieId === "string" && node.serieId.startsWith(myPrefix)) {
-              return userColor; // Orange color for user's own data points
+              return userColor;
             }
             // For base series, use gray if inactive, green if active
             if (node.serieId === azTotalKey) {
-              return activeKey === azTotalKey ? barColor : "#cccccc";
+              return activeKey === azTotalKey ? barColor : CHART_COLORS.inactive;
             }
             if (node.serieId === azHeatingKey) {
-              return activeKey === azHeatingKey ? barColor : "#cccccc";
+              return activeKey === azHeatingKey ? barColor : CHART_COLORS.inactive;
             }
             // Fallback
             return barColor;

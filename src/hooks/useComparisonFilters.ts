@@ -1,5 +1,6 @@
 import type { GridFilterModel } from "@mui/x-data-grid";
 import { useMemo, useState } from "react";
+import { CHART_COLORS } from "../lib/chartTheme";
 
 export interface ComparisonGroup {
   id: 1 | 2;
@@ -34,13 +35,6 @@ export interface UseComparisonFiltersReturn {
   clearFilterGroup2: () => void;
 }
 
-export const COMPARISON_COLORS = {
-  group1: "#23a477ff", // Medium green
-  group2: "#86efac", // Light green
-  outdoor: "#3b82f6", // Blue (existing)
-  flow: "#ef4444", // Red (existing)
-};
-
 export function useComparisonFilters(): UseComparisonFiltersReturn {
   const [filterGroup1, setFilterGroup1] = useState<GridFilterModel>({ items: [] });
   const [filterGroup2, setFilterGroup2] = useState<GridFilterModel>({ items: [] });
@@ -62,7 +56,7 @@ export function useComparisonFilters(): UseComparisonFiltersReturn {
       {
         id: 1,
         name: "Filter 1",
-        color: COMPARISON_COLORS.group1,
+        color: CHART_COLORS.group1,
         filterModel: filterGroup1,
       },
     ];
@@ -71,7 +65,7 @@ export function useComparisonFilters(): UseComparisonFiltersReturn {
       groups.push({
         id: 2,
         name: "Filter 2",
-        color: COMPARISON_COLORS.group2,
+        color: CHART_COLORS.group2,
         filterModel: filterGroup2,
       });
     }

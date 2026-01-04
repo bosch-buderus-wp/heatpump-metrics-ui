@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 import type { ComparisonDataGroup } from "../components/common/charts/AzBarChart";
+import { CHART_COLORS } from "../lib/chartTheme";
 
 interface LegendItem {
   id: string;
@@ -26,7 +27,7 @@ export function useChartLegend(options: UseChartLegendOptions) {
   const {
     azTotalKey,
     azHeatingKey,
-    barColor = "#23a477ff",
+    barColor = CHART_COLORS.primary,
     isComparisonMode = false,
     comparisonGroups,
     outdoorTempLabel,
@@ -75,14 +76,22 @@ export function useChartLegend(options: UseChartLegendOptions) {
       id: azTotalKey,
       label: azTotalKey,
       color:
-        currentActiveKey === azTotalKey ? (isComparisonMode ? "#23a477ff" : barColor) : "#cccccc",
+        currentActiveKey === azTotalKey
+          ? isComparisonMode
+            ? CHART_COLORS.primary
+            : barColor
+          : CHART_COLORS.inactive,
     });
 
     items.push({
       id: azHeatingKey,
       label: azHeatingKey,
       color:
-        currentActiveKey === azHeatingKey ? (isComparisonMode ? "#23a477ff" : barColor) : "#cccccc",
+        currentActiveKey === azHeatingKey
+          ? isComparisonMode
+            ? CHART_COLORS.primary
+            : barColor
+          : CHART_COLORS.inactive,
     });
 
     // Temperature lines (only if enabled)
@@ -90,13 +99,13 @@ export function useChartLegend(options: UseChartLegendOptions) {
       items.push({
         id: "outdoor_temp",
         label: outdoorTempLabel,
-        color: showOutdoorTemp ? "#3b82f6" : "#cccccc",
+        color: showOutdoorTemp ? CHART_COLORS.outdoorTemp : CHART_COLORS.inactive,
       });
 
       items.push({
         id: "flow_temp",
         label: flowTempLabel,
-        color: showFlowTemp ? "#ef4444" : "#cccccc",
+        color: showFlowTemp ? CHART_COLORS.flowTemp : CHART_COLORS.inactive,
       });
     }
 

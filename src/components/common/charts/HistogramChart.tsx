@@ -2,6 +2,7 @@ import { ResponsiveBar } from "@nivo/bar";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useChartLegend } from "../../../hooks/useChartLegend";
+import { CHART_COLORS } from "../../../lib/chartTheme";
 
 export interface HistogramBin {
   binLabel: string;
@@ -29,7 +30,7 @@ export function HistogramChart({
   statsTitle,
 }: HistogramChartProps) {
   const { t } = useTranslation();
-  const barColor = "#23a477ff";
+  const barColor = CHART_COLORS.primary;
 
   const azTotalKey = t("common.azTotal");
   const azHeatingKey = t("common.azHeating");

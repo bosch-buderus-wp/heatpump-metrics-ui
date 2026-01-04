@@ -7,6 +7,7 @@ import {
   mergeComparisonDatasets,
   processDataset,
 } from "../../../lib/chartDataProcessing";
+import { CHART_COLORS } from "../../../lib/chartTheme";
 import ChartTooltip from "./ChartTooltip";
 import TemperatureLineLayer from "./TemperatureLineLayer";
 
@@ -45,7 +46,7 @@ export default function AzBarChart({
   indexValues,
   indexFormatter,
   aggregateData = true,
-  barColor = "#23a477ff",
+  barColor = CHART_COLORS.primary,
   comparisonGroups,
 }: AzBarChartProps) {
   const { t } = useTranslation();

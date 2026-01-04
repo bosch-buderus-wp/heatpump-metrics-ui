@@ -30,7 +30,7 @@ import {
 } from "@mui/x-data-grid";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { COMPARISON_COLORS } from "../../../hooks/useComparisonFilters";
+import { CHART_COLORS } from "../../../lib/chartTheme";
 
 interface DataGridToolbarInternalProps {
   userId?: string | null;
@@ -154,7 +154,7 @@ function DataGridToolbarInternal({
       <Tooltip title={comparisonMode ? t("toolbar.filter1") : t("toolbar.filters")}>
         <Box
           sx={{
-            border: activeGroup === 1 ? `2px solid ${COMPARISON_COLORS.group1}` : "none",
+            border: activeGroup === 1 ? `2px solid ${CHART_COLORS.group1}` : "none",
             borderRadius: 1,
             display: "inline-flex",
           }}
@@ -162,11 +162,11 @@ function DataGridToolbarInternal({
           <ToolbarButton onClick={onFilterGroup1Click}>
             <Badge badgeContent={filterGroup1Count} color="success" variant="dot">
               <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                <FilterListIcon fontSize="small" sx={{ color: COMPARISON_COLORS.group1 }} />
+                <FilterListIcon fontSize="small" sx={{ color: CHART_COLORS.group1 }} />
                 {comparisonMode && (
                   <Typography
                     variant="caption"
-                    sx={{ color: COMPARISON_COLORS.group1, fontWeight: "bold" }}
+                    sx={{ color: CHART_COLORS.group1, fontWeight: "bold" }}
                   >
                     1
                   </Typography>
@@ -180,7 +180,7 @@ function DataGridToolbarInternal({
       <Tooltip title={t("toolbar.filter2")}>
         <Box
           sx={{
-            border: activeGroup === 2 ? `2px solid ${COMPARISON_COLORS.group2}` : "none",
+            border: activeGroup === 2 ? `2px solid ${CHART_COLORS.group2}` : "none",
             borderRadius: 1,
             opacity: comparisonMode ? 1 : 0.5,
             display: "inline-flex",
@@ -189,10 +189,10 @@ function DataGridToolbarInternal({
           <ToolbarButton onClick={onFilterGroup2Click}>
             <Badge badgeContent={filterGroup2Count} color="success" variant="dot">
               <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                <FilterListIcon fontSize="small" sx={{ color: COMPARISON_COLORS.group2 }} />
+                <FilterListIcon fontSize="small" sx={{ color: CHART_COLORS.group2 }} />
                 <Typography
                   variant="caption"
-                  sx={{ color: COMPARISON_COLORS.group2, fontWeight: "bold" }}
+                  sx={{ color: CHART_COLORS.group2, fontWeight: "bold" }}
                 >
                   2
                 </Typography>
@@ -205,7 +205,7 @@ function DataGridToolbarInternal({
       {comparisonMode && onClearFilterGroup2 && (
         <Tooltip title={t("toolbar.clearFilter2")}>
           <ToolbarButton onClick={onClearFilterGroup2} size="small">
-            <CancelIcon fontSize="small" sx={{ color: COMPARISON_COLORS.group2 }} />
+            <CancelIcon fontSize="small" sx={{ color: CHART_COLORS.group2 }} />
           </ToolbarButton>
         </Tooltip>
       )}

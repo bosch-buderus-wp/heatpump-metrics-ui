@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { CHART_COLORS } from "../../../lib/chartTheme";
 
 interface TemperatureLineLayerProps {
   // biome-ignore lint/suspicious/noExplicitAny: Nivo's bar type is complex and not exported
@@ -126,7 +127,7 @@ export default function TemperatureLineLayer({
         <path
           d={outdoorTempPath}
           fill="none"
-          stroke="#3b82f6"
+          stroke={CHART_COLORS.outdoorTemp}
           strokeWidth={2}
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -136,7 +137,7 @@ export default function TemperatureLineLayer({
         <path
           d={flowTempPath}
           fill="none"
-          stroke="#ef4444"
+          stroke={CHART_COLORS.flowTemp}
           strokeWidth={2}
           strokeLinecap="round"
           strokeLinejoin="round"
