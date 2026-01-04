@@ -187,10 +187,8 @@ Output: Single-file bundle (`app.js` + `app.css`) optimized for CDN distribution
 ### Planned Features
 
 - [ ] Allow users to filter for similar heating_systems
-- [ ] Gain automatic insights from data, e.g. average COP/AZ dependency on outdoor/flow temperature
 - [ ] Average/min/max temperature from weather APIs
 - [ ] Standard outdoor temperature (NAT) from waermepumpe.de
-- [ ] COP/AZ histogram visualization
 
 ## 🐛 Known Issues
 
