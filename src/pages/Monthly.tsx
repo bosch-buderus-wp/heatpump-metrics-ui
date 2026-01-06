@@ -10,13 +10,13 @@ import { DataGridWrapper } from "../components/common/data-grid";
 import { PageLayout } from "../components/common/layout";
 import { MonthYearPicker } from "../components/form";
 import { useComparisonMode } from "../hooks/useComparisonMode";
-import { calculateSystemAz, createHistogramBins } from "../lib/chartDataProcessing";
 import { supabase } from "../lib/supabaseClient";
 import { commonHiddenColumns, getAllDataGridColumns } from "../lib/tableHelpers";
 import type { Database } from "../types/database.types";
 
 type DailyValue = Database["public"]["Views"]["daily_values"]["Row"];
 type ViewMode = "timeSeries" | "distribution";
+type MetricMode = "cop" | "energy";
 
 export default function Monthly() {
   const { t } = useTranslation();
@@ -26,6 +26,7 @@ export default function Monthly() {
   const [year, setYear] = useState(defaultYear);
   const [filteredData, setFilteredData] = useState<DailyValue[]>([]);
   const [viewMode, setViewMode] = useState<ViewMode>("timeSeries");
+  const [metricMode, setMetricMode] = useState<MetricMode>("cop");
 
   // Wrap setFilteredData in useCallback to prevent infinite loops in DataGridWrapper
   const handleFilterChange = useCallback((data: DailyValue[]) => {
@@ -57,6 +58,10 @@ export default function Monthly() {
       cols.usedForCooling,
       cols.az,
       cols.azHeating,
+      cols.thermalEnergy,
+      cols.electricalEnergy,
+      cols.thermalEnergyHeating,
+      cols.electricalEnergyHeating,
       cols.outdoorTemperature,
       cols.flowTemperature,
     ];
@@ -99,35 +104,16 @@ export default function Monthly() {
     return data;
   }, [data]);
 
-  // Calculate histogram data for distribution view (MAZ - Monthly AZ) (lazy - only when needed)
-  const histogramData = useMemo(() => {
-    // Only calculate if we're in distribution mode
-    if (viewMode !== "distribution") return null;
-    if (!data) return null;
-
-    // Use filtered data if available, otherwise use all data
-    const dataToUse = (filteredDataForChart || filteredData || data) as Array<{
+  // Get the data to use for histogram (filtered if available)
+  const histogramDataSource = useMemo(() => {
+    return (filteredDataForChart || filteredData || data) as Array<{
       heating_id: string;
       thermal_energy_kwh?: number | null;
       electrical_energy_kwh?: number | null;
       thermal_energy_heating_kwh?: number | null;
       electrical_energy_heating_kwh?: number | null;
     }>;
-
-    // Calculate MAZ (monthly AZ) for each system
-    const systemAzData = calculateSystemAz(dataToUse);
-
-    // Create histogram bins for total AZ
-    const azHistogram = createHistogramBins(systemAzData, "az", 0.5);
-
-    // Create histogram bins for heating AZ
-    const azHeatingHistogram = createHistogramBins(systemAzData, "azHeating", 0.5);
-
-    return {
-      az: azHistogram,
-      azHeating: azHeatingHistogram,
-    };
-  }, [viewMode, data, filteredData, filteredDataForChart]);
+  }, [data, filteredData, filteredDataForChart]);
 
   return (
     <PageLayout
@@ -154,6 +140,20 @@ export default function Monthly() {
               {t("charts.distribution")}
             </Button>
           </ButtonGroup>
+          <ButtonGroup size="small" variant="outlined">
+            <Button
+              onClick={() => setMetricMode("cop")}
+              variant={metricMode === "cop" ? "contained" : "outlined"}
+            >
+              {t("charts.copMode")}
+            </Button>
+            <Button
+              onClick={() => setMetricMode("energy")}
+              variant={metricMode === "energy" ? "contained" : "outlined"}
+            >
+              {t("charts.energyMode")}
+            </Button>
+          </ButtonGroup>
         </div>
       }
       chart={
@@ -165,14 +165,16 @@ export default function Monthly() {
             indexLabel="common.date"
             indexFormatter={(date) => dayjs(date).format("DD")}
             aggregateData={true}
+            metricMode={metricMode}
           />
         ) : (
           <HistogramChart
-            azBins={histogramData?.az.bins || []}
-            azHeatingBins={histogramData?.azHeating.bins || []}
-            azStats={histogramData?.az.stats || { mean: 0, median: 0 }}
-            azHeatingStats={histogramData?.azHeating.stats || { mean: 0, median: 0 }}
-            statsTitle={t("charts.monthlyCopStats")}
+            data={histogramDataSource}
+            metricMode={metricMode}
+            statsTitle={
+              metricMode === "energy" ? t("charts.monthlyEnergyStats") : t("charts.monthlyCopStats")
+            }
+            binSize={0.5}
           />
         )
       }

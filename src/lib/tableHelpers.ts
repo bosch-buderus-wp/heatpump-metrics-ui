@@ -23,6 +23,10 @@ export const commonHiddenColumns: Record<string, boolean> = {
   used_for_heating: false,
   used_for_dhw: false,
   used_for_cooling: false,
+  electrical_energy_kwh: false,
+  electrical_energy_heating_kwh: false,
+  thermal_energy_kwh: false,
+  thermal_energy_heating_kwh: false,
 };
 
 import {

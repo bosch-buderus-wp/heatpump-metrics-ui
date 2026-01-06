@@ -9,7 +9,6 @@ import { AzBarChart, type ChartDataRow, HistogramChart } from "../components/com
 import { DataGridWrapper } from "../components/common/data-grid";
 import { PageLayout } from "../components/common/layout";
 import { useComparisonMode } from "../hooks/useComparisonMode";
-import { calculateDailyTaz, createHistogramBins } from "../lib/chartDataProcessing";
 import { flattenHeatingSystemsFields } from "../lib/dataTransformers";
 import { supabase } from "../lib/supabaseClient";
 import { commonHiddenColumns, getAllDataGridColumns } from "../lib/tableHelpers";
@@ -17,12 +16,14 @@ import type { Database } from "../types/database.types";
 
 type MeasurementRow = Database["public"]["Tables"]["measurements"]["Row"];
 type ViewMode = "timeSeries" | "distribution";
+type MetricMode = "cop" | "energy";
 
 export default function Daily() {
   const { t } = useTranslation();
   const [date, setDate] = useState(dayjs().format("YYYY-MM-DD"));
   const [filteredData, setFilteredData] = useState<MeasurementRow[]>([]);
   const [viewMode, setViewMode] = useState<ViewMode>("timeSeries");
+  const [metricMode, setMetricMode] = useState<MetricMode>("cop");
 
   // Wrap setFilteredData in useCallback to prevent infinite loops in DataGridWrapper
   const handleFilterChange = useCallback((data: MeasurementRow[]) => {
@@ -54,6 +55,10 @@ export default function Daily() {
       cols.usedForCooling,
       cols.az,
       cols.azHeating,
+      cols.thermalEnergy,
+      cols.electricalEnergy,
+      cols.thermalEnergyHeating,
+      cols.electricalEnergyHeating,
       cols.outdoorTemperature,
       cols.flowTemperature,
     ];
@@ -126,10 +131,20 @@ export default function Daily() {
           // Calculate AZ from differences
           enriched.az = deltaETotal > 0 ? deltaTTotal / deltaETotal : undefined;
           enriched.az_heating = deltaEHeating > 0 ? deltaTHeating / deltaEHeating : undefined;
+
+          // Replace cumulative energy values with deltas for display
+          enriched.electrical_energy_kwh = deltaETotal > 0 ? deltaETotal : null;
+          enriched.thermal_energy_kwh = deltaTTotal > 0 ? deltaTTotal : null;
+          enriched.electrical_energy_heating_kwh = deltaEHeating > 0 ? deltaEHeating : null;
+          enriched.thermal_energy_heating_kwh = deltaTHeating > 0 ? deltaTHeating : null;
         } else {
           // First measurement has no previous data
           enriched.az = undefined;
           enriched.az_heating = undefined;
+          enriched.electrical_energy_kwh = null;
+          enriched.thermal_energy_kwh = null;
+          enriched.electrical_energy_heating_kwh = null;
+          enriched.thermal_energy_heating_kwh = null;
         }
 
         // Flatten heating_systems fields to top level for filtering
@@ -152,35 +167,29 @@ export default function Daily() {
     dataGridComparisonProps,
   } = useComparisonMode(sortedData);
 
-  // Calculate histogram data for distribution view (Daily AZ) (lazy - only when needed)
-  const histogramData = useMemo(() => {
-    // Only calculate if we're in distribution mode
-    if (viewMode !== "distribution") return null;
-    if (!sortedData) return null;
+  // Get the data to use for histogram (filtered if available)
+  // For histogram, we need the original cumulative values, not the deltas
+  // But we still need to respect filtering from comparison mode or data grid filters
+  const histogramDataSource = useMemo(() => {
+    // Determine which filtered data to use
+    const sourceData = filteredDataForChart || filteredData || sortedData;
 
-    // Use filtered data if available, otherwise use all data
-    const dataToUse = (filteredDataForChart || filteredData || sortedData) as Array<{
+    // Get unique heating_ids from the filtered/enriched data
+    const filteredHeatingIds = new Set(
+      sourceData.map((row) => (row as { heating_id: string }).heating_id),
+    );
+
+    // Filter the original raw data to only include those systems
+    // This ensures we use cumulative values (not deltas) but respect filtering
+    return (data || []).filter((row) => filteredHeatingIds.has(row.heating_id)) as Array<{
       heating_id: string;
       thermal_energy_kwh?: number | null;
       electrical_energy_kwh?: number | null;
       thermal_energy_heating_kwh?: number | null;
       electrical_energy_heating_kwh?: number | null;
+      created_at?: string | null;
     }>;
-
-    // Calculate TAZ (daily AZ) for each system using difference between first and last measurement
-    const systemAzData = calculateDailyTaz(dataToUse);
-
-    // Create histogram bins for total AZ
-    const azHistogram = createHistogramBins(systemAzData, "az", 0.5);
-
-    // Create histogram bins for heating AZ
-    const azHeatingHistogram = createHistogramBins(systemAzData, "azHeating", 0.5);
-
-    return {
-      az: azHistogram,
-      azHeating: azHeatingHistogram,
-    };
-  }, [viewMode, sortedData, filteredData, filteredDataForChart]);
+  }, [data, filteredDataForChart, filteredData, sortedData]);
 
   return (
     <PageLayout
@@ -190,33 +199,30 @@ export default function Daily() {
       isLoading={isLoading}
       filters={
         <div className="filter-container">
-          <div className="row picker">
-            <label htmlFor="daily-date-picker">{t("common.date")}</label>
-            <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-              <button
-                type="button"
-                onClick={() => setDate(dayjs(date).subtract(1, "day").format("YYYY-MM-DD"))}
-                title={t("common.previousDay") || "Previous day"}
-                className="nav-button"
-              >
-                ◀
-              </button>
-              <input
-                id="daily-date-picker"
-                type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-                className="form-input"
-              />
-              <button
-                type="button"
-                onClick={() => setDate(dayjs(date).add(1, "day").format("YYYY-MM-DD"))}
-                title={t("common.nextDay") || "Next day"}
-                className="nav-button"
-              >
-                ▶
-              </button>
-            </div>
+          <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+            <button
+              type="button"
+              onClick={() => setDate(dayjs(date).subtract(1, "day").format("YYYY-MM-DD"))}
+              title={t("common.previousDay") || "Previous day"}
+              className="nav-button"
+            >
+              ◀
+            </button>
+            <input
+              id="daily-date-picker"
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className="form-input"
+            />
+            <button
+              type="button"
+              onClick={() => setDate(dayjs(date).add(1, "day").format("YYYY-MM-DD"))}
+              title={t("common.nextDay") || "Next day"}
+              className="nav-button"
+            >
+              ▶
+            </button>
           </div>
           <ButtonGroup size="small" variant="outlined">
             <Button
@@ -232,6 +238,20 @@ export default function Daily() {
               startIcon={<BarChartIcon />}
             >
               {t("charts.distribution")}
+            </Button>
+          </ButtonGroup>
+          <ButtonGroup size="small" variant="outlined">
+            <Button
+              onClick={() => setMetricMode("cop")}
+              variant={metricMode === "cop" ? "contained" : "outlined"}
+            >
+              {t("charts.copMode")}
+            </Button>
+            <Button
+              onClick={() => setMetricMode("energy")}
+              variant={metricMode === "energy" ? "contained" : "outlined"}
+            >
+              {t("charts.energyMode")}
             </Button>
           </ButtonGroup>
         </div>
@@ -270,14 +290,17 @@ export default function Daily() {
               "23",
             ]}
             aggregateData={true}
+            metricMode={metricMode}
           />
         ) : (
           <HistogramChart
-            azBins={histogramData?.az.bins || []}
-            azHeatingBins={histogramData?.azHeating.bins || []}
-            azStats={histogramData?.az.stats || { mean: 0, median: 0 }}
-            azHeatingStats={histogramData?.azHeating.stats || { mean: 0, median: 0 }}
-            statsTitle={t("charts.dailyCopStats")}
+            data={histogramDataSource}
+            metricMode={metricMode}
+            statsTitle={
+              metricMode === "energy" ? t("charts.dailyEnergyStats") : t("charts.dailyCopStats")
+            }
+            binSize={metricMode === "energy" ? 5 : 0.5}
+            useDailyTaz={true}
           />
         )
       }

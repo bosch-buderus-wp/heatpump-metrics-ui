@@ -11,11 +11,16 @@ import { CHART_COLORS } from "../../../lib/chartTheme";
 import ChartTooltip from "./ChartTooltip";
 import TemperatureLineLayer from "./TemperatureLineLayer";
 
+// Metric mode for the chart
+export type MetricMode = "cop" | "energy";
+
 // Interface for data that can be displayed in the AZ chart
 export interface ChartDataRow {
   [key: string]: string | number | null | undefined;
   az?: number | null;
   az_heating?: number | null;
+  electrical_energy_kwh?: number | null;
+  electrical_energy_heating_kwh?: number | null;
   outdoor_temperature_c?: number | null;
   flow_temperature_c?: number | null;
 }
@@ -35,6 +40,7 @@ interface AzBarChartProps {
   indexFormatter?: (value: string) => string; // Optional: format index labels (e.g., date formatting)
   aggregateData?: boolean; // If true, aggregate (average) AZ values across multiple systems
   barColor?: string; // Optional: custom bar color (default: '#f47560')
+  metricMode?: MetricMode; // "cop" or "energy" - determines what to display
   // Comparison mode
   comparisonGroups?: ComparisonDataGroup[]; // If provided, shows multiple data groups for comparison
 }
@@ -47,12 +53,16 @@ export default function AzBarChart({
   indexFormatter,
   aggregateData = true,
   barColor = CHART_COLORS.primary,
+  metricMode = "cop",
   comparisonGroups,
 }: AzBarChartProps) {
   const { t } = useTranslation();
 
-  const azTotalKey = t("common.azTotal");
-  const azHeatingKey = t("common.azHeating");
+  // Use different labels based on metric mode
+  const azTotalKey =
+    metricMode === "energy" ? t("charts.electricalEnergyTotal") : t("common.azTotal");
+  const azHeatingKey =
+    metricMode === "energy" ? t("charts.electricalEnergyHeating") : t("common.azHeating");
 
   // Determine if we're in comparison mode
   const isComparisonMode = comparisonGroups && comparisonGroups.length > 1;
@@ -80,6 +90,7 @@ export default function AzBarChart({
         azTotalKey,
         azHeatingKey,
         aggregateData,
+        metricMode,
       });
     }
 
@@ -93,9 +104,10 @@ export default function AzBarChart({
       azTotalKey,
       azHeatingKey,
       aggregateData,
+      metricMode,
     });
 
-    // Filter out entries with no AZ values
+    // Filter out entries with no values
     return processed.filter(
       (d) => ((d[azTotalKey] as number) || 0) > 0 || ((d[azHeatingKey] as number) || 0) > 0,
     );
@@ -107,6 +119,7 @@ export default function AzBarChart({
     aggregateData,
     azTotalKey,
     azHeatingKey,
+    metricMode,
     isComparisonMode,
     comparisonGroups,
   ]);
@@ -148,6 +161,7 @@ export default function AzBarChart({
         indexValue={indexValue}
         outdoorTemp={dataPoint?.outdoor_temp as number | null | undefined}
         flowTemp={dataPoint?.flow_temp as number | null | undefined}
+        metricMode={metricMode}
       />
     );
   };
@@ -200,7 +214,7 @@ export default function AzBarChart({
             tickSize: 5,
             tickPadding: 5,
             tickRotation: 0,
-            legend: t("common.az"),
+            legend: metricMode === "energy" ? t("charts.electricalEnergyTotal") : t("common.az"),
             legendPosition: "middle",
             legendOffset: -40,
           }}
@@ -227,7 +241,7 @@ export default function AzBarChart({
               translateX: 0,
               translateY: 60,
               itemsSpacing: 2,
-              itemWidth: 150,
+              itemWidth: 180,
               itemHeight: 20,
               itemDirection: "left-to-right",
               itemOpacity: 0.85,

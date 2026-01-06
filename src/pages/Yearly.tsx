@@ -9,12 +9,12 @@ import { AzBarChart, type ChartDataRow, HistogramChart } from "../components/com
 import { DataGridWrapper } from "../components/common/data-grid";
 import { PageLayout } from "../components/common/layout";
 import { useComparisonMode } from "../hooks/useComparisonMode";
-import { calculateSystemAz, createHistogramBins } from "../lib/chartDataProcessing";
 import { flattenHeatingSystemsFields } from "../lib/dataTransformers";
 import { supabase } from "../lib/supabaseClient";
 import { commonHiddenColumns, computeAz, getAllDataGridColumns } from "../lib/tableHelpers";
 
 type ViewMode = "timeSeries" | "distribution";
+type MetricMode = "cop" | "energy";
 
 export default function Yearly() {
   const { t } = useTranslation();
@@ -22,6 +22,8 @@ export default function Yearly() {
   const [year, setYear] = useState(defaultYear);
   const [filteredData, setFilteredData] = useState<Array<Record<string, unknown>>>([]);
   const [viewMode, setViewMode] = useState<ViewMode>("timeSeries");
+  const [metricMode, setMetricMode] = useState<MetricMode>("cop");
+  const [completeDataOnly, setCompleteDataOnly] = useState(true);
 
   // Wrap setFilteredData in useCallback to prevent infinite loops in DataGridWrapper
   const handleFilterChange = useCallback((data: Array<Record<string, unknown>>) => {
@@ -53,6 +55,10 @@ export default function Yearly() {
       cols.usedForCooling,
       cols.az,
       cols.azHeating,
+      cols.thermalEnergy,
+      cols.electricalEnergy,
+      cols.thermalEnergyHeating,
+      cols.electricalEnergyHeating,
       cols.outdoorTemperature,
       cols.flowTemperature,
     ];
@@ -77,13 +83,60 @@ export default function Yearly() {
     return y;
   }, []);
 
+  // Determine expected months based on selected year
+  const expectedMonths = useMemo(() => {
+    const currentYear = dayjs().year();
+    const currentMonth = dayjs().month() + 1; // 1-12
+
+    if (year < currentYear) {
+      // Past year: expect all 12 months
+      return 12;
+    }
+    if (year === currentYear) {
+      // Current year: expect Jan to current month
+      return currentMonth;
+    }
+    // Future year: expect 0 months
+    return 0;
+  }, [year]);
+
+  // Filter data to only include systems with complete data
+  const completeDataFilteredData = useMemo(() => {
+    if (!data || !completeDataOnly) return data;
+
+    // Count months per system
+    const systemMonthCounts = new Map<string, Set<number>>();
+
+    for (const row of data) {
+      const heatingId = row.heating_id;
+      const month = row.month;
+
+      if (!heatingId || !month) continue;
+
+      if (!systemMonthCounts.has(heatingId)) {
+        systemMonthCounts.set(heatingId, new Set());
+      }
+      systemMonthCounts.get(heatingId)?.add(Number(month));
+    }
+
+    // Filter to only include systems with expected number of months
+    const completeSystemIds = new Set<string>();
+    systemMonthCounts.forEach((months, heatingId) => {
+      if (months.size >= expectedMonths) {
+        completeSystemIds.add(heatingId);
+      }
+    });
+
+    return data.filter((row) => completeSystemIds.has(row.heating_id));
+  }, [data, completeDataOnly, expectedMonths]);
+
   // Calculate AZ values from energy data and prepare for display
   const sortedData = useMemo(() => {
-    if (!data) return [];
+    if (!completeDataFilteredData) return [];
 
     // Add calculated AZ values to each row using the shared computeAz function
     // Also flatten heating_systems fields to top level for filtering
-    return data.map((row) => {
+    return completeDataFilteredData.map((row) => {
       const { az, azHeating } = computeAz(row);
       return flattenHeatingSystemsFields({
         ...row,
@@ -91,7 +144,7 @@ export default function Yearly() {
         az_heating: azHeating,
       });
     });
-  }, [data]);
+  }, [completeDataFilteredData]);
 
   // Comparison mode hook - handles all filter logic
   const {
@@ -101,35 +154,16 @@ export default function Yearly() {
     dataGridComparisonProps,
   } = useComparisonMode(sortedData);
 
-  // Calculate histogram data for distribution view (JAZ - Yearly AZ) (lazy - only when needed)
-  const histogramData = useMemo(() => {
-    // Only calculate if we're in distribution mode
-    if (viewMode !== "distribution") return null;
-    if (!data) return null;
-
-    // Use filtered data if available, otherwise use all data
-    const dataToUse = (filteredDataForChart || filteredData || data) as Array<{
+  // Get the data to use for histogram (filtered if available)
+  const histogramDataSource = useMemo(() => {
+    return (filteredDataForChart || filteredData || data) as Array<{
       heating_id: string;
       thermal_energy_kwh?: number | null;
       electrical_energy_kwh?: number | null;
       thermal_energy_heating_kwh?: number | null;
       electrical_energy_heating_kwh?: number | null;
     }>;
-
-    // Calculate JAZ (yearly AZ) for each system
-    const systemAzData = calculateSystemAz(dataToUse);
-
-    // Create histogram bins for total AZ
-    const azHistogram = createHistogramBins(systemAzData, "az", 0.5);
-
-    // Create histogram bins for heating AZ
-    const azHeatingHistogram = createHistogramBins(systemAzData, "azHeating", 0.5);
-
-    return {
-      az: azHistogram,
-      azHeating: azHeatingHistogram,
-    };
-  }, [viewMode, data, filteredData, filteredDataForChart]);
+  }, [data, filteredData, filteredDataForChart]);
 
   return (
     <PageLayout
@@ -139,8 +173,7 @@ export default function Yearly() {
       isLoading={isLoading}
       filters={
         <div className="filter-container">
-          <div className="row picker">
-            <label htmlFor="yearly-year-select">{t("common.year")}</label>
+          <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
             <select
               id="yearly-year-select"
               value={year}
@@ -154,6 +187,26 @@ export default function Yearly() {
                 </option>
               ))}
             </select>
+            {viewMode === "distribution" && (
+              <label
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "4px",
+                  fontSize: "0.875rem",
+                  cursor: "pointer",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={completeDataOnly}
+                  onChange={(e) => setCompleteDataOnly(e.target.checked)}
+                  style={{ cursor: "pointer" }}
+                />
+                {t("charts.completeDataOnly")}
+              </label>
+            )}
           </div>
           <ButtonGroup size="small" variant="outlined">
             <Button
@@ -171,6 +224,20 @@ export default function Yearly() {
               {t("charts.distribution")}
             </Button>
           </ButtonGroup>
+          <ButtonGroup size="small" variant="outlined">
+            <Button
+              onClick={() => setMetricMode("cop")}
+              variant={metricMode === "cop" ? "contained" : "outlined"}
+            >
+              {t("charts.copMode")}
+            </Button>
+            <Button
+              onClick={() => setMetricMode("energy")}
+              variant={metricMode === "energy" ? "contained" : "outlined"}
+            >
+              {t("charts.energyMode")}
+            </Button>
+          </ButtonGroup>
         </div>
       }
       chart={
@@ -182,14 +249,16 @@ export default function Yearly() {
             indexLabel="common.month"
             indexValues={["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]}
             aggregateData={true}
+            metricMode={metricMode}
           />
         ) : (
           <HistogramChart
-            azBins={histogramData?.az.bins || []}
-            azHeatingBins={histogramData?.azHeating.bins || []}
-            azStats={histogramData?.az.stats || { mean: 0, median: 0 }}
-            azHeatingStats={histogramData?.azHeating.stats || { mean: 0, median: 0 }}
-            statsTitle={t("charts.yearlyCopStats")}
+            data={histogramDataSource}
+            metricMode={metricMode}
+            statsTitle={
+              metricMode === "energy" ? t("charts.yearlyEnergyStats") : t("charts.yearlyCopStats")
+            }
+            binSize={0.5}
           />
         )
       }

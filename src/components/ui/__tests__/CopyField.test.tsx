@@ -45,7 +45,9 @@ describe("CopyField", () => {
     const copyButton = screen.getByRole("button", { name: /copy/i });
     fireEvent.click(copyButton);
 
-    expect(mockWriteText).toHaveBeenCalledWith("test-value-123");
+    await waitFor(() => {
+      expect(mockWriteText).toHaveBeenCalledWith("test-value-123");
+    });
   });
 
   it("shows 'copied' message after successful copy", async () => {

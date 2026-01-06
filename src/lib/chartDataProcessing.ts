@@ -9,6 +9,8 @@ import { robustLinearRegression } from "./regressionUtils";
 interface AggregatedGroup {
   az_values: number[];
   az_heating_values: number[];
+  electrical_energy_values: number[];
+  electrical_energy_heating_values: number[];
   outdoor_temp_values: number[];
   flow_temp_values: number[];
 }
@@ -21,6 +23,7 @@ interface ProcessDatasetOptions {
   azHeatingKey: string;
   groupSuffix?: string;
   aggregateData?: boolean;
+  metricMode?: "cop" | "energy"; // "cop" = AZ values, "energy" = electrical energy values
 }
 
 /**
@@ -37,6 +40,18 @@ function aggregateGroup(group: AggregatedGroup) {
       ? group.az_heating_values.reduce((sum, val) => sum + val, 0) / group.az_heating_values.length
       : 0;
 
+  const electricalEnergyAvg =
+    group.electrical_energy_values.length > 0
+      ? group.electrical_energy_values.reduce((sum, val) => sum + val, 0) /
+        group.electrical_energy_values.length
+      : 0;
+
+  const electricalEnergyHeatingAvg =
+    group.electrical_energy_heating_values.length > 0
+      ? group.electrical_energy_heating_values.reduce((sum, val) => sum + val, 0) /
+        group.electrical_energy_heating_values.length
+      : 0;
+
   const outdoorTempAvg =
     group.outdoor_temp_values.length > 0
       ? group.outdoor_temp_values.reduce((sum, val) => sum + val, 0) /
@@ -51,6 +66,16 @@ function aggregateGroup(group: AggregatedGroup) {
   return {
     azAvg: azAvg ? Number(azAvg.toFixed(2)) : 0,
     azHeatingAvg: azHeatingAvg ? Number(azHeatingAvg.toFixed(2)) : 0,
+    electricalEnergyAvg: electricalEnergyAvg
+      ? electricalEnergyAvg < 10
+        ? Number(electricalEnergyAvg.toFixed(1))
+        : Math.round(electricalEnergyAvg)
+      : 0,
+    electricalEnergyHeatingAvg: electricalEnergyHeatingAvg
+      ? electricalEnergyHeatingAvg < 10
+        ? Number(electricalEnergyHeatingAvg.toFixed(1))
+        : Math.round(electricalEnergyHeatingAvg)
+      : 0,
     outdoorTempAvg: outdoorTempAvg !== null ? Number(outdoorTempAvg.toFixed(2)) : null,
     flowTempAvg: flowTempAvg !== null ? Number(flowTempAvg.toFixed(2)) : null,
   };
@@ -74,6 +99,8 @@ function groupDataByIndex(
       grouped[key] = {
         az_values: [],
         az_heating_values: [],
+        electrical_energy_values: [],
+        electrical_energy_heating_values: [],
         outdoor_temp_values: [],
         flow_temp_values: [],
       };
@@ -84,6 +111,20 @@ function groupDataByIndex(
     }
     if (row.az_heating !== undefined && row.az_heating !== null && row.az_heating > 0) {
       grouped[key].az_heating_values.push(row.az_heating);
+    }
+    if (
+      row.electrical_energy_kwh !== undefined &&
+      row.electrical_energy_kwh !== null &&
+      row.electrical_energy_kwh > 0
+    ) {
+      grouped[key].electrical_energy_values.push(row.electrical_energy_kwh);
+    }
+    if (
+      row.electrical_energy_heating_kwh !== undefined &&
+      row.electrical_energy_heating_kwh !== null &&
+      row.electrical_energy_heating_kwh > 0
+    ) {
+      grouped[key].electrical_energy_heating_values.push(row.electrical_energy_heating_kwh);
     }
     if (row.outdoor_temperature_c !== undefined && row.outdoor_temperature_c !== null) {
       grouped[key].outdoor_temp_values.push(row.outdoor_temperature_c);
@@ -103,16 +144,46 @@ function formatDataPoint(
   item: ChartDataRow,
   options: ProcessDatasetOptions,
 ): Record<string, unknown> {
-  const { indexField, indexFormatter, azTotalKey, azHeatingKey, groupSuffix = "" } = options;
+  const {
+    indexField,
+    indexFormatter,
+    azTotalKey,
+    azHeatingKey,
+    groupSuffix = "",
+    metricMode = "cop",
+  } = options;
 
   const indexValue = item[indexField];
   const formattedIndex =
     indexFormatter && indexValue != null ? indexFormatter(String(indexValue)) : indexValue;
 
+  // In energy mode, use electrical energy values instead of AZ
+  const totalValue =
+    metricMode === "energy"
+      ? item.electrical_energy_kwh
+        ? item.electrical_energy_kwh < 10
+          ? Number(item.electrical_energy_kwh.toFixed(1))
+          : Math.round(item.electrical_energy_kwh)
+        : 0
+      : item.az
+        ? Number(item.az.toFixed(2))
+        : 0;
+
+  const heatingValue =
+    metricMode === "energy"
+      ? item.electrical_energy_heating_kwh
+        ? item.electrical_energy_heating_kwh < 10
+          ? Number(item.electrical_energy_heating_kwh.toFixed(1))
+          : Math.round(item.electrical_energy_heating_kwh)
+        : 0
+      : item.az_heating
+        ? Number(item.az_heating.toFixed(2))
+        : 0;
+
   return {
     [indexField]: formattedIndex,
-    [`${azTotalKey}${groupSuffix}`]: item.az ? Number(item.az.toFixed(2)) : 0,
-    [`${azHeatingKey}${groupSuffix}`]: item.az_heating ? Number(item.az_heating.toFixed(2)) : 0,
+    [`${azTotalKey}${groupSuffix}`]: totalValue,
+    [`${azHeatingKey}${groupSuffix}`]: heatingValue,
     outdoor_temp: item.outdoor_temperature_c ? Number(item.outdoor_temperature_c.toFixed(1)) : null,
     flow_temp: item.flow_temperature_c ? Number(item.flow_temperature_c.toFixed(1)) : null,
   };
@@ -135,6 +206,7 @@ export function processDataset(
     azHeatingKey,
     groupSuffix = "",
     aggregateData = true,
+    metricMode = "cop",
   } = options;
 
   // Direct mapping without aggregation
@@ -149,8 +221,16 @@ export function processDataset(
   return indices.map((idx) => {
     const group = grouped[idx];
 
+    // Check if we have data for this index based on metric mode
+    const hasData =
+      metricMode === "energy"
+        ? group &&
+          (group.electrical_energy_values.length > 0 ||
+            group.electrical_energy_heating_values.length > 0)
+        : group && (group.az_values.length > 0 || group.az_heating_values.length > 0);
+
     // No data for this index
-    if (!group || (group.az_values.length === 0 && group.az_heating_values.length === 0)) {
+    if (!hasData) {
       return {
         [indexField]: indexFormatter ? indexFormatter(idx) : idx,
         [`${azTotalKey}${groupSuffix}`]: 0,
@@ -160,12 +240,23 @@ export function processDataset(
       };
     }
 
-    const { azAvg, azHeatingAvg, outdoorTempAvg, flowTempAvg } = aggregateGroup(group);
+    const {
+      azAvg,
+      azHeatingAvg,
+      electricalEnergyAvg,
+      electricalEnergyHeatingAvg,
+      outdoorTempAvg,
+      flowTempAvg,
+    } = aggregateGroup(group);
+
+    // Choose values based on metric mode
+    const totalValue = metricMode === "energy" ? electricalEnergyAvg : azAvg;
+    const heatingValue = metricMode === "energy" ? electricalEnergyHeatingAvg : azHeatingAvg;
 
     return {
       [indexField]: indexFormatter ? indexFormatter(idx) : idx,
-      [`${azTotalKey}${groupSuffix}`]: azAvg,
-      [`${azHeatingKey}${groupSuffix}`]: azHeatingAvg,
+      [`${azTotalKey}${groupSuffix}`]: totalValue,
+      [`${azHeatingKey}${groupSuffix}`]: heatingValue,
       outdoor_temp: outdoorTempAvg,
       flow_temp: flowTempAvg,
     };
@@ -427,6 +518,7 @@ export function createHistogramBins(
   systemData: SystemAzData[],
   azField: "az" | "azHeating" = "az",
   binSize = 0.5,
+  isEnergyMode = false,
 ): { bins: HistogramBin[]; stats: HistogramStats } {
   // Filter out null values and extract AZ values
   const validData = systemData
@@ -458,7 +550,10 @@ export function createHistogramBins(
 
   for (let binStart = minBin; binStart < maxBin; binStart += binSize) {
     const binEnd = binStart + binSize;
-    const binLabel = `${binStart.toFixed(1)}-${binEnd.toFixed(1)}`;
+    // Format labels: no decimals for energy mode, 1 decimal for COP mode
+    const binLabel = isEnergyMode
+      ? `${Math.round(binStart)}-${Math.round(binEnd)}`
+      : `${binStart.toFixed(1)}-${binEnd.toFixed(1)}`;
     binsMap.set(binLabel, { start: binStart, end: binEnd, systemIds: [] });
   }
 
@@ -466,7 +561,10 @@ export function createHistogramBins(
   validData.forEach(({ heatingId, value }) => {
     const binStart = Math.floor(value / binSize) * binSize;
     const binEnd = binStart + binSize;
-    const binLabel = `${binStart.toFixed(1)}-${binEnd.toFixed(1)}`;
+    // Format labels: no decimals for energy mode, 1 decimal for COP mode
+    const binLabel = isEnergyMode
+      ? `${Math.round(binStart)}-${Math.round(binEnd)}`
+      : `${binStart.toFixed(1)}-${binEnd.toFixed(1)}`;
 
     const bin = binsMap.get(binLabel);
     if (bin) {

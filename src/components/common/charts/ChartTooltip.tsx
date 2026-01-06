@@ -7,6 +7,7 @@ interface ChartTooltipProps {
   indexValue: string;
   outdoorTemp?: number | null;
   flowTemp?: number | null;
+  metricMode?: "cop" | "energy";
 }
 
 export default function ChartTooltip({
@@ -16,8 +17,12 @@ export default function ChartTooltip({
   indexValue,
   outdoorTemp,
   flowTemp,
+  metricMode = "cop",
 }: ChartTooltipProps) {
   const { t } = useTranslation();
+
+  // Add unit for energy mode
+  const displayValue = metricMode === "energy" ? `${value} kWh` : value;
 
   return (
     <div className="chart-tooltip">
@@ -29,7 +34,7 @@ export default function ChartTooltip({
           style={{ backgroundColor: color }}
         />
         <span className="chart-tooltip-text">
-          {id}: <strong>{value}</strong>
+          {id}: <strong>{displayValue}</strong>
         </span>
       </div>
 
