@@ -3,7 +3,7 @@ import TimelineIcon from "@mui/icons-material/Timeline";
 import { Button, ButtonGroup } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import dayjs from "dayjs";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AzBarChart, type ChartDataRow, HistogramChart } from "../components/common/charts";
 import { DataGridWrapper } from "../components/common/data-grid";
@@ -29,6 +29,17 @@ export default function Yearly() {
   const handleFilterChange = useCallback((data: Array<Record<string, unknown>>) => {
     setFilteredData(data);
   }, []);
+
+  // Reset completeDataOnly when switching views
+  // - Enable when switching to distribution mode (HistogramChart)
+  // - Disable when switching to timeSeries mode (AzBarChart)
+  useEffect(() => {
+    if (viewMode === "timeSeries") {
+      setCompleteDataOnly(false);
+    } else if (viewMode === "distribution") {
+      setCompleteDataOnly(true);
+    }
+  }, [viewMode]);
 
   // Define columns specific to Yearly page (az will be computed from monthly_values)
   const columns = useMemo(() => {
