@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { flattenHeatingSystemsFields, flattenHeatingSystemsInArray } from "../dataTransformers";
+import {
+  applyThermometerOffset,
+  flattenHeatingSystemsFields,
+  flattenHeatingSystemsInArray,
+} from "../dataTransformers";
 
 describe("dataTransformers", () => {
   describe("flattenHeatingSystemsFields", () => {
@@ -406,6 +410,66 @@ describe("dataTransformers", () => {
       expect(result[0]).toHaveProperty("hour", "10");
       expect(result[0]).toHaveProperty("az", 3.5);
       expect(result[0]).toHaveProperty("model_odu", "7IR-120");
+    });
+  });
+
+  describe("applyThermometerOffset", () => {
+    it("should apply positive offset (thermometer reads too high)", () => {
+      const result = applyThermometerOffset(5.0, 2.0);
+      expect(result).toBe(3.0);
+    });
+
+    it("should apply negative offset (thermometer reads too low)", () => {
+      const result = applyThermometerOffset(5.0, -2.0);
+      expect(result).toBe(7.0);
+    });
+
+    it("should handle zero offset", () => {
+      const result = applyThermometerOffset(5.0, 0);
+      expect(result).toBe(5.0);
+    });
+
+    it("should handle null offset (no correction)", () => {
+      const result = applyThermometerOffset(5.0, null);
+      expect(result).toBe(5.0);
+    });
+
+    it("should handle undefined offset (no correction)", () => {
+      const result = applyThermometerOffset(5.0, undefined);
+      expect(result).toBe(5.0);
+    });
+
+    it("should handle null temperature", () => {
+      const result = applyThermometerOffset(null, 2.0);
+      expect(result).toBeNull();
+    });
+
+    it("should handle null temperature and null offset", () => {
+      const result = applyThermometerOffset(null, null);
+      expect(result).toBeNull();
+    });
+
+    it("should handle negative temperatures", () => {
+      const result = applyThermometerOffset(-5.0, 2.0);
+      expect(result).toBe(-7.0);
+    });
+
+    it("should handle decimal offsets", () => {
+      const result = applyThermometerOffset(10.5, 1.3);
+      expect(result).toBeCloseTo(9.2, 10);
+    });
+
+    it("should handle large offsets within valid range", () => {
+      const result = applyThermometerOffset(25.0, 15.0);
+      expect(result).toBe(10.0);
+    });
+
+    it("should handle typical use case: 2K offset on wall-mounted thermometer", () => {
+      // Real-world scenario: thermometer on non-isolated wall reads 2K higher
+      const measuredTemp = 8.0;
+      const offset = 2.0;
+      const correctedTemp = applyThermometerOffset(measuredTemp, offset);
+      expect(correctedTemp).toBe(6.0);
     });
   });
 });

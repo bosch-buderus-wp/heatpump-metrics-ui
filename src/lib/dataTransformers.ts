@@ -49,3 +49,33 @@ export function flattenHeatingSystemsInArray<T extends Record<string, unknown>>(
 ): Array<T & Record<string, unknown>> {
   return data.map(flattenHeatingSystemsFields);
 }
+
+/**
+ * Applies thermometer offset correction to outdoor temperature measurements.
+ *
+ * Some heating systems have thermometers mounted in locations that cause systematic
+ * measurement errors (e.g., mounted on a non-isolated wall of the heated building).
+ * This function corrects these errors using a user-defined offset value.
+ *
+ * The offset represents how much HIGHER the thermometer reads compared to actual temperature.
+ * For example:
+ * - If thermometer reads 2°C higher than actual → offset = +2K
+ * - Corrected temperature = measured temperature - offset
+ *
+ * @param outdoorTempC - The measured outdoor temperature in Celsius
+ * @param offsetK - The thermometer offset in Kelvin (positive if thermometer reads too high)
+ * @returns The corrected outdoor temperature, or null if input is null
+ *
+ * @example
+ * applyThermometerOffset(5.0, 2.0)  // Returns 3.0 (thermometer reads 2K too high)
+ * applyThermometerOffset(5.0, null) // Returns 5.0 (no correction needed)
+ * applyThermometerOffset(null, 2.0) // Returns null (no measurement)
+ */
+export function applyThermometerOffset(
+  outdoorTempC: number | null,
+  offsetK: number | null | undefined,
+): number | null {
+  if (outdoorTempC === null) return null;
+  if (offsetK === null || offsetK === undefined || offsetK === 0) return outdoorTempC;
+  return outdoorTempC - offsetK;
+}

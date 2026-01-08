@@ -9,7 +9,7 @@ import { AzBarChart, type ChartDataRow, HistogramChart } from "../components/com
 import { DataGridWrapper } from "../components/common/data-grid";
 import { PageLayout } from "../components/common/layout";
 import { useComparisonMode } from "../hooks/useComparisonMode";
-import { flattenHeatingSystemsFields } from "../lib/dataTransformers";
+import { applyThermometerOffset, flattenHeatingSystemsFields } from "../lib/dataTransformers";
 import { supabase } from "../lib/supabaseClient";
 import { commonHiddenColumns, getAllDataGridColumns } from "../lib/tableHelpers";
 import type { Database } from "../types/database.types";
@@ -110,6 +110,15 @@ export default function Daily() {
         const enriched: MeasurementRow & { az?: number; az_heating?: number; hour?: string } = {
           ...current,
         };
+
+        // Apply thermometer offset correction to outdoor temperature
+        const offset = (current as any).heating_systems?.thermometer_offset_k;
+        if (offset !== null && offset !== undefined) {
+          enriched.outdoor_temperature_c = applyThermometerOffset(
+            current.outdoor_temperature_c,
+            offset,
+          );
+        }
 
         // Add hour field for chart grouping
         enriched.hour = dayjs(current.created_at).hour().toString();

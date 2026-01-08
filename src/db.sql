@@ -23,6 +23,7 @@ CREATE TABLE public.heating_systems (
   used_for_heating boolean DEFAULT true,
   used_for_dhw boolean DEFAULT false,
   used_for_cooling boolean DEFAULT false,
+  thermometer_offset_k double precision DEFAULT 0 CHECK (thermometer_offset_k >= '-20'::integer::double precision AND thermometer_offset_k <= 20::double precision),
   CONSTRAINT heating_systems_pkey PRIMARY KEY (heating_id),
   CONSTRAINT heating_systems_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id)
 );

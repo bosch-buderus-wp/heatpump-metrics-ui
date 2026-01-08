@@ -9,7 +9,7 @@ import { AzBarChart, type ChartDataRow, HistogramChart } from "../components/com
 import { DataGridWrapper } from "../components/common/data-grid";
 import { PageLayout } from "../components/common/layout";
 import { useComparisonMode } from "../hooks/useComparisonMode";
-import { flattenHeatingSystemsFields } from "../lib/dataTransformers";
+import { applyThermometerOffset, flattenHeatingSystemsFields } from "../lib/dataTransformers";
 import { supabase } from "../lib/supabaseClient";
 import { commonHiddenColumns, computeAz, getAllDataGridColumns } from "../lib/tableHelpers";
 
@@ -147,12 +147,18 @@ export default function Yearly() {
 
     // Add calculated AZ values to each row using the shared computeAz function
     // Also flatten heating_systems fields to top level for filtering
+    // Apply thermometer offset correction to outdoor temperatures
     return completeDataFilteredData.map((row) => {
       const { az, azHeating } = computeAz(row);
+      const offset = (row.heating_systems as any)?.thermometer_offset_k;
+
       return flattenHeatingSystemsFields({
         ...row,
         az,
         az_heating: azHeating,
+        outdoor_temp_avg_c: applyThermometerOffset(row.outdoor_temp_avg_c, offset),
+        outdoor_temp_min_c: applyThermometerOffset(row.outdoor_temp_min_c, offset),
+        outdoor_temp_max_c: applyThermometerOffset(row.outdoor_temp_max_c, offset),
       });
     });
   }, [completeDataFilteredData]);

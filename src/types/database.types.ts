@@ -27,6 +27,7 @@ export type Database = {
           postal_code: string | null;
           sw_idu: Database["public"]["Enums"]["sw_idu"] | null;
           sw_odu: Database["public"]["Enums"]["sw_odu"] | null;
+          thermometer_offset_k: number | null;
           used_for_cooling: boolean | null;
           used_for_dhw: boolean | null;
           used_for_heating: boolean | null;
@@ -50,6 +51,7 @@ export type Database = {
           postal_code?: string | null;
           sw_idu?: Database["public"]["Enums"]["sw_idu"] | null;
           sw_odu?: Database["public"]["Enums"]["sw_odu"] | null;
+          thermometer_offset_k?: number | null;
           used_for_cooling?: boolean | null;
           used_for_dhw?: boolean | null;
           used_for_heating?: boolean | null;
@@ -73,6 +75,7 @@ export type Database = {
           postal_code?: string | null;
           sw_idu?: Database["public"]["Enums"]["sw_idu"] | null;
           sw_odu?: Database["public"]["Enums"]["sw_odu"] | null;
+          thermometer_offset_k?: number | null;
           used_for_cooling?: boolean | null;
           used_for_dhw?: boolean | null;
           used_for_heating?: boolean | null;

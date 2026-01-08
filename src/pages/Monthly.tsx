@@ -10,11 +10,13 @@ import { DataGridWrapper } from "../components/common/data-grid";
 import { PageLayout } from "../components/common/layout";
 import { MonthYearPicker } from "../components/form";
 import { useComparisonMode } from "../hooks/useComparisonMode";
+import { applyThermometerOffset } from "../lib/dataTransformers";
 import { supabase } from "../lib/supabaseClient";
 import { commonHiddenColumns, getAllDataGridColumns } from "../lib/tableHelpers";
 import type { Database } from "../types/database.types";
 
 type DailyValue = Database["public"]["Views"]["daily_values"]["Row"];
+type DailyValueWithOffset = DailyValue & { thermometer_offset_k?: number | null };
 type ViewMode = "timeSeries" | "distribution";
 type MetricMode = "cop" | "energy";
 
@@ -24,12 +26,12 @@ export default function Monthly() {
   const defaultYear = Number(dayjs().format("YYYY"));
   const [month, setMonth] = useState(defaultMonth);
   const [year, setYear] = useState(defaultYear);
-  const [filteredData, setFilteredData] = useState<DailyValue[]>([]);
+  const [filteredData, setFilteredData] = useState<DailyValueWithOffset[]>([]);
   const [viewMode, setViewMode] = useState<ViewMode>("timeSeries");
   const [metricMode, setMetricMode] = useState<MetricMode>("cop");
 
   // Wrap setFilteredData in useCallback to prevent infinite loops in DataGridWrapper
-  const handleFilterChange = useCallback((data: DailyValue[]) => {
+  const handleFilterChange = useCallback((data: DailyValueWithOffset[]) => {
     setFilteredData(data);
   }, []);
 
@@ -75,13 +77,22 @@ export default function Monthly() {
 
       const { data, error } = await supabase
         .from("daily_values")
-        .select("*")
+        .select("*, heating_systems!inner(thermometer_offset_k)")
         .gte("date", start)
         .lte("date", end)
         .order("date", { ascending: false });
 
       if (error) throw error;
-      return data as DailyValue[];
+
+      // Apply thermometer offset correction to outdoor temperature
+      return (data as DailyValueWithOffset[]).map((row) => {
+        const offset = (row as any).heating_systems?.thermometer_offset_k;
+        return {
+          ...row,
+          thermometer_offset_k: offset,
+          outdoor_temperature_c: applyThermometerOffset(row.outdoor_temperature_c, offset),
+        };
+      });
     },
   });
 

@@ -213,6 +213,19 @@ export function SystemForm({ system, onSubmit }: SystemFormProps) {
         />
       </div>
 
+      <div className="row">
+        <label htmlFor="system-thermometer-offset">{t("systemForm.thermometerOffset")}</label>
+        <NumberInputWithUnit
+          id="system-thermometer-offset"
+          value={form.thermometer_offset_k}
+          onChange={(v) => set("thermometer_offset_k", v)}
+          unit="K"
+          min={-20}
+          max={20}
+          step={0.1}
+        />
+      </div>
+
       <SelectField
         label={t("systemForm.indoorUnit")}
         value={form.model_idu}
