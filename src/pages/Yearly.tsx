@@ -11,7 +11,7 @@ import { PageLayout } from "../components/common/layout";
 import { useComparisonMode } from "../hooks/useComparisonMode";
 import { applyThermometerOffset, flattenHeatingSystemsFields } from "../lib/dataTransformers";
 import { supabase } from "../lib/supabaseClient";
-import { commonHiddenColumns, computeAz, getAllDataGridColumns } from "../lib/tableHelpers";
+import { commonHiddenColumns, computeAz, getTimeSeriesColumns } from "../lib/tableHelpers";
 
 type ViewMode = "timeSeries" | "distribution";
 type MetricMode = "cop" | "energy";
@@ -41,39 +41,8 @@ export default function Yearly() {
     }
   }, [viewMode]);
 
-  // Define columns specific to Yearly page (az will be computed from monthly_values)
-  const columns = useMemo(() => {
-    const cols = getAllDataGridColumns(t);
-    return [
-      cols.user_id,
-      cols.month,
-      cols.name,
-      cols.postalCode,
-      cols.country,
-      cols.heatingType,
-      cols.modelIdu,
-      cols.modelOdu,
-      cols.swIdu,
-      cols.swOdu,
-      cols.heatingLoad,
-      cols.heatedArea,
-      cols.buildingConstructionYear,
-      cols.designOutdoorTemp,
-      cols.buildingType,
-      cols.buildingEnergyStandard,
-      cols.usedForHeating,
-      cols.usedForDhw,
-      cols.usedForCooling,
-      cols.az,
-      cols.azHeating,
-      cols.thermalEnergy,
-      cols.electricalEnergy,
-      cols.thermalEnergyHeating,
-      cols.electricalEnergyHeating,
-      cols.outdoorTemperature,
-      cols.flowTemperature,
-    ];
-  }, [t]);
+  // Define columns for Yearly page
+  const columns = useMemo(() => getTimeSeriesColumns(t, "month"), [t]);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["yearly", year],

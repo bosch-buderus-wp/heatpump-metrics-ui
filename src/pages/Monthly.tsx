@@ -12,7 +12,7 @@ import { MonthYearPicker } from "../components/form";
 import { useComparisonMode } from "../hooks/useComparisonMode";
 import { applyThermometerOffset } from "../lib/dataTransformers";
 import { supabase } from "../lib/supabaseClient";
-import { commonHiddenColumns, getAllDataGridColumns } from "../lib/tableHelpers";
+import { commonHiddenColumns, getTimeSeriesColumns } from "../lib/tableHelpers";
 import type { Database } from "../types/database.types";
 
 type DailyValue = Database["public"]["Views"]["daily_values"]["Row"];
@@ -35,39 +35,8 @@ export default function Monthly() {
     setFilteredData(data);
   }, []);
 
-  // Define columns specific to Monthly page (daily_values view already has az computed)
-  const columns = useMemo(() => {
-    const cols = getAllDataGridColumns(t);
-    return [
-      cols.user_id,
-      cols.date,
-      cols.name,
-      cols.postalCode,
-      cols.country,
-      cols.heatingType,
-      cols.modelIdu,
-      cols.modelOdu,
-      cols.swIdu,
-      cols.swOdu,
-      cols.heatingLoad,
-      cols.heatedArea,
-      cols.buildingConstructionYear,
-      cols.designOutdoorTemp,
-      cols.buildingType,
-      cols.buildingEnergyStandard,
-      cols.usedForHeating,
-      cols.usedForDhw,
-      cols.usedForCooling,
-      cols.az,
-      cols.azHeating,
-      cols.thermalEnergy,
-      cols.electricalEnergy,
-      cols.thermalEnergyHeating,
-      cols.electricalEnergyHeating,
-      cols.outdoorTemperature,
-      cols.flowTemperature,
-    ];
-  }, [t]);
+  // Define columns for Monthly page
+  const columns = useMemo(() => getTimeSeriesColumns(t, "date"), [t]);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["daily", month, year],

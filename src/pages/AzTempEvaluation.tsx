@@ -7,7 +7,7 @@ import { PageLayout } from "../components/common/layout";
 import { useComparisonMode } from "../hooks/useComparisonMode";
 import { applyThermometerOffset } from "../lib/dataTransformers";
 import { supabase } from "../lib/supabaseClient";
-import { commonHiddenColumns, getAllDataGridColumns } from "../lib/tableHelpers";
+import { commonHiddenColumns, getTimeSeriesColumns } from "../lib/tableHelpers";
 import type { Database } from "../types/database.types";
 
 type DailyValue = Database["public"]["Views"]["daily_values"]["Row"];
@@ -39,35 +39,8 @@ export default function AzTempEvaluation() {
     }, 300);
   }, []);
 
-  // Define columns
-  const columns = useMemo(() => {
-    const cols = getAllDataGridColumns(t);
-    return [
-      cols.user_id,
-      cols.date,
-      cols.name,
-      cols.postalCode,
-      cols.country,
-      cols.heatingType,
-      cols.modelIdu,
-      cols.modelOdu,
-      cols.swIdu,
-      cols.swOdu,
-      cols.heatingLoad,
-      cols.heatedArea,
-      cols.buildingConstructionYear,
-      cols.designOutdoorTemp,
-      cols.buildingType,
-      cols.buildingEnergyStandard,
-      cols.usedForHeating,
-      cols.usedForDhw,
-      cols.usedForCooling,
-      cols.az,
-      cols.azHeating,
-      cols.outdoorTemperature,
-      cols.flowTemperature,
-    ];
-  }, [t]);
+  // Define columns for AzTempEvaluation page (same as Monthly)
+  const columns = useMemo(() => getTimeSeriesColumns(t, "date"), [t]);
 
   // Fetch all daily values with thermometer offset
   const { data, isLoading, error } = useQuery({

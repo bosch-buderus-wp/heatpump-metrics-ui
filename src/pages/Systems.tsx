@@ -3,35 +3,13 @@ import { useTranslation } from "react-i18next";
 import { DataGridWrapper } from "../components/common/data-grid";
 import { PageLayout } from "../components/common/layout";
 import { supabase } from "../lib/supabaseClient";
-import { getAllDataGridColumns } from "../lib/tableHelpers";
+import { getBaseSystemColumns } from "../lib/tableHelpers";
 
 export default function Systems() {
   const { t } = useTranslation();
 
-  // Define columns specific to Systems page
-  const columns = (() => {
-    const cols = getAllDataGridColumns(t);
-    return [
-      cols.user_id,
-      cols.name,
-      cols.postalCode,
-      cols.country,
-      cols.heatingType,
-      cols.modelIdu,
-      cols.modelOdu,
-      cols.swIdu,
-      cols.swOdu,
-      cols.heatingLoad,
-      cols.heatedArea,
-      cols.buildingConstructionYear,
-      cols.designOutdoorTemp,
-      cols.buildingType,
-      cols.buildingEnergyStandard,
-      cols.usedForHeating,
-      cols.usedForDhw,
-      cols.usedForCooling,
-    ];
-  })();
+  // Define columns for Systems page
+  const columns = getBaseSystemColumns(t);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["systems"],

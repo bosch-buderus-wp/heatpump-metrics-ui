@@ -11,7 +11,7 @@ import { PageLayout } from "../components/common/layout";
 import { useComparisonMode } from "../hooks/useComparisonMode";
 import { applyThermometerOffset, flattenHeatingSystemsFields } from "../lib/dataTransformers";
 import { supabase } from "../lib/supabaseClient";
-import { commonHiddenColumns, getAllDataGridColumns } from "../lib/tableHelpers";
+import { commonHiddenColumns, getTimeSeriesColumns } from "../lib/tableHelpers";
 import type { Database } from "../types/database.types";
 
 type MeasurementRow = Database["public"]["Tables"]["measurements"]["Row"];
@@ -30,39 +30,8 @@ export default function Daily() {
     setFilteredData(data);
   }, []);
 
-  // Define columns specific to Daily page
-  const columns = useMemo(() => {
-    const cols = getAllDataGridColumns(t);
-    return [
-      cols.user_id,
-      cols.time,
-      cols.name,
-      cols.postalCode,
-      cols.country,
-      cols.heatingType,
-      cols.modelIdu,
-      cols.modelOdu,
-      cols.swIdu,
-      cols.swOdu,
-      cols.heatingLoad,
-      cols.heatedArea,
-      cols.buildingConstructionYear,
-      cols.designOutdoorTemp,
-      cols.buildingType,
-      cols.buildingEnergyStandard,
-      cols.usedForHeating,
-      cols.usedForDhw,
-      cols.usedForCooling,
-      cols.az,
-      cols.azHeating,
-      cols.thermalEnergy,
-      cols.electricalEnergy,
-      cols.thermalEnergyHeating,
-      cols.electricalEnergyHeating,
-      cols.outdoorTemperature,
-      cols.flowTemperature,
-    ];
-  }, [t]);
+  // Define columns for Daily page
+  const columns = useMemo(() => getTimeSeriesColumns(t, "time"), [t]);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["measurements", date],

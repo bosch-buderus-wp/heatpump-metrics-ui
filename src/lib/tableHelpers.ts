@@ -333,3 +333,56 @@ export function getAllDataGridColumns(t: TFunction): Record<string, GridColDef> 
     },
   };
 }
+
+/**
+ * Get base system information columns (no time, performance metrics, energy, or temperature)
+ * Used directly by Systems page and as building block for time-series pages
+ */
+export function getBaseSystemColumns(t: TFunction): GridColDef[] {
+  const cols = getAllDataGridColumns(t);
+  return [
+    cols.user_id,
+    cols.name,
+    cols.postalCode,
+    cols.country,
+    cols.heatingType,
+    cols.modelIdu,
+    cols.modelOdu,
+    cols.swIdu,
+    cols.swOdu,
+    cols.heatingLoad,
+    cols.heatedArea,
+    cols.buildingConstructionYear,
+    cols.designOutdoorTemp,
+    cols.buildingType,
+    cols.buildingEnergyStandard,
+    cols.usedForHeating,
+    cols.usedForDhw,
+    cols.usedForCooling,
+  ];
+}
+
+/**
+ * Get standard column set for time-series pages (Yearly, Monthly, Daily, AzTempEvaluation)
+ * These pages share most columns but differ in their time column
+ * Note: Energy columns are included but hidden by default via commonHiddenColumns
+ */
+export function getTimeSeriesColumns(
+  t: TFunction,
+  timeColumn: "month" | "date" | "time",
+): GridColDef[] {
+  const cols = getAllDataGridColumns(t);
+  return [
+    ...getBaseSystemColumns(t).slice(0, 1), // user_id
+    cols[timeColumn],
+    ...getBaseSystemColumns(t).slice(1), // rest of system columns
+    cols.az,
+    cols.azHeating,
+    cols.thermalEnergy,
+    cols.electricalEnergy,
+    cols.thermalEnergyHeating,
+    cols.electricalEnergyHeating,
+    cols.outdoorTemperature,
+    cols.flowTemperature,
+  ];
+}
