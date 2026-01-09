@@ -14,7 +14,9 @@ import { supabase } from "../lib/supabaseClient";
 import { commonHiddenColumns, getTimeSeriesColumns } from "../lib/tableHelpers";
 import type { Database } from "../types/database.types";
 
-type MeasurementRow = Database["public"]["Tables"]["measurements"]["Row"];
+type MeasurementRow = Database["public"]["Tables"]["measurements"]["Row"] & {
+  heating_systems: Database["public"]["Tables"]["heating_systems"]["Row"] | null;
+};
 type ViewMode = "timeSeries" | "distribution";
 type MetricMode = "cop" | "energy";
 
@@ -81,7 +83,7 @@ export default function Daily() {
         };
 
         // Apply thermometer offset correction to outdoor temperature
-        const offset = (current as any).heating_systems?.thermometer_offset_k;
+        const offset = current.heating_systems?.thermometer_offset_k;
         if (offset !== null && offset !== undefined) {
           enriched.outdoor_temperature_c = applyThermometerOffset(
             current.outdoor_temperature_c,

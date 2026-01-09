@@ -11,11 +11,10 @@ import { commonHiddenColumns, getTimeSeriesColumns } from "../lib/tableHelpers";
 import type { Database } from "../types/database.types";
 
 type DailyValue = Database["public"]["Views"]["daily_values"]["Row"];
-type DailyValueWithOffset = DailyValue & { thermometer_offset_k?: number | null };
 
 export default function AzTempEvaluation() {
   const { t } = useTranslation();
-  const [filteredData, setFilteredData] = useState<DailyValueWithOffset[] | null>(null);
+  const [filteredData, setFilteredData] = useState<DailyValue[] | null>(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -27,7 +26,7 @@ export default function AzTempEvaluation() {
   }, []);
 
   // Debounced filter change handler to prevent rapid updates
-  const handleFilterChange = useCallback((data: DailyValueWithOffset[]) => {
+  const handleFilterChange = useCallback((data: DailyValue[]) => {
     // Clear any existing timeout
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
@@ -43,22 +42,21 @@ export default function AzTempEvaluation() {
   const columns = useMemo(() => getTimeSeriesColumns(t, "date"), [t]);
 
   // Fetch all daily values with thermometer offset
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error } = useQuery<DailyValue[]>({
     queryKey: ["daily_all"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("daily_values")
-        .select("*, heating_systems!inner(thermometer_offset_k)")
+        .select("*")
         .order("date", { ascending: false });
 
       if (error) throw error;
 
       // Apply thermometer offset correction to outdoor temperature
-      return (data as DailyValueWithOffset[]).map((row) => {
-        const offset = (row as any).heating_systems?.thermometer_offset_k;
+      return (data as DailyValue[]).map((row) => {
+        const offset = row.thermometer_offset_k;
         return {
           ...row,
-          thermometer_offset_k: offset,
           outdoor_temperature_c: applyThermometerOffset(row.outdoor_temperature_c, offset),
         };
       });

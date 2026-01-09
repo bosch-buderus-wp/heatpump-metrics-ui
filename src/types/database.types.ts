@@ -244,6 +244,7 @@ export type Database = {
           sw_odu: Database["public"]["Enums"]["sw_odu"] | null;
           thermal_energy_heating_kwh: number | null;
           thermal_energy_kwh: number | null;
+          thermometer_offset_k: number | null;
           used_for_cooling: boolean | null;
           used_for_dhw: boolean | null;
           used_for_heating: boolean | null;

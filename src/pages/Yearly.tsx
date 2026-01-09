@@ -12,7 +12,11 @@ import { useComparisonMode } from "../hooks/useComparisonMode";
 import { applyThermometerOffset, flattenHeatingSystemsFields } from "../lib/dataTransformers";
 import { supabase } from "../lib/supabaseClient";
 import { commonHiddenColumns, computeAz, getTimeSeriesColumns } from "../lib/tableHelpers";
+import type { Database } from "../types/database.types";
 
+type MonthlyValueWithSystem = Database["public"]["Tables"]["monthly_values"]["Row"] & {
+  heating_systems: Database["public"]["Tables"]["heating_systems"]["Row"] | null;
+};
 type ViewMode = "timeSeries" | "distribution";
 type MetricMode = "cop" | "energy";
 
@@ -44,7 +48,7 @@ export default function Yearly() {
   // Define columns for Yearly page
   const columns = useMemo(() => getTimeSeriesColumns(t, "month"), [t]);
 
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error } = useQuery<MonthlyValueWithSystem[]>({
     queryKey: ["yearly", year],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -53,7 +57,7 @@ export default function Yearly() {
         .eq("year", year);
 
       if (error) throw error;
-      return data;
+      return data as MonthlyValueWithSystem[];
     },
   });
 
@@ -119,15 +123,15 @@ export default function Yearly() {
     // Apply thermometer offset correction to outdoor temperatures
     return completeDataFilteredData.map((row) => {
       const { az, azHeating } = computeAz(row);
-      const offset = (row.heating_systems as any)?.thermometer_offset_k;
+      const offset = row.heating_systems?.thermometer_offset_k;
 
       return flattenHeatingSystemsFields({
         ...row,
         az,
         az_heating: azHeating,
-        outdoor_temp_avg_c: applyThermometerOffset(row.outdoor_temp_avg_c, offset),
-        outdoor_temp_min_c: applyThermometerOffset(row.outdoor_temp_min_c, offset),
-        outdoor_temp_max_c: applyThermometerOffset(row.outdoor_temp_max_c, offset),
+        outdoor_temperature_c: applyThermometerOffset(row.outdoor_temperature_c, offset),
+        outdoor_temperature_min_c: applyThermometerOffset(row.outdoor_temperature_min_c, offset),
+        outdoor_temperature_max_c: applyThermometerOffset(row.outdoor_temperature_max_c, offset),
       });
     });
   }, [completeDataFilteredData]);
