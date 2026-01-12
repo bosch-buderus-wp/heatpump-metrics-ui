@@ -120,6 +120,32 @@ const resources = {
         electricalEnergy: "El. Energie",
         thermalEnergyHeating: "Wärmeenergie Heizung",
         electricalEnergyHeating: "El. Energie Heizung",
+        hints: {
+          az: "Verhältnis von erzeugter Wärmeenergie zur eingesetzten elektrischen Energie (inklusive Heizung, Warmwasser und Kühlung)",
+          azHeating:
+            "Verhältnis von erzeugter Wärmeenergie zur eingesetzten elektrischen Energie nur für Heizung (ohne Warmwasser und Kühlung)",
+          buildingConstructionYear: "Baujahr des Gebäudes",
+          designOutdoorTemp:
+            "Kältestes Zweitagesmittel der Außenlufttemperatur für den Standort, das statistisch etwa alle zwei Jahre auftritt",
+          heatedArea: "Gesamte beheizte Wohnfläche",
+          heatingLoad: "Maximale Heizleistung, die bei der Normaußentemperatur benötigt wird.",
+          buildingType: "Der architektonische Typ des Gebäudes (Einfamilienhaus, Reihenhaus, etc.)",
+          buildingEnergyStandard:
+            "Der Energieeffizienzstandard des Gebäudes (z.B. Passivhaus, KfW 55)",
+          swIdu: "Softwareversion der Inneneinheit der Wärmepumpe",
+          swOdu: "Softwareversion der Außeneinheit der Wärmepumpe",
+          electricalEnergy: "Elektrische Energie (Strom), die von der Wärmepumpe eingesetzt wurde",
+          thermalEnergy: "Gesamte thermische Energie (Wärme), die von der Wärmepumpe erzeugt wurde",
+          electricalEnergyHeating:
+            "Elektrische Energie (Strom), die nur für Heizung eingesetzt wurde (ohne Warmwasser und Kühlung)",
+          thermalEnergyHeating:
+            "Thermische Energie (Wärme), die nur für Heizung erzeugt wurde (ohne Warmwasser und Kühlung)",
+          flowTemperature: "Vorlauftemperatur des Heizkreislaufs",
+          outdoorTemperature: "Außenlufttemperatur",
+          usedForHeating: "Ob die Wärmepumpe für Heizung verwendet wird",
+          usedForDhw: "Ob die Wärmepumpe für Warmwasserbereitung verwendet wird",
+          usedForCooling: "Ob die Wärmepumpe für Kühlung verwendet wird",
+        },
       },
       systems: {
         title: "Heizungsanlagen",
@@ -183,6 +209,9 @@ const resources = {
           "Hier kannst du Daten deiner Heizungsanlage eintragen. Es gibt keine Pflichtfelder. Trage nur die Daten ein, die du veröffentlichen möchtest, um anderen Nutzern beim Vergleich oder dem Umstieg auf eine Wärmepumpe zu helfen.",
         monthlyValuesInfo:
           "Pflege hier deine monatlichen Verbrauchswerte. Diese werden automatisch berechnet, wenn du stündliche Messwerte hochlädst (siehe Mitmach-Guide), oder können hier manuell eingetragen werden. Deine monatlichen Werte kannst du von deiner Bosch- und Buderus-App unter Energiemonitoring --> Detailansicht übertragen. Sobald du einen Monatswert manuell speicherst, wird die automatische Berechnung für diesen Monat deaktiviert.",
+        hints: {
+          username: "Dein öffentlicher Anzeigename im System.",
+        },
       },
       deleteConfirm: {
         deleteSystem: "Anlage löschen",
@@ -303,6 +332,35 @@ const resources = {
           other: "Anderes Land...",
         },
         countryPlaceholder: "Land eingeben",
+        hints: {
+          name: "Ein Name für deine Wärmepumpenanlage zur besseren Identifikation.",
+          country: "Das Land, in dem deine Wärmepumpe installiert ist.",
+          postalCode:
+            "Die Postleitzahl deines Standorts. Du kannst auch nur die ersten Ziffern eingeben, wenn du deine komplette Postleitzahl nicht veröffentlichen möchtest.",
+          buildingConstructionYear:
+            "Das Jahr, in dem dein Gebäude ursprünglich gebaut wurde. Dies hilft bei der Einschätzung der Dämmqualität.",
+          heatedArea:
+            "Die gesamte Wohnfläche, die von deiner Wärmepumpe beheizt wird. Wird zur Berechnung der Heizlast pro Quadratmeter verwendet.",
+          buildingType:
+            "Der architektonische Typ deines Gebäudes. Dies beeinflusst den Heizbedarf und das thermische Verhalten.",
+          buildingEnergyStandard:
+            "Der Energieeffizienzstandard, den dein Gebäude erfüllt (z.B. Passivhaus, Niedrigenergiehaus). Höhere Standards bedeuten bessere Dämmung.",
+          heatingSystem: "Die Art des Wärmeverteilungssystems in deinem Gebäude.",
+          heatingLoad:
+            "Maximale Heizleistung, die an der Normaußentemperatur (NAT) benötigt wird. Wird normalerweise von einem Heizungsbauer berechnet oder ist im Energieausweis des Gebäudes zu finden.",
+          designOutdoorTemp:
+            "Kältestes Zweitagesmittel der Außenlufttemperatur für deinen Standort, das statistisch etwa alle zwei Jahre auftritt (z.B. -12 °C für Mitteldeutschland). [Klimakarte ansehen](https://www.waermepumpe.de/werkzeuge/klimakarte/)",
+          thermometerOffset:
+            "Korrekturwert für deinen Außentemperatursensor. Verwende dies, wenn der Sensor eine zu hohe oder zu niedrige Temperatur misst. Ein positiver Wert bedeutet, dass der Sensor zu hoch misst, ein negativer Wert bedeutet, dass der Sensor zu niedrig misst, z.B. 2 K wenn der Sensor 2 °C zu hoch misst. Mit diesem Wert werden alle deine Messwerte korrigiert.",
+          modelIndoor: "Das Modell deiner Inneneinheit.",
+          modelOutdoor: "Das Modell deiner Außeneinheit.",
+          softwareIndoor:
+            "Die Softwareversion deiner Inneneinheit. Diese findest du im Servicemenü deiner Wärmepumpe oder in der App.",
+          softwareOutdoor:
+            "Die Softwareversion deiner Außeneinheit. Diese findest du im Servicemenü deiner Wärmepumpe oder in der App.",
+          usage: "Wofür wird deine Wärmepumpe eingesetzt? Wähle alle zutreffenden Optionen.",
+          notes: "Zusätzliche Notizen oder Besonderheiten zu deiner Anlage.",
+        },
       },
       monthlyForm: {
         autoCalculatedInfo:
@@ -317,6 +375,24 @@ const resources = {
         flowTempAvg: "Vorlauftemperatur Ø",
         errorCopLessThanOne: "Arbeitszahl < 1 (Wärmeenergie muss ≥ el. Energie sein)",
         errorHeatingExceedsTotal: "Heizung kann nicht größer als Gesamt sein",
+        hints: {
+          electricalEnergy:
+            "Die gesamte elektrische Energie (Strom), die deine Wärmepumpe in diesem Monat benötigt hat (inklusive Heizung, Warmwasser und Kühlung). Diese Werte findest du in der Bosch/Buderus App unter Energiemonitoring → Detailansicht.",
+          thermalEnergy:
+            "Die gesamte Wärmeenergie, die deine Wärmepumpe in diesem Monat erzeugt hat. Diese Werte findest du in der Bosch/Buderus App unter Energiemonitoring → Detailansicht.",
+          electricalEnergyHeating:
+            "Die elektrische Energie (Strom), die nur zum Heizen verwendet wurde (ohne Warmwasser und Kühlung). Diese Werte findest du in der Bosch/Buderus App unter Energiemonitoring → Detailansicht.",
+          thermalEnergyHeating:
+            "Die Wärmeenergie, die zum Heizen erzeugt wurde (ohne Warmwasser und Kühlung).",
+          outdoorTempAvg:
+            "Die durchschnittliche Außentemperatur in diesem Monat. Diese Werte findest du in der Bosch/Buderus App unter Energiemonitoring → Detailansicht.",
+          outdoorTempMin:
+            "Die niedrigste Außentemperatur in diesem Monat. Wenn du sie nicht weißt, lass das Feld leer.",
+          outdoorTempMax:
+            "Die höchste Außentemperatur in diesem Monat. Wenn du sie nicht weißt, lass das Feld leer.",
+          flowTempAvg:
+            "Die durchschnittliche Vorlauftemperatur in diesem Monat. Diese Werte findest du in der Bosch/Buderus App unter Energiemonitoring → Detailansicht.",
+        },
       },
     },
   },
@@ -457,6 +533,34 @@ const resources = {
         electricalEnergy: "Electrical Energy",
         thermalEnergyHeating: "Thermal Energy Heating",
         electricalEnergyHeating: "Electrical Energy Heating",
+        hints: {
+          az: "Ratio of thermal energy generated to electrical energy consumed (including heating, domestic hot water, and cooling)",
+          azHeating:
+            "Ratio of thermal energy generated to electrical energy consumed for heating only (excluding domestic hot water and cooling)",
+          buildingConstructionYear: "Construction year of the building",
+          designOutdoorTemp: "Coldest average outdoor temperature for the location",
+          heatedArea: "Total heated living area",
+          heatingLoad: "Maximum heating power required at the design outdoor temperature",
+          buildingType:
+            "Architectural type of the building (single family house, terraced house, etc.)",
+          buildingEnergyStandard:
+            "Energy efficiency standard of the building (e.g., passive house, KfW 55)",
+          swIdu: "The software version of the indoor unit of the heat pump",
+          swOdu: "The software version of the outdoor unit of the heat pump",
+          electricalEnergy: "The total electrical energy consumed by the heat pump",
+          thermalEnergy: "The total thermal energy generated by the heat pump",
+          electricalEnergyHeating:
+            "The electrical energy consumed only for heating (excluding domestic hot water and cooling)",
+          thermalEnergyHeating:
+            "The thermal energy generated only for heating (excluding domestic hot water and cooling)",
+          flowTemperature:
+            "The flow temperature of the heating circuit. Higher temperatures mean higher energy consumption",
+          outdoorTemperature:
+            "The outdoor temperature. Lower temperatures require more heating energy",
+          usedForHeating: "Whether the heat pump is used for heating",
+          usedForDhw: "Whether the heat pump is used for domestic hot water",
+          usedForCooling: "Whether the heat pump is used for cooling",
+        },
       },
       deleteConfirm: {
         deleteSystem: "Delete heating system",
@@ -523,6 +627,9 @@ const resources = {
           "Here you can enter data about your heating system. There are no mandatory fields. Only enter the data you want to publish to help other users compare or switch to a heat pump.",
         monthlyValuesInfo:
           "Maintain your monthly consumption values here. These are automatically calculated when you upload hourly measurements (see Participation Guide in menu), or can be entered manually here. Once you manually save a monthly value, automatic calculation is disabled for that month.",
+        hints: {
+          username: "Your public display name in the system.",
+        },
       },
       models: {
         heating_type: {
@@ -628,6 +735,35 @@ const resources = {
           other: "Other country...",
         },
         countryPlaceholder: "Enter country",
+        hints: {
+          name: "A name for your heat pump system for better identification.",
+          country: "The country where your heat pump is installed.",
+          postalCode:
+            "The postal code of your location. You can also enter only the first digits if you don't want to publish your complete postal code.",
+          buildingConstructionYear:
+            "The year your building was originally constructed. This helps estimate insulation quality.",
+          heatedArea:
+            "The total living area heated by your heat pump. Used to calculate heating load per square meter.",
+          buildingType:
+            "The architectural type of your building. This affects heating requirements and thermal behavior.",
+          buildingEnergyStandard:
+            "The energy efficiency standard your building meets (e.g., passive house, low energy house). Higher standards mean better insulation.",
+          heatingSystem: "The type of heat distribution system in your building.",
+          heatingLoad:
+            "Maximum heating power needed at design outdoor temperature (DOT). Typically calculated by a heating engineer or found in your building's energy certificate.",
+          designOutdoorTemp:
+            "The coldest average outdoor temperature for your location (e.g., -12°C for central Germany). [View climate map](https://www.waermepumpe.de/werkzeuge/klimakarte/)",
+          thermometerOffset:
+            "Correction value for your outdoor temperature sensor. Use this if the sensor measures too high or too low. A positive value means the sensor reads too high, a negative value means it reads too low, e.g., 2 K if the sensor reads 2°C too high. This value will be used to correct all your measurements.",
+          modelIndoor: "The model of your indoor unit.",
+          modelOutdoor: "The model of your outdoor unit.",
+          softwareIndoor:
+            "The software version of your indoor unit. You can find this in the service menu of your heat pump or in the app.",
+          softwareOutdoor:
+            "The software version of your outdoor unit. You can find this in the service menu of your heat pump or in the app.",
+          usage: "What is your heat pump used for? Select all applicable options.",
+          notes: "Additional notes or special features of your system.",
+        },
       },
       monthlyForm: {
         autoCalculatedInfo:
@@ -642,6 +778,24 @@ const resources = {
         flowTempAvg: "Flow temperature avg",
         errorCopLessThanOne: "COP < 1 (thermal energy must be ≥ electrical energy)",
         errorHeatingExceedsTotal: "Heating cannot exceed total",
+        hints: {
+          electricalEnergy:
+            "The total electrical energy (electricity) consumed by your heat pump this month (including heating, domestic hot water, and cooling). You can find these values in the Bosch/Buderus app under Energy Monitoring → Detail View.",
+          thermalEnergy:
+            "The total thermal energy generated by your heat pump this month. You can find these values in the Bosch/Buderus app under Energy Monitoring → Detail View.",
+          electricalEnergyHeating:
+            "The electrical energy (electricity) used only for heating (excluding domestic hot water and cooling). You can find these values in the Bosch/Buderus app under Energy Monitoring → Detail View.",
+          thermalEnergyHeating:
+            "The thermal energy generated for heating (excluding domestic hot water and cooling).",
+          outdoorTempAvg:
+            "The average outdoor temperature this month. You can find these values in the Bosch/Buderus app under Energy Monitoring → Detail View.",
+          outdoorTempMin:
+            "The lowest outdoor temperature this month. Leave this field empty if you don't know it.",
+          outdoorTempMax:
+            "The highest outdoor temperature this month. Leave this field empty if you don't know it.",
+          flowTempAvg:
+            "The average flow temperature this month. You can find these values in the Bosch/Buderus app under Energy Monitoring → Detail View.",
+        },
       },
     },
   },

@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { FieldHint } from "../../ui";
 
 interface EnumSelectFieldProps {
   label: string;
@@ -7,6 +8,7 @@ interface EnumSelectFieldProps {
   enumKey: string; // e.g., "building_type", "building_energy_standard"
   enumValues: string[]; // e.g., ["single_family_detached", "semi_detached", ...]
   translationPrefix: string; // e.g., "models.building_type"
+  hint?: string;
 }
 
 export function EnumSelectField({
@@ -16,6 +18,7 @@ export function EnumSelectField({
   enumKey,
   enumValues,
   translationPrefix,
+  hint,
 }: EnumSelectFieldProps) {
   const { t } = useTranslation();
 
@@ -31,6 +34,7 @@ export function EnumSelectField({
           </option>
         ))}
       </select>
+      {hint && <FieldHint hint={hint} />}
     </div>
   );
 }

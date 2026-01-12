@@ -146,6 +146,7 @@ export function getAllDataGridColumns(t: TFunction): Record<string, GridColDef> 
     az: {
       field: "az",
       headerName: t("tableHeaders.az"),
+      description: t("tableHeaders.hints.az"),
       width: 150,
       type: "number",
       valueGetter: (_value, row) => {
@@ -160,6 +161,7 @@ export function getAllDataGridColumns(t: TFunction): Record<string, GridColDef> 
     azHeating: {
       field: "azHeating",
       headerName: t("tableHeaders.azHeating"),
+      description: t("tableHeaders.hints.azHeating"),
       width: 160,
       type: "number",
       valueGetter: (_value, row) => {
@@ -176,6 +178,7 @@ export function getAllDataGridColumns(t: TFunction): Record<string, GridColDef> 
     outdoorTemperature: {
       field: "outdoor_temperature_c",
       headerName: t("tableHeaders.outdoorTemperature"),
+      description: t("tableHeaders.hints.outdoorTemperature"),
       width: 130,
       type: "number",
       valueFormatter: (value: number | null) => (value != null ? `${value.toFixed(1)} °C` : "-"),
@@ -183,6 +186,7 @@ export function getAllDataGridColumns(t: TFunction): Record<string, GridColDef> 
     flowTemperature: {
       field: "flow_temperature_c",
       headerName: t("tableHeaders.flowTemperature"),
+      description: t("tableHeaders.hints.flowTemperature"),
       width: 130,
       type: "number",
       valueFormatter: (value: number | null) => (value != null ? `${value.toFixed(1)} °C` : "-"),
@@ -192,6 +196,7 @@ export function getAllDataGridColumns(t: TFunction): Record<string, GridColDef> 
     thermalEnergy: {
       field: "thermal_energy_kwh",
       headerName: t("tableHeaders.thermalEnergy"),
+      description: t("tableHeaders.hints.thermalEnergy"),
       width: 120,
       type: "number",
       valueFormatter: (value: number | null) => (value != null ? `${value.toFixed(1)} kWh` : "-"),
@@ -199,6 +204,7 @@ export function getAllDataGridColumns(t: TFunction): Record<string, GridColDef> 
     electricalEnergy: {
       field: "electrical_energy_kwh",
       headerName: t("tableHeaders.electricalEnergy"),
+      description: t("tableHeaders.hints.electricalEnergy"),
       width: 120,
       type: "number",
       valueFormatter: (value: number | null) => (value != null ? `${value.toFixed(1)} kWh` : "-"),
@@ -206,6 +212,7 @@ export function getAllDataGridColumns(t: TFunction): Record<string, GridColDef> 
     thermalEnergyHeating: {
       field: "thermal_energy_heating_kwh",
       headerName: t("tableHeaders.thermalEnergyHeating"),
+      description: t("tableHeaders.hints.thermalEnergyHeating"),
       width: 120,
       type: "number",
       valueFormatter: (value: number | null) => (value != null ? `${value.toFixed(1)} kWh` : "-"),
@@ -213,6 +220,7 @@ export function getAllDataGridColumns(t: TFunction): Record<string, GridColDef> 
     electricalEnergyHeating: {
       field: "electrical_energy_heating_kwh",
       headerName: t("tableHeaders.electricalEnergyHeating"),
+      description: t("tableHeaders.hints.electricalEnergyHeating"),
       width: 120,
       type: "number",
       valueFormatter: (value: number | null) => (value != null ? `${value.toFixed(1)} kWh` : "-"),
@@ -229,6 +237,7 @@ export function getAllDataGridColumns(t: TFunction): Record<string, GridColDef> 
     swIdu: {
       field: "sw_idu",
       headerName: t("tableHeaders.swIdu"),
+      description: t("tableHeaders.hints.swIdu"),
       width: 120,
       valueGetter: (_value, row) => row.heating_systems?.sw_idu ?? row.sw_idu,
       valueFormatter: (value: string) => getSwIduLabel(t, value),
@@ -238,6 +247,7 @@ export function getAllDataGridColumns(t: TFunction): Record<string, GridColDef> 
     swOdu: {
       field: "sw_odu",
       headerName: t("tableHeaders.swOdu"),
+      description: t("tableHeaders.hints.swOdu"),
       width: 80,
       valueGetter: (_value, row) => row.heating_systems?.sw_odu ?? row.sw_odu,
       valueFormatter: (value: string) => getSwOduLabel(t, value),
@@ -247,6 +257,7 @@ export function getAllDataGridColumns(t: TFunction): Record<string, GridColDef> 
     heatingLoad: {
       field: "heating_load_kw",
       headerName: t("tableHeaders.heatingLoad"),
+      description: t("tableHeaders.hints.heatingLoad"),
       width: 70,
       type: "number",
       valueGetter: (_value, row) =>
@@ -256,6 +267,7 @@ export function getAllDataGridColumns(t: TFunction): Record<string, GridColDef> 
     heatedArea: {
       field: "heated_area_m2",
       headerName: t("tableHeaders.heatedArea"),
+      description: t("tableHeaders.hints.heatedArea"),
       width: 80,
       type: "number",
       valueGetter: (_value, row) =>
@@ -265,6 +277,7 @@ export function getAllDataGridColumns(t: TFunction): Record<string, GridColDef> 
     buildingConstructionYear: {
       field: "building_construction_year",
       headerName: t("systemForm.buildingConstructionYear"),
+      description: t("tableHeaders.hints.buildingConstructionYear"),
       width: 100,
       valueGetter: (_value, row) =>
         row.heating_systems?.building_construction_year ?? row.building_construction_year ?? null,
@@ -273,6 +286,7 @@ export function getAllDataGridColumns(t: TFunction): Record<string, GridColDef> 
     designOutdoorTemp: {
       field: "design_outdoor_temp_c",
       headerName: t("systemForm.designOutdoorTemp"),
+      description: t("tableHeaders.hints.designOutdoorTemp"),
       width: 150,
       type: "number",
       valueGetter: (_value, row) =>
@@ -282,6 +296,7 @@ export function getAllDataGridColumns(t: TFunction): Record<string, GridColDef> 
     buildingType: {
       field: "building_type",
       headerName: t("systemForm.buildingType"),
+      description: t("tableHeaders.hints.buildingType"),
       width: 180,
       valueGetter: (_value, row) => row.heating_systems?.building_type ?? row.building_type,
       valueFormatter: (value: string) => getBuildingTypeLabel(t, value),
@@ -297,6 +312,7 @@ export function getAllDataGridColumns(t: TFunction): Record<string, GridColDef> 
     buildingEnergyStandard: {
       field: "building_energy_standard",
       headerName: t("systemForm.buildingEnergyStandard"),
+      description: t("tableHeaders.hints.buildingEnergyStandard"),
       width: 180,
       valueGetter: (_value, row) =>
         row.heating_systems?.building_energy_standard ?? row.building_energy_standard,
@@ -311,6 +327,7 @@ export function getAllDataGridColumns(t: TFunction): Record<string, GridColDef> 
     usedForHeating: {
       field: "used_for_heating",
       headerName: t("systemForm.usedForHeating"),
+      description: t("tableHeaders.hints.usedForHeating"),
       width: 100,
       type: "boolean",
       valueGetter: (_value, row) =>
@@ -319,6 +336,7 @@ export function getAllDataGridColumns(t: TFunction): Record<string, GridColDef> 
     usedForDhw: {
       field: "used_for_dhw",
       headerName: t("systemForm.usedForDhw"),
+      description: t("tableHeaders.hints.usedForDhw"),
       width: 120,
       type: "boolean",
       valueGetter: (_value, row) => row.heating_systems?.used_for_dhw ?? row.used_for_dhw ?? null,
@@ -326,6 +344,7 @@ export function getAllDataGridColumns(t: TFunction): Record<string, GridColDef> 
     usedForCooling: {
       field: "used_for_cooling",
       headerName: t("systemForm.usedForCooling"),
+      description: t("tableHeaders.hints.usedForCooling"),
       width: 100,
       type: "boolean",
       valueGetter: (_value, row) =>

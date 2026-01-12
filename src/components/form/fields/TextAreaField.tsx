@@ -1,9 +1,12 @@
+import { FieldHint } from "../../ui";
+
 interface TextAreaFieldProps {
   label: string;
   value: string | null | undefined;
   onChange: (value: string | null) => void;
   placeholder?: string;
   rows?: number;
+  hint?: string;
 }
 
 export function TextAreaField({
@@ -12,6 +15,7 @@ export function TextAreaField({
   onChange,
   placeholder,
   rows = 3,
+  hint,
 }: TextAreaFieldProps) {
   const id = `textarea-field-${label.replace(/\s+/g, "-").toLowerCase()}`;
   return (
@@ -24,6 +28,7 @@ export function TextAreaField({
         placeholder={placeholder}
         rows={rows}
       />
+      {hint && <FieldHint hint={hint} />}
     </div>
   );
 }

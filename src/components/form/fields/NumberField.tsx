@@ -1,3 +1,5 @@
+import { FieldHint } from "../../ui";
+
 interface NumberFieldProps {
   label: string;
   value: number | null | undefined;
@@ -6,6 +8,7 @@ interface NumberFieldProps {
   max?: number;
   step?: number | string;
   placeholder?: string;
+  hint?: string;
 }
 
 export function NumberField({
@@ -16,6 +19,7 @@ export function NumberField({
   max,
   step = 1,
   placeholder,
+  hint,
 }: NumberFieldProps) {
   const id = `number-field-${label.replace(/\s+/g, "-").toLowerCase()}`;
   return (
@@ -31,6 +35,7 @@ export function NumberField({
         onChange={(e) => onChange(e.target.value ? Number(e.target.value) : null)}
         placeholder={placeholder}
       />
+      {hint && <FieldHint hint={hint} />}
     </div>
   );
 }

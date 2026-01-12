@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { Database } from "../../../types/database.types";
 import { MonthYearPicker, NumberInputWithUnit } from "../../form";
+import { FieldHint } from "../../ui";
 import { ActionBar, type ActionButton } from "../../ui/ActionBar";
 
 type HeatingSystem = Database["public"]["Tables"]["heating_systems"]["Row"];
@@ -177,23 +178,55 @@ export function MonthlyEditor({
 
       <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
         {[
-          { k: "electrical_energy_kwh", l: t("monthlyForm.electricalEnergy"), unit: "kWh" },
-          { k: "thermal_energy_kwh", l: t("monthlyForm.thermalEnergy"), unit: "kWh" },
+          {
+            k: "electrical_energy_kwh",
+            l: t("monthlyForm.electricalEnergy"),
+            unit: "kWh",
+            hint: "electricalEnergy",
+          },
+          {
+            k: "thermal_energy_kwh",
+            l: t("monthlyForm.thermalEnergy"),
+            unit: "kWh",
+            hint: "thermalEnergy",
+          },
           {
             k: "electrical_energy_heating_kwh",
             l: t("monthlyForm.electricalEnergyHeating"),
             unit: "kWh",
+            hint: "electricalEnergyHeating",
           },
           {
             k: "thermal_energy_heating_kwh",
             l: t("monthlyForm.thermalEnergyHeating"),
             unit: "kWh",
+            hint: "thermalEnergyHeating",
           },
-          { k: "outdoor_temperature_c", l: t("monthlyForm.outdoorTempAvg"), unit: "°C" },
-          { k: "outdoor_temperature_min_c", l: t("monthlyForm.outdoorTempMin"), unit: "°C" },
-          { k: "outdoor_temperature_max_c", l: t("monthlyForm.outdoorTempMax"), unit: "°C" },
-          { k: "flow_temperature_c", l: t("monthlyForm.flowTempAvg"), unit: "°C" },
-        ].map(({ k, l, unit }) => {
+          {
+            k: "outdoor_temperature_c",
+            l: t("monthlyForm.outdoorTempAvg"),
+            unit: "°C",
+            hint: "outdoorTempAvg",
+          },
+          {
+            k: "outdoor_temperature_min_c",
+            l: t("monthlyForm.outdoorTempMin"),
+            unit: "°C",
+            hint: "outdoorTempMin",
+          },
+          {
+            k: "outdoor_temperature_max_c",
+            l: t("monthlyForm.outdoorTempMax"),
+            unit: "°C",
+            hint: "outdoorTempMax",
+          },
+          {
+            k: "flow_temperature_c",
+            l: t("monthlyForm.flowTempAvg"),
+            unit: "°C",
+            hint: "flowTempAvg",
+          },
+        ].map(({ k, l, unit, hint }) => {
           const hasError = validationErrors[k];
           const fieldId = `monthly-field-${k}`;
           return (
@@ -213,6 +246,7 @@ export function MonthlyEditor({
                   </span>
                 )}
               </div>
+              {hint && <FieldHint hint={t(`monthlyForm.hints.${hint}`)} />}
             </div>
           );
         })}

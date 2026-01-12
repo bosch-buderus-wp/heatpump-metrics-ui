@@ -18,6 +18,7 @@ import {
   TextAreaField,
   TextField,
 } from "../../form";
+import { FieldHint } from "../../ui";
 
 type HeatingSystem = Database["public"]["Tables"]["heating_systems"]["Row"];
 type HeatingSystemInsert = Database["public"]["Tables"]["heating_systems"]["Insert"];
@@ -84,6 +85,7 @@ export function SystemForm({ system, onSubmit }: SystemFormProps) {
         onChange={(v) => set("name", v)}
         placeholder={t("systemForm.namePlaceholder")}
         required
+        hint={t("systemForm.hints.name")}
       />
 
       <div className="row">
@@ -129,12 +131,14 @@ export function SystemForm({ system, onSubmit }: SystemFormProps) {
             </button>
           </div>
         )}
+        <FieldHint hint={t("systemForm.hints.country")} />
       </div>
 
       <TextField
         label={t("systemForm.postalCode")}
         value={form.postal_code}
         onChange={(v) => set("postal_code", v)}
+        hint={t("systemForm.hints.postalCode")}
       />
 
       <NumberField
@@ -144,6 +148,7 @@ export function SystemForm({ system, onSubmit }: SystemFormProps) {
         min={1800}
         max={2100}
         step={1}
+        hint={t("systemForm.hints.buildingConstructionYear")}
       />
 
       <div className="row">
@@ -155,6 +160,7 @@ export function SystemForm({ system, onSubmit }: SystemFormProps) {
           unit="m²"
           step={1}
         />
+        <FieldHint hint={t("systemForm.hints.heatedArea")} />
       </div>
 
       <EnumSelectField
@@ -164,6 +170,7 @@ export function SystemForm({ system, onSubmit }: SystemFormProps) {
         enumKey="building_type"
         enumValues={BUILDING_TYPE_VALUES}
         translationPrefix="models.building_type"
+        hint={t("systemForm.hints.buildingType")}
       />
 
       <EnumSelectField
@@ -175,6 +182,7 @@ export function SystemForm({ system, onSubmit }: SystemFormProps) {
         enumKey="building_energy_standard"
         enumValues={BUILDING_ENERGY_STANDARD_VALUES}
         translationPrefix="models.building_energy_standard"
+        hint={t("systemForm.hints.buildingEnergyStandard")}
       />
 
       <SelectField
@@ -187,6 +195,7 @@ export function SystemForm({ system, onSubmit }: SystemFormProps) {
           { value: "mixed", label: t("models.heating_type.mixed") },
         ]}
         emptyOption={false}
+        hint={t("systemForm.hints.heatingSystem")}
       />
 
       <div className="row">
@@ -198,6 +207,7 @@ export function SystemForm({ system, onSubmit }: SystemFormProps) {
           unit="kW"
           step="any"
         />
+        <FieldHint hint={t("systemForm.hints.heatingLoad")} />
       </div>
 
       <div className="row">
@@ -211,6 +221,7 @@ export function SystemForm({ system, onSubmit }: SystemFormProps) {
           max={30}
           step={0.1}
         />
+        <FieldHint hint={t("systemForm.hints.designOutdoorTemp")} />
       </div>
 
       <div className="row">
@@ -224,6 +235,7 @@ export function SystemForm({ system, onSubmit }: SystemFormProps) {
           max={20}
           step={0.1}
         />
+        <FieldHint hint={t("systemForm.hints.thermometerOffset")} />
       </div>
 
       <SelectField
@@ -232,6 +244,7 @@ export function SystemForm({ system, onSubmit }: SystemFormProps) {
         onChange={(v) => set("model_idu", (v as typeof form.model_idu) ?? null)}
         options={modelIduOptions}
         emptyOption={false}
+        hint={t("systemForm.hints.modelIndoor")}
       />
 
       <SelectField
@@ -240,6 +253,7 @@ export function SystemForm({ system, onSubmit }: SystemFormProps) {
         onChange={(v) => set("model_odu", (v as typeof form.model_odu) ?? null)}
         options={modelOduOptions}
         emptyOption={false}
+        hint={t("systemForm.hints.modelOutdoor")}
       />
 
       <SelectField
@@ -248,6 +262,7 @@ export function SystemForm({ system, onSubmit }: SystemFormProps) {
         onChange={(v) => set("sw_idu", (v as typeof form.sw_idu) ?? null)}
         options={swIduOptions}
         emptyOption={false}
+        hint={t("systemForm.hints.softwareIndoor")}
       />
 
       <SelectField
@@ -256,6 +271,7 @@ export function SystemForm({ system, onSubmit }: SystemFormProps) {
         onChange={(v) => set("sw_odu", (v as typeof form.sw_odu) ?? null)}
         options={swOduOptions}
         emptyOption={false}
+        hint={t("systemForm.hints.softwareOutdoor")}
       />
 
       <div className="row">
@@ -286,6 +302,7 @@ export function SystemForm({ system, onSubmit }: SystemFormProps) {
             {t("systemForm.usedForCooling")}
           </label>
         </div>
+        <FieldHint hint={t("systemForm.hints.usage")} />
       </div>
 
       <TextAreaField
@@ -294,6 +311,7 @@ export function SystemForm({ system, onSubmit }: SystemFormProps) {
         onChange={(v) => set("notes", v)}
         placeholder={t("systemForm.notesPlaceholder")}
         rows={3}
+        hint={t("systemForm.hints.notes")}
       />
     </form>
   );

@@ -1,3 +1,5 @@
+import { FieldHint } from "../../ui";
+
 interface SelectFieldProps {
   label: string;
   value: string | null | undefined;
@@ -5,6 +7,7 @@ interface SelectFieldProps {
   options: Array<{ value: string; label: string }>;
   emptyOption?: boolean;
   required?: boolean;
+  hint?: string;
 }
 
 export function SelectField({
@@ -14,6 +17,7 @@ export function SelectField({
   options,
   emptyOption = true,
   required,
+  hint,
 }: SelectFieldProps) {
   const id = `select-field-${label.replace(/\s+/g, "-").toLowerCase()}`;
   return (
@@ -32,6 +36,7 @@ export function SelectField({
           </option>
         ))}
       </select>
+      {hint && <FieldHint hint={hint} />}
     </div>
   );
 }

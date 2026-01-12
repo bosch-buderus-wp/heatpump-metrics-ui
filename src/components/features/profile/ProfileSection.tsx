@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { Profile } from "../../../hooks/useProfile";
+import { FieldHint } from "../../ui";
 import { ActionBar, type ActionButton } from "../../ui/ActionBar";
 import { ConfirmDialog } from "../../ui/ConfirmDialog";
 import { CopyField } from "../../ui/CopyField";
@@ -117,6 +118,7 @@ export function ProfileSection({
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
+          <FieldHint hint={t("dash.hints.username")} />
         </div>
       </form>
 
