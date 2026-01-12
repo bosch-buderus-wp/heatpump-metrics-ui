@@ -80,7 +80,6 @@ jobs:
           files: |
             dist/app.js
             dist/app.css
-          generate_release_notes: true
           draft: false
           prerelease: false
           body: |
@@ -90,24 +89,6 @@ jobs:
 
             ### 📝 Changes
             ${{ env.COMMITS }}
-
-            ### 📦 CDN Usage (Recommended)
-
-            Use the stable link to always get the latest version, or the versioned link for a specific release.
-
-            #### Stable (Latest)
-            ```html
-            <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/bosch-buderus-wp/heatpump-metrics-ui@release/app.css">
-            <div id="root"></div>
-            <script type="module" src="https://cdn.jsdelivr.net/gh/bosch-buderus-wp/heatpump-metrics-ui@release/app.js"></script>
-            ```
-
-            #### Versioned (${{ github.ref_name }})
-            ```html
-            <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/bosch-buderus-wp/heatpump-metrics-ui@${{ github.ref_name }}-release/app.css">
-            <div id="root"></div>
-            <script type="module" src="https://cdn.jsdelivr.net/gh/bosch-buderus-wp/heatpump-metrics-ui@${{ github.ref_name }}-release/app.js"></script>
-            ```
 
             ### 📄 Files
             - `app.js` - Main application bundle
