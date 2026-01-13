@@ -58,6 +58,7 @@ export function SystemForm({ system, onSubmit }: SystemFormProps) {
     building_type: system?.building_type ?? null,
     country: initialCountry,
     building_energy_standard: system?.building_energy_standard ?? null,
+    thermometer_offset_k: system?.thermometer_offset_k ?? null,
     used_for_heating: system?.used_for_heating ?? true,
     used_for_dhw: system?.used_for_dhw ?? false,
     used_for_cooling: system?.used_for_cooling ?? false,
