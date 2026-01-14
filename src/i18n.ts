@@ -101,6 +101,15 @@ const resources = {
         searchPlaceholder: "Suchen...",
         clearSearch: "Suche löschen",
       },
+      dataQuality: {
+        unrealisticCopHigh:
+          "Unrealistische Arbeitszahl: {{cop}} ist zu hoch (>{{max}}) - Wert wird nicht berücksichtigt",
+        unrealisticCopLow:
+          "Unrealistische Arbeitszahl: {{cop}} ist zu niedrig (<{{min}}) - Wert wird nicht berücksichtigt",
+        negativeElectricalEnergy: "Elektrische Energie kann nicht negativ sein",
+        negativeThermalEnergy: "Thermische Energie - vermutlich Abtauenergie",
+        dataIssue: "Datenproblem erkannt",
+      },
       tableHeaders: {
         userId: "Nutzer-ID",
         az: "Arbeitszahl (gesamt)",
@@ -513,6 +522,15 @@ const resources = {
         search: "Search",
         searchPlaceholder: "Search...",
         clearSearch: "Clear search",
+      },
+      dataQuality: {
+        unrealisticCopHigh:
+          "Unrealistic COP: {{cop}} is too high (>{{max}}) - value will not be considered",
+        unrealisticCopLow:
+          "Unrealistic COP: {{cop}} is too low (<{{min}}) - value will not be considered",
+        negativeElectricalEnergy: "Electrical energy cannot be negative",
+        negativeThermalEnergy: "Thermal energy - probably defrost energy",
+        dataIssue: "Data issue detected",
       },
       tableHeaders: {
         userId: "User ID",

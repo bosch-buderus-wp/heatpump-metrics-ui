@@ -8,6 +8,7 @@ import {
   processDataset,
 } from "../../../lib/chartDataProcessing";
 import { CHART_COLORS } from "../../../lib/chartTheme";
+import { filterRealisticDataForCharts } from "../../../lib/dataQuality";
 import ChartTooltip from "./ChartTooltip";
 import TemperatureLineLayer from "./TemperatureLineLayer";
 
@@ -83,7 +84,13 @@ export default function AzBarChart({
   const chartData = useMemo(() => {
     // Comparison mode: merge multiple datasets
     if (isComparisonMode && comparisonGroups) {
-      return mergeComparisonDatasets(comparisonGroups, {
+      // Filter unrealistic data from each comparison group
+      const filteredGroups = comparisonGroups.map((group) => ({
+        ...group,
+        data: filterRealisticDataForCharts(group.data),
+      }));
+
+      return mergeComparisonDatasets(filteredGroups, {
         indexField,
         indexFormatter,
         indexValues,
@@ -97,7 +104,10 @@ export default function AzBarChart({
     // Normal mode: single dataset
     if (!data || data.length === 0) return [];
 
-    const processed = processDataset(data, {
+    // Filter out unrealistic data before processing
+    const realisticData = filterRealisticDataForCharts(data);
+
+    const processed = processDataset(realisticData, {
       indexField,
       indexFormatter,
       indexValues,

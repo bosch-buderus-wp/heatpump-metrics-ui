@@ -1,6 +1,8 @@
 import type { GridColDef } from "@mui/x-data-grid";
 import dayjs from "dayjs";
 import type { TFunction } from "i18next";
+import React from "react";
+import { validateMeasurementData } from "./dataQuality";
 
 /**
  * Common column visibility settings for hiding system details across all pages
@@ -79,6 +81,51 @@ export function computeAz(row: EnergyRow) {
  */
 export function getAllDataGridColumns(t: TFunction): Record<string, GridColDef> {
   return {
+    // Data quality warning column
+    dataQuality: {
+      field: "data_quality",
+      headerName: "⚠️",
+      width: 50,
+      sortable: false,
+      filterable: false,
+      hideable: false,
+      renderCell: (params: any) => {
+        // Validate measurement data (same rules for hourly/daily/monthly)
+        const validation = validateMeasurementData(params.row);
+
+        if (validation.issues.length === 0) {
+          return null;
+        }
+
+        const hasErrors = validation.issues.some((issue: any) => issue.severity === "error");
+        const icon = hasErrors ? "⚠️" : "⚡";
+
+        // Use translated messages if available, otherwise fall back to English message
+        const title = validation.issues
+          .map((issue: any) => {
+            if (issue.translationKey) {
+              return t(issue.translationKey, issue.translationParams || {});
+            }
+            return issue.message;
+          })
+          .join("\n");
+
+        // Use React.createElement to avoid JSX in .ts file
+        return React.createElement(
+          "span",
+          {
+            style: {
+              cursor: "help",
+              fontSize: "1.2em",
+              color: hasErrors ? "#ef4444" : "#f59e0b",
+            },
+            title: title,
+          },
+          icon,
+        );
+      },
+    },
+
     // Hidden columns for filtering
     user_id: {
       field: "user_id",
@@ -403,5 +450,6 @@ export function getTimeSeriesColumns(
     cols.electricalEnergyHeating,
     cols.outdoorTemperature,
     cols.flowTemperature,
+    cols.dataQuality, // Data quality warning column first
   ];
 }

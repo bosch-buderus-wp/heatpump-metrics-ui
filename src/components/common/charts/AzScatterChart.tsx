@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import { useChartLegend } from "../../../hooks/useChartLegend";
 import { computeAzTemperatureRegression } from "../../../lib/chartDataProcessing";
 import { CHART_COLORS } from "../../../lib/chartTheme";
+import { filterRealisticDataForCharts } from "../../../lib/dataQuality";
 import type { RegressionResult } from "../../../lib/regressionUtils";
 import { generateCurvePoints } from "../../../lib/regressionUtils";
 
@@ -85,11 +86,14 @@ export function AzScatterChart({ data, currentUserId }: AzScatterChartProps) {
   const { scatterData, regression } = useMemo(() => {
     if (!data || data.length === 0) return { scatterData: [], activePoints: [], regression: null };
 
+    // Filter out unrealistic data before processing
+    const realisticData = filterRealisticDataForCharts(data);
+
     // Determine which AZ values to use based on active key
     const useAzHeating = activeKey === azHeatingKey;
 
     // Filter and transform data points
-    const points = data
+    const points = realisticData
       .map((row) => {
         const azValue = useAzHeating ? row.az_heating : row.az;
         const outdoor = row.outdoor_temperature_c;

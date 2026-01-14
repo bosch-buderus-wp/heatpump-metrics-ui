@@ -9,6 +9,7 @@ import { AzBarChart, type ChartDataRow, HistogramChart } from "../components/com
 import { DataGridWrapper } from "../components/common/data-grid";
 import { PageLayout } from "../components/common/layout";
 import { useComparisonMode } from "../hooks/useComparisonMode";
+import { filterRealisticDataForCharts } from "../lib/dataQuality";
 import { applyThermometerOffset, flattenHeatingSystemsFields } from "../lib/dataTransformers";
 import { supabase } from "../lib/supabaseClient";
 import { commonHiddenColumns, getTimeSeriesColumns } from "../lib/tableHelpers";
@@ -147,6 +148,20 @@ export default function Daily() {
     dataGridComparisonProps,
   } = useComparisonMode(sortedData);
 
+  // Filter out unrealistic data for charts (hourly data)
+  const realisticDataForChart = useMemo(() => {
+    if (!filteredDataForChart) return null;
+    return filterRealisticDataForCharts(filteredDataForChart, true); // true = hourly data
+  }, [filteredDataForChart]);
+
+  const realisticComparisonGroups = useMemo(() => {
+    if (!comparisonGroupsForChart) return undefined;
+    return comparisonGroupsForChart.map((group) => ({
+      ...group,
+      data: filterRealisticDataForCharts(group.data, true), // true = hourly data
+    }));
+  }, [comparisonGroupsForChart]);
+
   // Get the data to use for histogram (filtered if available)
   // For histogram, we need the original cumulative values, not the deltas
   // But we still need to respect filtering from comparison mode or data grid filters
@@ -239,8 +254,13 @@ export default function Daily() {
       chart={
         viewMode === "timeSeries" ? (
           <AzBarChart
-            data={comparisonMode ? [] : ((filteredDataForChart || filteredData) as ChartDataRow[])}
-            comparisonGroups={comparisonGroupsForChart}
+            data={
+              comparisonMode
+                ? []
+                : ((realisticDataForChart ||
+                    filterRealisticDataForCharts(filteredData, true)) as ChartDataRow[])
+            }
+            comparisonGroups={realisticComparisonGroups}
             indexField="hour"
             indexLabel="common.hour"
             indexValues={[
