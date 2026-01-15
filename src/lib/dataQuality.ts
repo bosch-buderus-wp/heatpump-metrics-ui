@@ -127,13 +127,63 @@ export function validateMeasurementData(data: {
   return validateData(data);
 }
 
-// Deprecated aliases for backward compatibility
-/** @deprecated Use validateMeasurementData instead */
-export const validateHourlyData = validateMeasurementData;
-/** @deprecated Use validateMeasurementData instead */
-export const validateDailyData = validateMeasurementData;
-/** @deprecated Use validateMeasurementData instead */
-export const validateMonthlyData = validateMeasurementData;
+/**
+ * Filter SystemAzData by realistic COP values calculated from energy totals
+ * Used for histogram filtering after aggregating/calculating system totals
+ *
+ * @param systems - Array of system data to filter
+ * @param checkAzFields - If true, also validate az/azHeating fields as COP values.
+ *                        Set to false in energy mode where these fields contain energy values, not COP.
+ */
+export function filterSystemsByRealisticCOP<
+  T extends {
+    az?: number | null;
+    azHeating?: number | null;
+    thermalTotal?: number;
+    electricalTotal?: number;
+    thermalHeatingTotal?: number;
+    electricalHeatingTotal?: number;
+  },
+>(systems: T[], checkAzFields = true): T[] {
+  return systems.filter((system) => {
+    // Check total COP calculated from energy totals
+    if (
+      system.thermalTotal != null &&
+      system.electricalTotal != null &&
+      system.electricalTotal > 0
+    ) {
+      const totalCop = system.thermalTotal / system.electricalTotal;
+      if (!isRealisticCOP(totalCop)) {
+        return false;
+      }
+    }
+
+    // Check heating COP calculated from energy totals
+    if (
+      system.thermalHeatingTotal != null &&
+      system.electricalHeatingTotal != null &&
+      system.electricalHeatingTotal > 0
+    ) {
+      const heatingCop = system.thermalHeatingTotal / system.electricalHeatingTotal;
+      if (!isRealisticCOP(heatingCop)) {
+        return false;
+      }
+    }
+
+    // Only check az/azHeating if they represent COP values (not in energy mode)
+    if (checkAzFields) {
+      if (system.az != null && !isRealisticCOP(system.az)) {
+        return false;
+      }
+
+      if (system.azHeating != null && !isRealisticCOP(system.azHeating)) {
+        return false;
+      }
+    }
+
+    return true;
+  });
+}
 
 /**
  * Filter out rows with unrealistic data for chart visualization

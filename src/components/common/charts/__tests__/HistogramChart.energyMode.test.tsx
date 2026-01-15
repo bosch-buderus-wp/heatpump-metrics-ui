@@ -536,4 +536,32 @@ describe("HistogramChart - Energy Mode", () => {
       }
     });
   });
+
+  describe("Data Filtering", () => {
+    it("filters out systems with unrealistic COP calculated from energy totals", () => {
+      const dataWithUnrealisticValues = [
+        ...mockYearlyData.slice(0, 12), // Only include sys1 data (12 months)
+        // Add unrealistic system with similar energy consumption to sys1 but unrealistic COP
+        {
+          heating_id: "sys-unrealistic-cop",
+          month: 1,
+          thermal_energy_kwh: 22500, // 2500 * 9 = very high thermal for 2500 electrical
+          electrical_energy_kwh: 2500, // Similar total to sys1 (2450)
+          thermal_energy_heating_kwh: 20250,
+          electrical_energy_heating_kwh: 2250,
+        },
+      ];
+
+      render(<HistogramChart data={dataWithUnrealisticValues} metricMode="energy" binSize={100} />);
+
+      const chartData = JSON.parse(screen.getByTestId("chart-data").textContent || "[]");
+
+      // Calculate total systems in bins
+      const totalSystemsInBins = chartData.reduce((sum: number, bin: any) => sum + bin.count, 0);
+
+      // Should only have 1 realistic system (sys1 = 2450 kWh)
+      // sys-unrealistic-cop (2500 kWh) should be filtered out due to COP = 9.0
+      expect(totalSystemsInBins).toBe(1);
+    });
+  });
 });

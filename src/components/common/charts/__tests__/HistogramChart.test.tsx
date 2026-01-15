@@ -164,4 +164,43 @@ describe("HistogramChart", () => {
     render(<HistogramChart data={mockData} metricMode="cop" />);
     expect(screen.getByTestId("responsive-bar")).toBeInTheDocument();
   });
+
+  it("filters out unrealistic COP values (> 8.0 or < 0.0)", () => {
+    const dataWithUnrealisticCOP = [
+      ...mockData,
+      {
+        heating_id: "sys-unrealistic-high",
+        thermal_energy_kwh: 900,
+        electrical_energy_kwh: 100, // COP = 9.0 (unrealistic)
+        thermal_energy_heating_kwh: 810,
+        electrical_energy_heating_kwh: 90,
+      },
+      {
+        heating_id: "sys-unrealistic-negative",
+        thermal_energy_kwh: -50,
+        electrical_energy_kwh: 100, // COP = -0.5 (unrealistic)
+        thermal_energy_heating_kwh: -45,
+        electrical_energy_heating_kwh: 90,
+      },
+      {
+        heating_id: "sys-negative-energy",
+        thermal_energy_kwh: 100,
+        electrical_energy_kwh: -50, // Negative energy (unrealistic)
+        thermal_energy_heating_kwh: 90,
+        electrical_energy_heating_kwh: -45,
+      },
+    ];
+
+    render(<HistogramChart data={dataWithUnrealisticCOP} metricMode="cop" />);
+
+    const chartData = JSON.parse(screen.getByTestId("chart-data").textContent || "[]");
+
+    // Calculate expected system count: mockData has 6 systems, all with realistic COPs
+    // The 3 additional systems should be filtered out
+    // We need to count total systems in bins
+    const totalSystemsInBins = chartData.reduce((sum: number, bin: any) => sum + bin.count, 0);
+
+    // Should only have the 6 realistic systems
+    expect(totalSystemsInBins).toBe(6);
+  });
 });

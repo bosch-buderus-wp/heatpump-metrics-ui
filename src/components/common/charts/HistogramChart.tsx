@@ -9,6 +9,10 @@ import {
   type SystemAzData,
 } from "../../../lib/chartDataProcessing";
 import { CHART_COLORS } from "../../../lib/chartTheme";
+import {
+  filterRealisticDataForCharts,
+  filterSystemsByRealisticCOP,
+} from "../../../lib/dataQuality";
 
 export interface HistogramBin {
   binLabel: string;
@@ -66,13 +70,16 @@ export function HistogramChart({
     }
 
     if (metricMode === "energy") {
+      // Filter out unrealistic data first
+      const filteredData = filterRealisticDataForCharts(data);
+
       // Calculate energy consumption per system
       const systemData: SystemAzData[] = [];
 
       if (useDailyTaz) {
         // For daily data: calculate difference between first and last measurement
-        const systemMeasurements = new Map<string, typeof data>();
-        data.forEach((row) => {
+        const systemMeasurements = new Map<string, typeof filteredData>();
+        filteredData.forEach((row) => {
           if (!systemMeasurements.has(row.heating_id)) {
             systemMeasurements.set(row.heating_id, []);
           }
@@ -92,31 +99,41 @@ export function HistogramChart({
           const first = sorted[0];
           const last = sorted[sorted.length - 1];
 
+          const thermalDiff = (last.thermal_energy_kwh || 0) - (first.thermal_energy_kwh || 0);
           const electricalDiff =
             (last.electrical_energy_kwh || 0) - (first.electrical_energy_kwh || 0);
+          const thermalHeatingDiff =
+            (last.thermal_energy_heating_kwh || 0) - (first.thermal_energy_heating_kwh || 0);
           const electricalHeatingDiff =
             (last.electrical_energy_heating_kwh || 0) - (first.electrical_energy_heating_kwh || 0);
 
           systemData.push({
             heatingId,
-            az: electricalDiff,
+            az: electricalDiff, // In energy mode, az stores electrical energy for histogram display
             azHeating: electricalHeatingDiff,
-            thermalTotal: 0,
+            thermalTotal: thermalDiff,
             electricalTotal: electricalDiff,
-            thermalHeatingTotal: 0,
+            thermalHeatingTotal: thermalHeatingDiff,
             electricalHeatingTotal: electricalHeatingDiff,
           });
         });
       } else {
         // For monthly/yearly data: sum energy values per system
-        const systemTotals = new Map<string, { electrical: number; electricalHeating: number }>();
+        const systemTotals = new Map<
+          string,
+          { thermal: number; electrical: number; thermalHeating: number; electricalHeating: number }
+        >();
 
-        data.forEach((row) => {
+        filteredData.forEach((row) => {
           const existing = systemTotals.get(row.heating_id) || {
+            thermal: 0,
             electrical: 0,
+            thermalHeating: 0,
             electricalHeating: 0,
           };
+          existing.thermal += row.thermal_energy_kwh || 0;
           existing.electrical += row.electrical_energy_kwh || 0;
+          existing.thermalHeating += row.thermal_energy_heating_kwh || 0;
           existing.electricalHeating += row.electrical_energy_heating_kwh || 0;
           systemTotals.set(row.heating_id, existing);
         });
@@ -127,22 +144,28 @@ export function HistogramChart({
             heatingId,
             az: totals.electrical,
             azHeating: totals.electricalHeating,
-            thermalTotal: 0,
+            thermalTotal: totals.thermal,
             electricalTotal: totals.electrical,
-            thermalHeatingTotal: 0,
+            thermalHeatingTotal: totals.thermalHeating,
             electricalHeatingTotal: totals.electricalHeating,
           });
         });
       }
+
+      // Filter out systems with unrealistic COP values calculated from energy data
+      // In energy mode, az fields contain energy values, not COP, so don't check them
+      const filteredSystemData = filterSystemsByRealisticCOP(systemData, false);
 
       // Calculate appropriate bin size based on data range
       // For energy data, we need much larger bins than COP data
       let energyBinSize = binSize; // Use provided binSize if it's already set for energy
 
       // If binSize is still the default COP size (0.5), calculate appropriate energy bin size
-      if (binSize <= 1 && systemData.length > 0) {
+      if (binSize <= 1 && filteredSystemData.length > 0) {
         // Find min and max values to determine appropriate bin size
-        const values = systemData.map((s) => s.az).filter((v): v is number => v !== null && v > 0);
+        const values = filteredSystemData
+          .map((s) => s.az)
+          .filter((v): v is number => v !== null && v > 0);
         if (values.length > 0) {
           const min = Math.min(...values);
           const max = Math.max(...values);
@@ -155,8 +178,13 @@ export function HistogramChart({
         }
       }
 
-      const totalHistogram = createHistogramBins(systemData, "az", energyBinSize, true);
-      const heatingHistogram = createHistogramBins(systemData, "azHeating", energyBinSize, true);
+      const totalHistogram = createHistogramBins(filteredSystemData, "az", energyBinSize, true);
+      const heatingHistogram = createHistogramBins(
+        filteredSystemData,
+        "azHeating",
+        energyBinSize,
+        true,
+      );
 
       return {
         totalBins: totalHistogram.bins,
@@ -166,10 +194,17 @@ export function HistogramChart({
       };
     }
 
-    // COP mode: calculate AZ as before
-    const systemAzData = useDailyTaz ? calculateDailyTaz(data) : calculateSystemAz(data);
-    const totalHistogram = createHistogramBins(systemAzData, "az", binSize);
-    const heatingHistogram = createHistogramBins(systemAzData, "azHeating", binSize);
+    // COP mode: calculate AZ, then filter unrealistic calculated values
+    const filteredData = filterRealisticDataForCharts(data);
+    const systemAzData = useDailyTaz
+      ? calculateDailyTaz(filteredData)
+      : calculateSystemAz(filteredData);
+
+    // Filter out systems with unrealistic calculated COP values
+    const filteredSystemAzData = filterSystemsByRealisticCOP(systemAzData);
+
+    const totalHistogram = createHistogramBins(filteredSystemAzData, "az", binSize);
+    const heatingHistogram = createHistogramBins(filteredSystemAzData, "azHeating", binSize);
 
     return {
       totalBins: totalHistogram.bins,
