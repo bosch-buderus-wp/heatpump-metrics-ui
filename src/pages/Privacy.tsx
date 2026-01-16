@@ -4,7 +4,7 @@ export default function Privacy() {
   const { t } = useTranslation();
 
   return (
-    <div style={{ maxWidth: "800px", margin: "0 auto", padding: "20px", textAlign: "left" }}>
+    <div className="page-content-container">
       <h1>{t("legal.privacyTitle")}</h1>
 
       <section>
@@ -193,7 +193,7 @@ export default function Privacy() {
         </p>
       </section>
 
-      <p style={{ marginTop: "40px", fontSize: "0.9em", color: "#666" }}>Stand: 17.12.2025</p>
+      <p className="page-footer-date">Stand: 17.12.2025</p>
     </div>
   );
 }

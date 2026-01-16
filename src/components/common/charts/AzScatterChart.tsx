@@ -204,10 +204,7 @@ export function AzScatterChart({ data, currentUserId }: AzScatterChartProps) {
 
   if (!data || data.length === 0) {
     return (
-      <div
-        style={{ height: 400, display: "flex", alignItems: "center", justifyContent: "center" }}
-        className="card"
-      >
+      <div className="chart-no-data-card card">
         <p className="muted">{t("charts.noData")}</p>
       </div>
     );
@@ -215,7 +212,7 @@ export function AzScatterChart({ data, currentUserId }: AzScatterChartProps) {
 
   return (
     <>
-      <div style={{ marginTop: 20, marginBottom: 10, display: "flex", justifyContent: "center" }}>
+      <div className="chart-legend-controls">
         <ButtonGroup size="small" variant="outlined">
           <Button
             onClick={() => setTemperatureMode("outdoor")}
@@ -237,10 +234,7 @@ export function AzScatterChart({ data, currentUserId }: AzScatterChartProps) {
           </Button>
         </ButtonGroup>
       </div>
-      <div
-        style={{ height: 400, marginTop: 10, marginBottom: 10, position: "relative" }}
-        className="card"
-      >
+      <div className="chart-container-relative card">
         <ResponsiveScatterPlot
           // biome-ignore lint/suspicious/noExplicitAny: Nivo's ScatterPlot type is complex
           data={scatterData as any}
@@ -315,7 +309,7 @@ export function AzScatterChart({ data, currentUserId }: AzScatterChartProps) {
                 </div>
                 <div className="chart-tooltip-item">
                   <div
-                    className="chart-tooltip-indicator chart-tooltip-indicator-bar"
+                    className="chart-tooltip-indicator chart-tooltip-indicator-bar chart-tooltip-indicator-custom"
                     style={{ backgroundColor: dotColor }}
                   />
                   <span className="chart-tooltip-text">
@@ -355,17 +349,9 @@ export function AzScatterChart({ data, currentUserId }: AzScatterChartProps) {
           ]}
         />
         {regression && (
-          <div
-            className="chart-stats"
-            style={{
-              position: "absolute",
-              top: 0,
-              right: 0,
-              transition: "all 0.3s ease",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <h3 className="chart-stats-title" style={{ margin: 0 }}>
+          <div className="chart-stats chart-stats-absolute">
+            <div className="chart-stats-header">
+              <h3 className="chart-stats-title chart-stats-title-no-margin">
                 {t("charts.azTempStats")}
               </h3>
               <Tooltip title={statsExpanded ? t("charts.hideStats") : t("charts.showStats")}>
@@ -383,15 +369,9 @@ export function AzScatterChart({ data, currentUserId }: AzScatterChartProps) {
               </Tooltip>
             </div>
             {statsExpanded && (
-              <div style={{ marginTop: 8 }}>
+              <div className="chart-stats-expanded">
                 {/* Reference temperature predictions */}
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(4, 1fr)",
-                    gap: "8px",
-                  }}
-                >
+                <div className="chart-stats-grid">
                   {getReferenceTemperatures(temperatureMode).map((temp) => {
                     const predictedCOP = predictCOP(regression, temp);
                     return (

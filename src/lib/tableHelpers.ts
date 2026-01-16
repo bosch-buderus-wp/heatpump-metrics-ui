@@ -139,7 +139,8 @@ export function getAllDataGridColumns(t: TFunction): Record<string, GridColDef> 
     name: {
       field: "name",
       headerName: t("tableHeaders.system"),
-      width: 170,
+      flex: 1,
+      minWidth: 180,
       valueGetter: (_value, row) => row.heating_systems?.name ?? row.name ?? "-",
     },
     heatingType: {
@@ -163,7 +164,7 @@ export function getAllDataGridColumns(t: TFunction): Record<string, GridColDef> 
     modelOdu: {
       field: "model_odu",
       headerName: t("tableHeaders.modelOdu"),
-      width: 60,
+      width: 70,
       valueGetter: (_value, row) => row.heating_systems?.model_odu ?? row.model_odu,
       valueFormatter: (value: string) => getModelOduLabel(t, value),
       type: "singleSelect",
@@ -277,7 +278,7 @@ export function getAllDataGridColumns(t: TFunction): Record<string, GridColDef> 
     postalCode: {
       field: "postal_code",
       headerName: t("tableHeaders.postalCode"),
-      width: 60,
+      width: 70,
       type: "number",
       valueGetter: (_value, row) => row.heating_systems?.postal_code ?? row.postal_code ?? null,
     },
@@ -285,7 +286,7 @@ export function getAllDataGridColumns(t: TFunction): Record<string, GridColDef> 
       field: "sw_idu",
       headerName: t("tableHeaders.swIdu"),
       description: t("tableHeaders.hints.swIdu"),
-      width: 120,
+      width: 80,
       valueGetter: (_value, row) => row.heating_systems?.sw_idu ?? row.sw_idu,
       valueFormatter: (value: string) => getSwIduLabel(t, value),
       type: "singleSelect",
@@ -325,7 +326,7 @@ export function getAllDataGridColumns(t: TFunction): Record<string, GridColDef> 
       field: "building_construction_year",
       headerName: t("systemForm.buildingConstructionYear"),
       description: t("tableHeaders.hints.buildingConstructionYear"),
-      width: 100,
+      width: 80,
       valueGetter: (_value, row) =>
         row.heating_systems?.building_construction_year ?? row.building_construction_year ?? null,
       valueFormatter: (value: number | null) => (value != null ? String(value) : "-"),

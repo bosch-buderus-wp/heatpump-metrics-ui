@@ -30,7 +30,7 @@ export default function ChartTooltip({
 
       <div className="chart-tooltip-item">
         <div
-          className="chart-tooltip-indicator chart-tooltip-indicator-bar"
+          className="chart-tooltip-indicator chart-tooltip-indicator-bar chart-tooltip-indicator-custom"
           style={{ backgroundColor: color }}
         />
         <span className="chart-tooltip-text">

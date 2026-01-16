@@ -1,4 +1,6 @@
 import BarChartIcon from "@mui/icons-material/BarChart";
+import ElectricBoltIcon from "@mui/icons-material/ElectricBolt";
+import SpeedIcon from "@mui/icons-material/Speed";
 import TimelineIcon from "@mui/icons-material/Timeline";
 import { Button, ButtonGroup } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
@@ -194,7 +196,7 @@ export default function Daily() {
       isLoading={isLoading}
       filters={
         <div className="filter-container">
-          <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+          <div className="flex-row-gap">
             <button
               type="button"
               onClick={() => setDate(dayjs(date).subtract(1, "day").format("YYYY-MM-DD"))}
@@ -239,12 +241,14 @@ export default function Daily() {
             <Button
               onClick={() => setMetricMode("cop")}
               variant={metricMode === "cop" ? "contained" : "outlined"}
+              startIcon={<SpeedIcon />}
             >
               {t("charts.copMode")}
             </Button>
             <Button
               onClick={() => setMetricMode("energy")}
               variant={metricMode === "energy" ? "contained" : "outlined"}
+              startIcon={<ElectricBoltIcon />}
             >
               {t("charts.energyMode")}
             </Button>

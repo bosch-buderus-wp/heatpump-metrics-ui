@@ -167,7 +167,7 @@ export default function TemperatureLineLayer({
                 y={y}
                 textAnchor="start"
                 dominantBaseline="middle"
-                style={{ fontSize: 11, fill: "#333" }}
+                className="chart-temp-label"
               >
                 {Math.round(temp)}°
               </text>
@@ -182,7 +182,7 @@ export default function TemperatureLineLayer({
           textAnchor="middle"
           dominantBaseline="middle"
           transform={`rotate(90, 40, ${innerHeight / 2})`}
-          style={{ fontSize: 12, fill: "#333", fontWeight: 500 }}
+          className="chart-temp-axis-label"
         >
           {t("common.temperature")} (°C)
         </text>

@@ -13,29 +13,19 @@ interface ActionBarProps {
 
 export function ActionBar({ actions, feedback }: ActionBarProps) {
   return (
-    <div style={{ marginTop: "1.5rem" }}>
+    <div className="action-bar-container">
       {feedback && (
         <div
-          style={{
-            marginBottom: "1rem",
-            padding: "0.75rem",
-            borderRadius: "4px",
-            backgroundColor: feedback.type === "success" ? "#d4edda" : "#f8d7da",
-            color: feedback.type === "success" ? "#155724" : "#721c24",
-            border: `1px solid ${feedback.type === "success" ? "#c3e6cb" : "#f5c6cb"}`,
-          }}
+          className={`action-bar-feedback ${
+            feedback.type === "success"
+              ? "action-bar-feedback-success"
+              : "action-bar-feedback-error"
+          }`}
         >
           {feedback.message}
         </div>
       )}
-      <div
-        style={{
-          display: "flex",
-          gap: "0.75rem",
-          alignItems: "center",
-          flexWrap: "wrap",
-        }}
-      >
+      <div className="action-bar-buttons">
         {actions.map((action) => {
           const variantClass = action.variant
             ? `action-btn-${action.variant}`

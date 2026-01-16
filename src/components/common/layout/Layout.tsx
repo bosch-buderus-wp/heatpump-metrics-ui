@@ -88,9 +88,9 @@ export function Layout({ children }: LayoutProps) {
         <main className="app-main">{children}</main>
         <footer className="app-footer">
           <span>© {new Date().getFullYear()} Heatpump Metrics</span>
-          <span style={{ margin: "0 10px" }}>|</span>
+          <span className="footer-separator">|</span>
           <Link to="/terms">{t("legal.terms")}</Link>
-          <span style={{ margin: "0 10px" }}>|</span>
+          <span className="footer-separator">|</span>
           <Link to="/privacy">{t("legal.privacy")}</Link>
         </footer>
       </div>

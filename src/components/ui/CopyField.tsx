@@ -24,8 +24,8 @@ export function CopyField({ label, value }: CopyFieldProps) {
   return (
     <div className="row">
       <label htmlFor={id}>{label}</label>
-      <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-        <input id={id} type="text" value={value} readOnly style={{ flex: 1 }} />
+      <div className="copy-field-wrapper">
+        <input id={id} type="text" value={value} readOnly className="copy-field-input" />
         <button type="button" onClick={handleCopy}>
           {copied ? t("common.copied") : t("common.copy")}
         </button>

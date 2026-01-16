@@ -101,70 +101,47 @@ export default function Login() {
         )}
 
         {/* Consent Checkboxes */}
-        <div className="consent-section" style={{ marginTop: "20px", marginBottom: "10px" }}>
-          <label
-            style={{
-              display: "flex",
-              alignItems: "flex-start",
-              marginBottom: "10px",
-              cursor: "pointer",
-            }}
-          >
+        <div className="consent-section">
+          <label className="consent-label">
             <input
               type="checkbox"
               checked={acceptTerms}
               onChange={(e) => setAcceptTerms(e.target.checked)}
-              style={{ marginRight: "10px", marginTop: "3px", flexShrink: 0 }}
+              className="consent-checkbox"
             />
-            <span style={{ fontSize: "0.9em" }}>
+            <span className="consent-text">
               {t("auth.acceptTerms1")}{" "}
-              <Link to="/terms" target="_blank" style={{ textDecoration: "underline" }}>
+              <Link to="/terms" target="_blank" className="consent-link">
                 {t("legal.terms")}
               </Link>{" "}
               {t("auth.acceptTerms2")}
             </span>
           </label>
 
-          <label
-            style={{
-              display: "flex",
-              alignItems: "flex-start",
-              marginBottom: "10px",
-              cursor: "pointer",
-            }}
-          >
+          <label className="consent-label">
             <input
               type="checkbox"
               checked={acceptPrivacy}
               onChange={(e) => setAcceptPrivacy(e.target.checked)}
-              style={{ marginRight: "10px", marginTop: "3px", flexShrink: 0 }}
+              className="consent-checkbox"
             />
-            <span style={{ fontSize: "0.9em" }}>
+            <span className="consent-text">
               {t("auth.acceptPrivacy1")}{" "}
-              <Link to="/privacy" target="_blank" style={{ textDecoration: "underline" }}>
+              <Link to="/privacy" target="_blank" className="consent-link">
                 {t("legal.privacy")}
               </Link>{" "}
               {t("auth.acceptPrivacy2")}
             </span>
           </label>
 
-          <label
-            style={{
-              display: "flex",
-              alignItems: "flex-start",
-              marginBottom: "10px",
-              cursor: "pointer",
-            }}
-          >
+          <label className="consent-label">
             <input
               type="checkbox"
               checked={acceptPublicData}
               onChange={(e) => setAcceptPublicData(e.target.checked)}
-              style={{ marginRight: "10px", marginTop: "3px", flexShrink: 0 }}
+              className="consent-checkbox"
             />
-            <span style={{ fontSize: "0.9em", fontWeight: "bold" }}>
-              {t("auth.acceptPublicData")}
-            </span>
+            <span className="consent-text-bold">{t("auth.acceptPublicData")}</span>
           </label>
         </div>
 

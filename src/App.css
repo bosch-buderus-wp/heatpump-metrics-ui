@@ -1,18 +1,48 @@
+:root {
+  --primary-color: #23a477ff; /* Modern Teal */
+  --primary-hover: #0f766e;
+  --primary-light: #f0fdfa;
+  --secondary-color: #6366f1;
+  --bg-canvas: #f8fafc;
+  --border-color: rgba(0, 0, 0, 0.08);
+  --text-main: #1e293b;
+  --text-muted: #64748b;
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --radius-lg: 1rem;
+  --radius-md: 0.75rem;
+}
+
+* {
+  box-sizing: border-box;
+}
+
 #root {
   max-width: 1280px;
   margin: 0 auto;
   text-align: center;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: var(--text-main);
 }
 
 /* MUI DataGrid overrides */
 .MuiDataGrid-root {
-  font-size: 0.7rem;
+  font-size: 0.75rem;
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--radius-md) !important;
+  background: white;
+  box-shadow: var(--shadow-sm);
 }
 .MuiDataGrid-columnHeaders {
-  font-size: 0.7rem;
+  background-color: var(--bg-canvas);
+  border-bottom: 2px solid var(--border-color) !important;
+  font-weight: 600;
 }
 .MuiDataGrid-cell {
-  font-size: 0.7rem;
+  border-bottom: 1px solid var(--border-color) !important;
+}
+.MuiDataGrid-row:hover {
+  background-color: var(--primary-light) !important;
 }
 
 /* MUI Table Pagination overrides - increase specificity to override MUI defaults */
@@ -22,13 +52,16 @@ p.MuiTablePagination-selectLabel,
 p.MuiTablePagination-displayedRows {
   /* biome-ignore lint/complexity/noImportantStyles: required to override third-party styles */
   margin: 0 !important;
+  font-size: 0.8rem;
 }
 
 .section-container {
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  margin-bottom: 2rem;
+  background: white;
+  box-shadow: var(--shadow-md);
 }
 
 /* Section Layout */
@@ -38,18 +71,19 @@ p.MuiTablePagination-displayedRows {
 
 .section-header h2 {
   margin: 0;
-  color: #333;
-  font-size: 1.5rem;
-  font-weight: 600;
+  color: var(--text-main);
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
 }
 
 .section-info {
-  margin-bottom: 1rem;
-  padding: 0.8rem 0;
-  color: #666;
-  font-size: 0.95rem;
-  line-height: 1.5;
-  max-width: 900px;
+  margin-bottom: 1.5rem;
+  padding: 0.5rem 0;
+  color: var(--text-muted);
+  font-size: 1rem;
+  line-height: 1.6;
+  max-width: 1000px;
 }
 
 .section-info p {
@@ -57,37 +91,39 @@ p.MuiTablePagination-displayedRows {
 }
 
 .section-content {
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 0.7rem;
-  padding: 0.8rem;
-  background: rgba(0, 0, 0, 0.02);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  background: white;
   width: 100%;
-  max-width: 900px;
+  max-width: 1000px;
+  box-shadow: var(--shadow-sm);
 }
 
 .section-form {
   margin-top: 10px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 0.7rem;
-  padding: 0.8rem;
-  background: rgba(0, 0, 0, 0.02);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  background: white;
   width: 100%;
-  max-width: 900px;
+  max-width: 1000px;
+  box-shadow: var(--shadow-sm);
 }
 
 /* Action Bar Buttons */
 .action-btn {
   padding: 0.6rem 1.2rem;
-  border: none;
-  border-radius: 4px;
+  border-radius: var(--radius-md);
   font-size: 0.95rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
   font-family: inherit;
+  border: none;
 }
 
 .action-btn:disabled {
@@ -96,14 +132,13 @@ p.MuiTablePagination-displayedRows {
 }
 
 .action-btn-primary {
-  background-color: #1976d2;
+  background-color: var(--primary-color);
   color: white;
-  box-shadow: 0 2px 4px rgba(25, 118, 210, 0.3);
+  border: none;
 }
 
 .action-btn-primary:hover:not(:disabled) {
-  background-color: #1565c0;
-  box-shadow: 0 3px 6px rgba(25, 118, 210, 0.4);
+  background-color: var(--primary-hover);
   transform: translateY(-1px);
 }
 
@@ -137,6 +172,7 @@ p.MuiTablePagination-displayedRows {
 .app-container {
   max-width: 1100px;
   margin: 0 auto;
+  padding: 0 1.5rem;
 }
 .app-header {
   display: flex;
@@ -144,6 +180,8 @@ p.MuiTablePagination-displayedRows {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 1rem;
+  padding: 1.5rem 0;
+  border-bottom: 1px solid var(--border-color);
 }
 .brand {
   font-weight: 700;
@@ -154,11 +192,20 @@ p.MuiTablePagination-displayedRows {
   gap: 0.75rem;
 }
 .nav a {
-  padding: 0.4rem 0.6rem;
+  padding: 0.5rem 1rem;
   border-radius: 0.5rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  transition: all 0.2s ease;
+}
+.nav a:hover {
+  color: var(--primary-color);
+  background: var(--primary-light);
 }
 .nav a.active {
-  background: rgba(100, 108, 255, 0.15);
+  color: var(--primary-color);
+  background: var(--primary-light);
+  font-weight: 600;
 }
 .actions {
   display: flex;
@@ -167,8 +214,16 @@ p.MuiTablePagination-displayedRows {
 }
 .app-main {
   display: grid;
-  gap: 1rem;
+  gap: 1.5rem;
   justify-items: center;
+}
+
+.app-main > section {
+  width: 100%;
+  max-width: 1000px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 .app-footer {
   opacity: 0.6;
@@ -201,13 +256,13 @@ p.MuiTablePagination-displayedRows {
   display: flex;
   gap: 0.75rem;
   align-items: flex-end;
-  margin: 0.5rem 0 1rem;
+  margin: 0;
   flex-wrap: wrap;
 }
 .filters label {
-  display: grid;
   gap: 0.25rem;
-  font-size: 0.9rem;
+  font-size: 0.7rem;
+  margin-bottom: 0;
 }
 
 /* Chart Tooltip Styles */
@@ -266,13 +321,21 @@ p.MuiTablePagination-displayedRows {
 }
 
 .card {
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 0.7rem;
-  padding: 0.8rem;
-  background: rgba(0, 0, 0, 0.02);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  background: white;
   width: 100%;
-  max-width: 900px;
+  max-width: 1000px; /* Constrained to match sections */
   margin: 0 auto;
+  box-shadow: var(--shadow-sm);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
 }
 .grid {
   display: grid;
@@ -297,9 +360,6 @@ p.MuiTablePagination-displayedRows {
   align-items: center;
   align-self: center;
   margin-bottom: 0;
-}
-.row.picker label {
-  margin-left: 1rem;
 }
 .row.picker label:first-child {
   margin-left: 0;
@@ -343,6 +403,9 @@ p.MuiTablePagination-displayedRows {
     box-shadow 0.2s ease;
   max-width: none;
   margin: 0;
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
 }
 
 .stats-card.clickable {
@@ -377,23 +440,44 @@ p.MuiTablePagination-displayedRows {
   align-items: center;
   justify-content: space-between;
   width: 100%;
+  background: white;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  margin-bottom: 0;
+}
+
+.filter-container .MuiButton-root.MuiButton-sizeSmall {
+  height: 32px;
+  min-height: 32px;
 }
 
 /* Form Control Styles */
 .form-select,
 .form-input {
-  padding: 6px 12px;
+  height: 32px;
+  padding: 0 0.75rem;
+  margin-bottom: 0;
   font-size: 0.875rem;
   border-radius: 4px;
-  border: 1px solid rgba(0, 0, 0, 0.23);
+  border: 1px solid var(--border-color);
   transition:
     border-color 0.2s ease,
     background-color 0.2s ease;
   cursor: pointer;
+  background: white;
+  display: inline-flex;
+  align-items: center;
+}
+
+.form-select:focus,
+.form-input:focus {
+  outline: 2px solid var(--primary-color);
+  border-color: transparent;
 }
 
 .form-select {
-  min-width: 80px;
+  min-width: 40px;
 }
 
 .form-input {
@@ -417,11 +501,12 @@ p.MuiTablePagination-displayedRows {
   transition:
     border-color 0.2s ease,
     background-color 0.2s ease;
-  min-width: 32px;
-  min-height: 32px;
+  width: 32px;
+  height: 32px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 .nav-button:hover {
@@ -480,7 +565,7 @@ p.MuiTablePagination-displayedRows {
 .chart-stat-value {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #23a477ff;
+  color: var(--primary-color);
 }
 
 /* Field Hint Styles */
@@ -565,6 +650,290 @@ p.MuiTablePagination-displayedRows {
 
 .field-hint-popover-left {
   right: calc(100% + 8px);
+}
+
+/* System Form */
+#system-form {
+  background-color: white;
+}
+
+/* Monthly Editor */
+.monthly-editor-info-box {
+  padding: 10px 15px;
+  background-color: #e8f4f8;
+  border-left: 3px solid #2196f3;
+  margin: 15px 0;
+  font-size: 0.9em;
+  border-radius: 4px;
+}
+
+.monthly-editor-fields-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.monthly-editor-field-wrapper {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.monthly-editor-error {
+  color: red;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+}
+
+/* Chart Components */
+.chart-container {
+  height: 400px;
+  margin-bottom: 10px;
+}
+
+.chart-container-relative {
+  height: 400px;
+  margin-bottom: 10px;
+  position: relative;
+}
+
+.chart-no-data {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chart-no-data-card {
+  height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chart-legend-controls {
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: center;
+}
+
+.chart-tooltip-indicator-custom {
+  background-color: inherit;
+}
+
+.chart-stats-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.chart-stats-title-no-margin {
+  margin: 0;
+}
+
+.chart-stats-expanded {
+  margin-top: 8px;
+}
+
+.chart-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.chart-stats-absolute {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transition: all 0.3s ease;
+}
+
+.chart-temp-label {
+  font-size: 11px;
+  fill: #333;
+}
+
+.chart-temp-axis-label {
+  font-size: 12px;
+  fill: #333;
+  font-weight: 500;
+}
+
+/* UI Components */
+.action-bar-container {
+  margin-top: 1.5rem;
+}
+
+.action-bar-feedback {
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  border-radius: 4px;
+}
+
+.action-bar-feedback-success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.action-bar-feedback-error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.action-bar-buttons {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.confirm-dialog-description {
+  white-space: pre-line;
+}
+
+.confirm-dialog-danger-button {
+  background-color: var(--danger-color, #dc3545);
+}
+
+.copy-field-wrapper {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.copy-field-input {
+  flex: 1;
+}
+
+/* Form Components */
+.number-input-with-unit-wrapper {
+  position: relative;
+  flex: 1;
+  display: flex;
+}
+
+.number-input-with-unit-input {
+  padding-right: 3.5rem;
+  flex: 1;
+}
+
+.number-input-with-unit-input-error {
+  border-color: red;
+  border-width: 2px;
+}
+
+.number-input-with-unit-label {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #999;
+  font-size: 0.9rem;
+  pointer-events: none;
+  user-select: none;
+}
+
+.flex-row-gap {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.flex-row-gap-large {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.flex-1 {
+  flex: 1;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: auto;
+}
+
+.button-padding-medium {
+  padding: 0.5rem 1rem;
+}
+
+/* Layout and DataGrid Components */
+.data-grid-container {
+  height: 70vh;
+  width: 100%;
+  min-height: 400px;
+  max-height: 800px;
+}
+
+.footer-separator {
+  margin: 0 10px;
+}
+
+/* Page Components */
+.page-filter-select-year {
+  min-width: 100px;
+}
+
+.page-complete-data-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.page-complete-data-checkbox input {
+  cursor: pointer;
+}
+
+.consent-section {
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+.consent-label {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+.consent-checkbox {
+  margin-right: 10px;
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+
+.consent-text {
+  font-size: 0.9em;
+}
+
+.consent-text-bold {
+  font-size: 0.9em;
+  font-weight: bold;
+}
+
+.consent-link {
+  text-decoration: underline;
+}
+
+.page-content-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  text-align: left;
+}
+
+.page-footer-date {
+  margin-top: 40px;
+  font-size: 0.9em;
+  color: #666;
 }
 
 /* Add a small arrow pointing to the icon */

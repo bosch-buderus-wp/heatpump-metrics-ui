@@ -124,14 +124,17 @@ export function DataGridWrapper<T = Record<string, unknown>>({
   const theme = createTheme(
     {
       palette: {
-        primary: { main: "#1976d2" },
+        primary: { main: "#0d9488" },
+      },
+      shape: {
+        borderRadius: 12,
       },
     },
     deDE,
   );
 
   return (
-    <div style={{ height: "70vh", width: "100%", minHeight: 400, maxHeight: 800 }}>
+    <div className="data-grid-container">
       <ThemeProvider theme={theme}>
         <DataGrid
           apiRef={apiRef}

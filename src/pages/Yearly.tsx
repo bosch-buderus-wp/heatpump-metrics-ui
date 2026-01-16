@@ -1,4 +1,6 @@
 import BarChartIcon from "@mui/icons-material/BarChart";
+import ElectricBoltIcon from "@mui/icons-material/ElectricBolt";
+import SpeedIcon from "@mui/icons-material/Speed";
 import TimelineIcon from "@mui/icons-material/Timeline";
 import { Button, ButtonGroup } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
@@ -163,13 +165,12 @@ export default function Yearly() {
       isLoading={isLoading}
       filters={
         <div className="filter-container">
-          <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+          <div className="flex-row-gap">
             <select
               id="yearly-year-select"
               value={year}
               onChange={(e) => setYear(Number(e.target.value))}
-              className="form-select"
-              style={{ minWidth: "100px" }}
+              className="form-select page-filter-select-year"
             >
               {years.map((y) => (
                 <option key={y} value={y}>
@@ -178,21 +179,11 @@ export default function Yearly() {
               ))}
             </select>
             {viewMode === "distribution" && (
-              <label
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "4px",
-                  fontSize: "0.875rem",
-                  cursor: "pointer",
-                  whiteSpace: "nowrap",
-                }}
-              >
+              <label className="page-complete-data-checkbox">
                 <input
                   type="checkbox"
                   checked={completeDataOnly}
                   onChange={(e) => setCompleteDataOnly(e.target.checked)}
-                  style={{ cursor: "pointer" }}
                 />
                 {t("charts.completeDataOnly")}
               </label>
@@ -218,12 +209,14 @@ export default function Yearly() {
             <Button
               onClick={() => setMetricMode("cop")}
               variant={metricMode === "cop" ? "contained" : "outlined"}
+              startIcon={<SpeedIcon />}
             >
               {t("charts.copMode")}
             </Button>
             <Button
               onClick={() => setMetricMode("energy")}
               variant={metricMode === "energy" ? "contained" : "outlined"}
+              startIcon={<ElectricBoltIcon />}
             >
               {t("charts.energyMode")}
             </Button>

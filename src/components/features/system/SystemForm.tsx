@@ -112,21 +112,20 @@ export function SystemForm({ system, onSubmit }: SystemFormProps) {
             <option value="__other__">{t("systemForm.countries.other")}</option>
           </select>
         ) : (
-          <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+          <div className="flex-row-gap">
             <input
               value={form.country ?? ""}
               onChange={(e) => set("country", e.target.value || null)}
               placeholder={t("systemForm.countryPlaceholder")}
-              style={{ flex: 1 }}
+              className="flex-1"
             />
             <button
               type="button"
-              className="btn"
+              className="btn button-padding-medium"
               onClick={() => {
                 setCountryMode("dropdown");
                 set("country", "");
               }}
-              style={{ padding: "0.5rem 1rem" }}
             >
               ↩
             </button>
@@ -277,8 +276,8 @@ export function SystemForm({ system, onSubmit }: SystemFormProps) {
 
       <div className="row">
         <span>{t("systemForm.usageLabel")}</span>
-        <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
-          <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", minWidth: "auto" }}>
+        <div className="flex-row-gap-large">
+          <label className="checkbox-label">
             <input
               type="checkbox"
               checked={form.used_for_heating ?? false}
@@ -286,7 +285,7 @@ export function SystemForm({ system, onSubmit }: SystemFormProps) {
             />
             {t("systemForm.usedForHeating")}
           </label>
-          <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", minWidth: "auto" }}>
+          <label className="checkbox-label">
             <input
               type="checkbox"
               checked={form.used_for_dhw ?? false}
@@ -294,7 +293,7 @@ export function SystemForm({ system, onSubmit }: SystemFormProps) {
             />
             {t("systemForm.usedForDhw")}
           </label>
-          <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", minWidth: "auto" }}>
+          <label className="checkbox-label">
             <input
               type="checkbox"
               checked={form.used_for_cooling ?? false}

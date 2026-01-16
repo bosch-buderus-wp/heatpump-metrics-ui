@@ -26,7 +26,7 @@ export function NumberInputWithUnit({
   hasError = false,
 }: NumberInputWithUnitProps) {
   return (
-    <div style={{ position: "relative", flex: 1, display: "flex" }}>
+    <div className="number-input-with-unit-wrapper">
       <input
         id={id}
         type="number"
@@ -37,28 +37,10 @@ export function NumberInputWithUnit({
         max={max}
         step={step}
         disabled={disabled}
-        style={{
-          ...style,
-          paddingRight: "3.5rem", // Make room for the unit
-          flex: 1,
-          borderColor: hasError ? "red" : undefined,
-          borderWidth: hasError ? "2px" : undefined,
-        }}
+        className={`number-input-with-unit-input ${hasError ? "number-input-with-unit-input-error" : ""}`}
+        style={style}
       />
-      <span
-        style={{
-          position: "absolute",
-          right: "0.75rem",
-          top: "50%",
-          transform: "translateY(-50%)",
-          color: "#999",
-          fontSize: "0.9rem",
-          pointerEvents: "none",
-          userSelect: "none",
-        }}
-      >
-        {unit}
-      </span>
+      <span className="number-input-with-unit-label">{unit}</span>
     </div>
   );
 }

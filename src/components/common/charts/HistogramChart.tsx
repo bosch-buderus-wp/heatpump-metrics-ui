@@ -234,23 +234,20 @@ export function HistogramChart({
 
   if (!chartData || chartData.length === 0) {
     return (
-      <div
-        style={{ height: 400, display: "flex", alignItems: "center", justifyContent: "center" }}
-        className="card"
-      >
+      <div className="chart-no-data-card card">
         <p className="muted">{t("charts.noData")}</p>
       </div>
     );
   }
 
   return (
-    <div style={{ height: 400, marginTop: 20, marginBottom: 10 }} className="card">
+    <div className="chart-container card">
       <ResponsiveBar
         // biome-ignore lint/suspicious/noExplicitAny: Nivo's BarDatum type is too strict for our flexible data structure
         data={chartData as any}
         keys={["count"]}
         indexBy="binLabel"
-        margin={{ top: 10, right: 60, bottom: 60, left: 50 }}
+        margin={{ top: 10, right: 60, bottom: 70, left: 50 }}
         padding={0.3}
         valueScale={{ type: "linear" }}
         indexScale={{ type: "band", round: true }}
@@ -291,7 +288,7 @@ export function HistogramChart({
             </div>
             <div className="chart-tooltip-item">
               <div
-                className="chart-tooltip-indicator chart-tooltip-indicator-bar"
+                className="chart-tooltip-indicator chart-tooltip-indicator-bar chart-tooltip-indicator-custom"
                 style={{ backgroundColor: barColor }}
               />
               <span className="chart-tooltip-text">
@@ -308,7 +305,7 @@ export function HistogramChart({
             direction: "row",
             justify: false,
             translateX: 0,
-            translateY: 60,
+            translateY: 70,
             itemsSpacing: 20,
             itemWidth: 200,
             itemHeight: 20,

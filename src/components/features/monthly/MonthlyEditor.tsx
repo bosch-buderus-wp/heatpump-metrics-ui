@@ -153,16 +153,7 @@ export function MonthlyEditor({
       />
 
       {existing?.last_auto_calculated_at && (
-        <div
-          style={{
-            padding: "10px 15px",
-            backgroundColor: "#e8f4f8",
-            borderLeft: "3px solid #2196F3",
-            marginBottom: "15px",
-            fontSize: "0.9em",
-            borderRadius: "4px",
-          }}
-        >
+        <div className="monthly-editor-info-box">
           ℹ️{" "}
           {t("monthlyForm.autoCalculatedInfo", {
             date: new Date(existing.last_auto_calculated_at).toLocaleString("de-DE", {
@@ -176,7 +167,7 @@ export function MonthlyEditor({
         </div>
       )}
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+      <div className="monthly-editor-fields-container">
         {[
           {
             k: "electrical_energy_kwh",
@@ -232,7 +223,7 @@ export function MonthlyEditor({
           return (
             <div key={k} className="row wide">
               <label htmlFor={fieldId}>{l}</label>
-              <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
+              <div className="monthly-editor-field-wrapper">
                 <NumberInputWithUnit
                   id={fieldId}
                   value={(form[k as keyof MonthlyValue] as number) ?? null}
@@ -240,11 +231,7 @@ export function MonthlyEditor({
                   unit={unit}
                   hasError={hasError !== undefined}
                 />
-                {hasError && (
-                  <span style={{ color: "red", fontSize: "0.85rem", marginTop: "0.25rem" }}>
-                    ⚠ {hasError}
-                  </span>
-                )}
+                {hasError && <span className="monthly-editor-error">⚠ {hasError}</span>}
               </div>
               {hint && <FieldHint hint={t(`monthlyForm.hints.${hint}`)} />}
             </div>

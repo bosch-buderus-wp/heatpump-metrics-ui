@@ -177,14 +177,14 @@ export default function AzBarChart({
   };
 
   return (
-    <div style={{ height: 400, marginTop: 20, marginBottom: 10 }} className="card">
+    <div className="chart-container card">
       {chartData.length > 0 ? (
         <ResponsiveBar
           // biome-ignore lint/suspicious/noExplicitAny: Nivo's BarDatum type is too strict for our flexible data structure
           data={chartData as any}
           keys={chartKeys}
           indexBy={indexField}
-          margin={{ top: 10, right: 60, bottom: 60, left: 50 }}
+          margin={{ top: 10, right: 60, bottom: 70, left: 50 }}
           padding={0.3}
           valueScale={{ type: "linear" }}
           indexScale={{ type: "band", round: true }}
@@ -249,7 +249,7 @@ export default function AzBarChart({
               direction: "row",
               justify: false,
               translateX: 0,
-              translateY: 60,
+              translateY: 70,
               itemsSpacing: 2,
               itemWidth: 180,
               itemHeight: 20,
@@ -273,16 +273,7 @@ export default function AzBarChart({
           groupMode={isComparisonMode ? "grouped" : "grouped"}
         />
       ) : (
-        <div
-          style={{
-            height: "100%",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          {t("common.noData")}
-        </div>
+        <div className="chart-no-data">{t("common.noData")}</div>
       )}
     </div>
   );

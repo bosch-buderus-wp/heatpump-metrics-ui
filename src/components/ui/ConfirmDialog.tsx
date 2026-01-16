@@ -41,7 +41,7 @@ export function ConfirmDialog({
         aria-describedby="dialog-description"
       >
         <h2 id="dialog-title">{title}</h2>
-        <p id="dialog-description" style={{ whiteSpace: "pre-line" }}>
+        <p id="dialog-description" className="confirm-dialog-description">
           {message}
         </p>
         <div className="modal-buttons">
@@ -52,7 +52,7 @@ export function ConfirmDialog({
             type="button"
             onClick={onConfirm}
             disabled={isLoading}
-            style={{ backgroundColor: "var(--danger-color, #dc3545)" }}
+            className="confirm-dialog-danger-button"
           >
             {isLoading ? loadingText || t("common.loading") : t("common.confirm")}
           </button>
