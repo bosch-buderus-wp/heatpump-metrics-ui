@@ -1,0 +1,167 @@
+/* UI Components */
+
+/* Action Bar */
+.action-bar-container {
+  margin-top: var(--spacing-xl);
+}
+
+.action-bar-feedback {
+  margin-bottom: var(--spacing-lg);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-base);
+}
+
+.action-bar-feedback-success {
+  background-color: var(--success-bg);
+  color: var(--success-text);
+  border: 1px solid var(--success-border);
+}
+
+.action-bar-feedback-error {
+  background-color: var(--error-bg);
+  color: var(--error-text);
+  border: 1px solid var(--error-border);
+}
+
+.action-bar-buttons {
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* Confirm Dialog */
+.confirm-dialog-description {
+  white-space: pre-line;
+}
+
+.confirm-dialog-danger-button {
+  background-color: var(--danger-color, #dc3545);
+}
+
+/* Copy Field */
+.copy-field-wrapper {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: center;
+}
+
+.copy-field-input {
+  flex: 1;
+}
+
+/* Field Hint Styles */
+.field-hint-container {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  margin-left: var(--spacing-sm);
+}
+
+.field-hint-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  background: none;
+  border: none;
+  color: #6b7280;
+  cursor: pointer;
+  transition:
+    color var(--transition-base),
+    transform var(--transition-base);
+  border-radius: var(--radius-round);
+}
+
+.field-hint-icon:hover {
+  color: var(--chart-blue);
+  transform: scale(1.1);
+}
+
+.field-hint-icon:focus {
+  outline: 2px solid var(--chart-blue);
+  outline-offset: 2px;
+}
+
+.field-hint-icon:active {
+  transform: scale(0.95);
+}
+
+.field-hint-popover {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: var(--z-overlay);
+  min-width: 300px;
+  max-width: 400px;
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: var(--bg-white);
+  border: 1px solid #e5e7eb;
+  border-radius: var(--spacing-sm);
+  box-shadow: var(--shadow-hint);
+  font-size: 14px;
+  line-height: 1.5;
+  color: #374151;
+  white-space: normal;
+  word-wrap: break-word;
+  animation: fadeIn var(--transition-fast);
+}
+
+.field-hint-link {
+  color: var(--chart-blue);
+  text-decoration: underline;
+  font-weight: 500;
+  transition: color var(--transition-base);
+}
+
+.field-hint-link:hover {
+  color: #2563eb;
+}
+
+.field-hint-link:visited {
+  color: #7c3aed;
+}
+
+.field-hint-popover-right {
+  left: calc(100% + 8px);
+}
+
+.field-hint-popover-left {
+  right: calc(100% + 8px);
+}
+
+/* Add a small arrow pointing to the icon */
+.field-hint-popover::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-style: solid;
+}
+
+.field-hint-popover-right::before {
+  left: -8px;
+  border-width: 8px 8px 8px 0;
+  border-color: transparent #e5e7eb transparent transparent;
+}
+
+.field-hint-popover-left::before {
+  right: -8px;
+  border-width: 8px 0 8px 8px;
+  border-color: transparent transparent transparent #e5e7eb;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-50%) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-50%) scale(1);
+  }
+}

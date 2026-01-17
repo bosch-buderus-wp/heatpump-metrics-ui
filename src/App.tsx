@@ -1,5 +1,4 @@
 import { Navigate, Route, Routes } from "react-router-dom";
-import "./App.css";
 import "./i18n";
 import { Layout } from "./components/common/layout";
 import AuthCallback from "./pages/AuthCallback";

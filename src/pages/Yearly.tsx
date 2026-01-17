@@ -165,7 +165,7 @@ export default function Yearly() {
       isLoading={isLoading}
       filters={
         <div className="filter-container">
-          <div className="flex-row-gap">
+          <div className="flex-center-gap-sm">
             <select
               id="yearly-year-select"
               value={year}

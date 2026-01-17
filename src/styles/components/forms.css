@@ -1,0 +1,221 @@
+/* Form Control Styles */
+.form-select,
+.form-input {
+  height: var(--input-height);
+  padding: 0 var(--spacing-md);
+  margin-bottom: 0;
+  font-size: var(--font-base);
+  border-radius: var(--radius-base);
+  border: 1px solid var(--border-color);
+  transition:
+    border-color var(--transition-base),
+    background-color var(--transition-base);
+  cursor: pointer;
+  background: var(--bg-white);
+  display: inline-flex;
+  align-items: center;
+}
+
+.form-select:focus,
+.form-input:focus {
+  outline: 2px solid var(--primary-color);
+  border-color: transparent;
+}
+
+.form-select {
+  min-width: 40px;
+}
+
+.form-input {
+  min-width: 150px;
+}
+
+.form-select:hover,
+.form-input:hover {
+  border-color: rgba(0, 0, 0, 0.87);
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+/* System Form */
+#system-form {
+  background-color: var(--bg-white);
+}
+
+/* Number Input with Unit */
+.number-input-with-unit-wrapper {
+  position: relative;
+  flex: 1;
+  display: flex;
+}
+
+.number-input-with-unit-input {
+  padding-right: 3.5rem;
+  flex: 1;
+}
+
+.number-input-with-unit-input-error {
+  border-color: var(--error-color);
+  border-width: 2px;
+}
+
+.number-input-with-unit-label {
+  position: absolute;
+  right: var(--spacing-md);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-medium-gray);
+  font-size: var(--font-md);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Form-specific utilities */
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  min-width: auto;
+}
+
+.button-padding-medium {
+  padding: var(--spacing-sm) var(--spacing-lg);
+}
+
+/* Monthly Editor */
+.monthly-editor-info-box {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: var(--info-bg);
+  border-left: 3px solid var(--info-border);
+  margin: var(--spacing-md) 0;
+  font-size: var(--font-md);
+  border-radius: var(--radius-base);
+}
+
+/* Specific monthly editor layouts */
+.monthly-editor-fields-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.monthly-editor-field-wrapper {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.monthly-editor-error {
+  color: var(--error-color);
+  font-size: var(--font-sm);
+  margin-top: var(--spacing-xs);
+}
+
+/* Filter Controls */
+.filters {
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: flex-end;
+  margin: 0;
+  flex-wrap: wrap;
+}
+
+.filters label {
+  gap: var(--spacing-xs);
+  font-size: var(--font-xs);
+  margin-bottom: 0;
+}
+
+.filter-container {
+  display: flex;
+  gap: var(--spacing-lg);
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: var(--bg-white);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  margin-bottom: 0;
+}
+
+.filter-container .MuiButton-root.MuiButton-sizeSmall {
+  height: var(--input-height);
+  min-height: var(--input-height);
+}
+
+/* Navigation Buttons */
+.nav-button {
+  padding: 0;
+  cursor: pointer;
+  font-size: var(--font-base);
+  border-radius: var(--radius-base);
+  border: 1px solid rgba(0, 0, 0, 0.23);
+  background-color: transparent;
+  transition:
+    border-color var(--transition-base),
+    background-color var(--transition-base);
+  width: var(--input-height);
+  height: var(--input-height);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.nav-button:hover {
+  border-color: rgba(0, 0, 0, 0.87);
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+/* Action Bar Buttons */
+.action-btn {
+  padding: var(--spacing-btn-v) var(--spacing-btn-h);
+  border-radius: var(--radius-md);
+  font-size: var(--font-base);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-smooth);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-family: inherit;
+  border: none;
+}
+
+.action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.action-btn-primary {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+}
+
+.action-btn-primary:hover:not(:disabled) {
+  background-color: var(--primary-hover);
+  transform: translateY(-1px);
+}
+
+.action-btn-secondary {
+  background-color: #90caf9;
+  color: #0d47a1;
+  border: 1px solid #64b5f6;
+}
+
+.action-btn-secondary:hover:not(:disabled) {
+  background-color: #64b5f6;
+  border-color: #42a5f5;
+}
+
+.action-btn-danger {
+  background-color: #ffcdd2;
+  color: #c62828;
+  border: 1px solid #ef9a9a;
+}
+
+.action-btn-danger:hover:not(:disabled) {
+  background-color: #ef9a9a;
+  border-color: #e57373;
+}

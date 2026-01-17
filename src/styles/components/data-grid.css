@@ -1,0 +1,40 @@
+/* MUI DataGrid overrides */
+.MuiDataGrid-root {
+  font-size: var(--font-xs);
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--radius-md) !important;
+  background: var(--bg-white);
+  box-shadow: var(--shadow-sm);
+}
+
+.MuiDataGrid-columnHeaders {
+  background-color: var(--bg-canvas);
+  border-bottom: 2px solid var(--border-color) !important;
+  font-weight: 600;
+}
+
+.MuiDataGrid-cell {
+  border-bottom: 1px solid var(--border-color) !important;
+}
+
+.MuiDataGrid-row:hover {
+  background-color: var(--primary-light) !important;
+}
+
+/* MUI Table Pagination overrides - increase specificity to override MUI defaults */
+.MuiDataGrid-root .MuiTablePagination-selectLabel,
+.MuiDataGrid-root .MuiTablePagination-displayedRows,
+p.MuiTablePagination-selectLabel,
+p.MuiTablePagination-displayedRows {
+  /* biome-ignore lint/complexity/noImportantStyles: required to override third-party styles */
+  margin: 0 !important;
+  font-size: var(--font-base);
+}
+
+/* DataGrid Container */
+.data-grid-container {
+  height: 70vh;
+  width: 100%;
+  min-height: 400px;
+  max-height: 800px;
+}

@@ -1,0 +1,182 @@
+/* Chart Components */
+.chart-container {
+  height: var(--chart-height);
+  margin-bottom: var(--spacing-sm);
+}
+
+.chart-container-relative {
+  height: var(--chart-height);
+  margin-bottom: var(--spacing-sm);
+  position: relative;
+}
+
+.chart-no-data {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chart-no-data-card {
+  height: var(--chart-height);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chart-legend-controls {
+  margin-bottom: var(--spacing-sm);
+  display: flex;
+  justify-content: center;
+}
+
+.chart-tooltip-indicator-custom {
+  background-color: inherit;
+}
+
+.chart-stats-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.chart-stats-title-no-margin {
+  margin: 0;
+}
+
+.chart-stats-expanded {
+  margin-top: var(--spacing-sm);
+}
+
+.chart-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-sm);
+}
+
+.chart-stats-absolute {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transition: all var(--transition-base);
+}
+
+.chart-temp-label {
+  font-size: 11px;
+  fill: var(--text-gray);
+}
+
+.chart-temp-axis-label {
+  font-size: 12px;
+  fill: var(--text-gray);
+  font-weight: 500;
+}
+
+/* Chart Tooltip Styles */
+.chart-tooltip {
+  background: var(--bg-white);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid #ccc;
+  border-radius: var(--radius-base);
+  box-shadow: var(--shadow-tooltip);
+  min-width: 200px;
+}
+
+.chart-tooltip-header {
+  margin-bottom: var(--spacing-xs);
+  font-weight: 600;
+}
+
+.chart-tooltip-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: var(--spacing-xs);
+  white-space: nowrap;
+}
+
+.chart-tooltip-item:last-child {
+  margin-bottom: 0;
+}
+
+.chart-tooltip-indicator {
+  margin-right: var(--spacing-sm);
+  flex-shrink: 0;
+}
+
+.chart-tooltip-indicator-bar {
+  width: 12px;
+  height: 12px;
+  border-radius: var(--radius-xs);
+}
+
+.chart-tooltip-indicator-line {
+  width: 12px;
+  height: 2px;
+}
+
+.chart-tooltip-indicator-outdoor {
+  background-color: var(--chart-blue);
+}
+
+.chart-tooltip-indicator-flow {
+  background-color: var(--chart-red);
+}
+
+.chart-tooltip-text {
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+/* Chart Statistics Display */
+.chart-stats {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-lg);
+  margin-left: auto;
+  margin-right: var(--spacing-lg);
+  padding: var(--spacing-md) var(--spacing-lg);
+  background-color: var(--bg-white);
+  border-radius: var(--radius-base);
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  width: fit-content;
+  position: relative;
+  z-index: var(--z-dropdown);
+}
+
+.chart-stats-title {
+  font-size: var(--font-base);
+  font-weight: bold;
+  color: rgba(0, 0, 0, 0.7);
+  margin: 0 0 var(--spacing-xs) 0;
+  align-self: stretch;
+  text-align: center;
+}
+
+.chart-stats > div:not(.chart-stats-title) {
+  display: flex;
+  gap: var(--spacing-2xl);
+}
+
+.chart-stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.chart-stat-label {
+  font-size: var(--font-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: rgba(0, 0, 0, 0.6);
+  font-weight: 500;
+}
+
+.chart-stat-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--primary-color);
+}

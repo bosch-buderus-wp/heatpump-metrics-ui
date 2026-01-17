@@ -196,7 +196,7 @@ export default function Daily() {
       isLoading={isLoading}
       filters={
         <div className="filter-container">
-          <div className="flex-row-gap">
+          <div className="flex-center-gap-sm">
             <button
               type="button"
               onClick={() => setDate(dayjs(date).subtract(1, "day").format("YYYY-MM-DD"))}

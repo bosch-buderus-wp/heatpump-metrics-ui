@@ -112,7 +112,7 @@ export function SystemForm({ system, onSubmit }: SystemFormProps) {
             <option value="__other__">{t("systemForm.countries.other")}</option>
           </select>
         ) : (
-          <div className="flex-row-gap">
+          <div className="flex-center-gap-sm">
             <input
               value={form.country ?? ""}
               onChange={(e) => set("country", e.target.value || null)}
@@ -276,7 +276,7 @@ export function SystemForm({ system, onSubmit }: SystemFormProps) {
 
       <div className="row">
         <span>{t("systemForm.usageLabel")}</span>
-        <div className="flex-row-gap-large">
+        <div className="flex-center-gap-lg">
           <label className="checkbox-label">
             <input
               type="checkbox"
