@@ -3,14 +3,16 @@ import ElectricBoltIcon from "@mui/icons-material/ElectricBolt";
 import SpeedIcon from "@mui/icons-material/Speed";
 import TimelineIcon from "@mui/icons-material/Timeline";
 import { Button, ButtonGroup } from "@mui/material";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AzBarChart, type ChartDataRow, HistogramChart } from "../components/common/charts";
 import { DataGridWrapper } from "../components/common/data-grid";
 import { PageLayout } from "../components/common/layout";
+import { ConfirmDialog } from "../components/ui";
 import { useComparisonMode } from "../hooks/useComparisonMode";
+import { useDeleteMeasurement } from "../hooks/useDeleteOperations";
 import { filterRealisticDataForCharts } from "../lib/dataQuality";
 import { applyThermometerOffset, flattenHeatingSystemsFields } from "../lib/dataTransformers";
 import { supabase } from "../lib/supabaseClient";
@@ -25,10 +27,16 @@ type MetricMode = "cop" | "energy";
 
 export default function Daily() {
   const { t } = useTranslation();
+  const queryClient = useQueryClient();
   const [date, setDate] = useState(dayjs().format("YYYY-MM-DD"));
   const [filteredData, setFilteredData] = useState<MeasurementRow[]>([]);
   const [viewMode, setViewMode] = useState<ViewMode>("timeSeries");
   const [metricMode, setMetricMode] = useState<MetricMode>("cop");
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [measurementToDelete, setMeasurementToDelete] = useState<string | null>(null);
+
+  // Delete mutation
+  const deleteMutation = useDeleteMeasurement();
 
   // Wrap setFilteredData in useCallback to prevent infinite loops in DataGridWrapper
   const handleFilterChange = useCallback((data: MeasurementRow[]) => {
@@ -37,6 +45,32 @@ export default function Daily() {
 
   // Define columns for Daily page
   const columns = useMemo(() => getTimeSeriesColumns(t, "time"), [t]);
+
+  // Handle delete action
+  const handleDeleteClick = useCallback((rowId: string | number) => {
+    setMeasurementToDelete(String(rowId));
+    setDeleteDialogOpen(true);
+  }, []);
+
+  const handleDeleteConfirm = useCallback(async () => {
+    if (!measurementToDelete) return;
+
+    try {
+      await deleteMutation.mutateAsync(measurementToDelete);
+      // Invalidate and refetch the measurements query
+      await queryClient.invalidateQueries({ queryKey: ["measurements", date] });
+      setDeleteDialogOpen(false);
+      setMeasurementToDelete(null);
+    } catch (error) {
+      console.error("Failed to delete measurement:", error);
+      // Error handling - the mutation will handle error display
+    }
+  }, [measurementToDelete, deleteMutation, queryClient, date]);
+
+  const handleDeleteCancel = useCallback(() => {
+    setDeleteDialogOpen(false);
+    setMeasurementToDelete(null);
+  }, []);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["measurements", date],
@@ -317,6 +351,17 @@ export default function Daily() {
         columnVisibilityModel={commonHiddenColumns}
         onFilterChange={handleFilterChange}
         {...dataGridComparisonProps}
+        onDeleteRow={handleDeleteClick}
+        deleteDisabled={deleteMutation.isPending}
+      />
+      <ConfirmDialog
+        open={deleteDialogOpen}
+        title={t("deleteConfirm.deleteMeasurement")}
+        message={t("deleteConfirm.deleteMeasurementMessage")}
+        onConfirm={handleDeleteConfirm}
+        onCancel={handleDeleteCancel}
+        isLoading={deleteMutation.isPending}
+        loadingText={t("deleteConfirm.deleting")}
       />
     </PageLayout>
   );

@@ -19,6 +19,19 @@ export function useDeleteAccount() {
   });
 }
 
+export function useDeleteMeasurement() {
+  return useMutation({
+    mutationFn: async (measurementId: string) => {
+      const { error } = await supabase.from("measurements").delete().eq("id", measurementId);
+
+      if (error) {
+        console.error("Error deleting measurement:", error);
+        throw error;
+      }
+    },
+  });
+}
+
 export interface DeleteSystemCounts {
   monthlyCount: number;
   measurementCount: number;

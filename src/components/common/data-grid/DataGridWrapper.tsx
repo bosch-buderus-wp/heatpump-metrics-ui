@@ -1,7 +1,9 @@
+import DeleteIcon from "@mui/icons-material/Delete";
+import { IconButton } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { DataGrid, type GridColDef, type GridFilterModel, useGridApiRef } from "@mui/x-data-grid";
 import { deDE } from "@mui/x-data-grid/locales";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useDataGridFilter } from "../../../hooks/useDataGridFilter";
 import { useSession } from "../layout/Layout";
 import { DataGridToolbar } from "./DataGridToolbar";
@@ -23,6 +25,9 @@ interface DataGridWrapperProps<T = Record<string, unknown>> {
   onUpdateFilterGroup?: (group: 1 | 2, model: GridFilterModel) => void;
   onSetActiveGroup?: (group: 1 | 2) => void;
   onClearFilterGroup2?: () => void;
+  // Delete action props
+  onDeleteRow?: (rowId: string | number) => void;
+  deleteDisabled?: boolean;
 }
 
 export function DataGridWrapper<T = Record<string, unknown>>({
@@ -41,9 +46,56 @@ export function DataGridWrapper<T = Record<string, unknown>>({
   onUpdateFilterGroup,
   onSetActiveGroup,
   onClearFilterGroup2,
+  onDeleteRow,
+  deleteDisabled = false,
 }: DataGridWrapperProps<T>) {
   const { session } = useSession();
   const apiRef = useGridApiRef();
+
+  // Add delete action column if onDeleteRow is provided and user is logged in
+  const columnsWithActions = useMemo(() => {
+    if (!onDeleteRow || !session) {
+      return columns;
+    }
+
+    const deleteColumn: GridColDef = {
+      field: "actions",
+      headerName: "",
+      width: 50,
+      sortable: false,
+      filterable: false,
+      hideable: false,
+      disableColumnMenu: true,
+      renderCell: (params) => {
+        // Only show delete button if the row belongs to the logged-in user
+        const rowUserId = (params.row as { user_id?: string }).user_id;
+        const currentUserId = session?.user?.id;
+
+        if (!rowUserId || !currentUserId || rowUserId !== currentUserId) {
+          return null;
+        }
+
+        return (
+          <IconButton
+            size="small"
+            onClick={() => onDeleteRow(params.id)}
+            disabled={deleteDisabled}
+            aria-label="delete"
+            sx={{
+              padding: "4px",
+              "&:hover": {
+                color: "error.main",
+              },
+            }}
+          >
+            <DeleteIcon fontSize="small" />
+          </IconButton>
+        );
+      },
+    };
+
+    return [...columns, deleteColumn];
+  }, [columns, onDeleteRow, session, deleteDisabled]);
 
   // Use custom hook to handle DataGrid filtering
   // biome-ignore lint/suspicious/noExplicitAny: MUI type incompatibility between RefObject and MutableRefObject
@@ -140,7 +192,7 @@ export function DataGridWrapper<T = Record<string, unknown>>({
           apiRef={apiRef}
           rowHeight={20}
           rows={rows}
-          columns={columns}
+          columns={columnsWithActions}
           loading={loading}
           getRowId={getRowId}
           initialState={{

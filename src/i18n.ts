@@ -235,6 +235,9 @@ const resources = {
         deleteMonthlyValue: "Monatswert löschen",
         deleteMonthlyValueMessage:
           "Möchten Sie diesen Monatswert wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden!",
+        deleteMeasurement: "Messwert löschen",
+        deleteMeasurementMessage:
+          "Möchten Sie diesen Messwert wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden!",
         deleting: "Wird gelöscht...",
       },
       models: {
@@ -593,6 +596,9 @@ const resources = {
         deleteMonthlyValue: "Delete monthly value",
         deleteMonthlyValueMessage:
           "Do you really want to delete this monthly value? This action cannot be undone!",
+        deleteMeasurement: "Delete measurement",
+        deleteMeasurementMessage:
+          "Do you really want to delete this measurement? This action cannot be undone!",
         deleting: "Deleting...",
       },
       public: {

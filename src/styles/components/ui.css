@@ -1,5 +1,77 @@
 /* UI Components */
 
+/* Modal Overlay and Content */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-modal);
+  padding: var(--spacing-lg);
+}
+
+.modal-content {
+  background: var(--bg-white);
+  padding: var(--spacing-2xl);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  max-width: 500px;
+  width: 100%;
+  animation: modalFadeIn 0.2s ease-out;
+}
+
+.modal-content h2 {
+  margin-top: 0;
+  margin-bottom: var(--spacing-lg);
+  font-size: var(--font-xl);
+  color: var(--text-main);
+}
+
+.modal-buttons {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-content: flex-end;
+  margin-top: var(--spacing-xl);
+}
+
+.modal-buttons button {
+  padding: var(--spacing-btn-v) var(--spacing-btn-h);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  background: var(--bg-white);
+  color: var(--text-main);
+  cursor: pointer;
+  font-size: var(--font-base);
+  transition: all var(--transition-base);
+}
+
+.modal-buttons button:hover:not(:disabled) {
+  background: var(--bg-canvas);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.modal-buttons button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 /* Action Bar */
 .action-bar-container {
   margin-top: var(--spacing-xl);
