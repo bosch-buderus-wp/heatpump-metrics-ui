@@ -1,20 +1,20 @@
 /* Import all styles in the correct order */
 
 /* 1. CSS Variables first */
-@import './variables.css';
+@import "./variables.css";
 
 /* 2. Base styles and resets */
-@import './base.css';
+@import "./base.css";
 
 /* 3. Layout styles */
-@import './layout.css';
+@import "./layout.css";
 
 /* 4. Component styles */
-@import './components/cards.css';
-@import './components/forms.css';
-@import './components/charts.css';
-@import './components/data-grid.css';
-@import './components/ui.css';
+@import "./components/cards.css";
+@import "./components/forms.css";
+@import "./components/charts.css";
+@import "./components/data-grid.css";
+@import "./components/ui.css";
 
 /* 5. Page-specific styles */
-@import './pages.css';
+@import "./pages.css";

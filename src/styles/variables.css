@@ -12,7 +12,7 @@
   --text-gray: #333;
   --text-light-gray: #666;
   --text-medium-gray: #999;
-  
+
   /* Status Colors */
   --success-bg: #d4edda;
   --success-text: #155724;
@@ -24,17 +24,17 @@
   --danger-color: #dc3545;
   --info-bg: #e8f4f8;
   --info-border: #2196f3;
-  
+
   /* Chart Colors */
   --chart-blue: #3b82f6;
   --chart-red: #ef4444;
-  
+
   /* Shadows */
   --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   --shadow-tooltip: 0 2px 4px rgba(0, 0, 0, 0.1);
   --shadow-hint: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  
+
   /* Border Radius */
   --radius-lg: 1rem;
   --radius-md: 0.75rem;
@@ -42,7 +42,7 @@
   --radius-xs: 0.25rem;
   --radius-base: 4px;
   --radius-round: 50%;
-  
+
   /* Spacing */
   --spacing-xs: 0.25rem;
   --spacing-sm: 0.5rem;
@@ -53,7 +53,7 @@
   --spacing-1-25: 1.25rem;
   --spacing-btn-v: 0.6rem;
   --spacing-btn-h: 1.2rem;
-  
+
   /* Font Sizes */
   --font-xs: 0.75rem;
   --font-sm: 0.85rem;
@@ -63,18 +63,18 @@
   --font-xl: 1.2rem;
   --font-2xl: 1.75rem;
   --font-3xl: 2.5rem;
-  
+
   /* Dimensions */
   --chart-height: 400px;
   --input-height: 32px;
   --max-content-width: 1000px;
   --max-page-width: 800px;
-  
+
   /* Transitions */
   --transition-fast: 0.15s ease-out;
   --transition-base: 0.2s ease;
   --transition-smooth: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  
+
   /* Z-index Layers */
   --z-base: 1;
   --z-dropdown: 10;
