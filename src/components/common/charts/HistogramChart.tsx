@@ -3,7 +3,6 @@ import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useChartLegend } from "../../../hooks/useChartLegend";
 import {
-  calculateDailyTaz,
   calculateSystemAz,
   createHistogramBins,
   type SystemAzData,
@@ -31,7 +30,6 @@ interface HistogramDataRow {
   electrical_energy_kwh?: number | null;
   thermal_energy_heating_kwh?: number | null;
   electrical_energy_heating_kwh?: number | null;
-  created_at?: string | null; // Required for daily TAZ calculation
 }
 
 interface HistogramChartProps {
@@ -39,7 +37,6 @@ interface HistogramChartProps {
   metricMode?: "cop" | "energy";
   statsTitle?: string;
   binSize?: number;
-  useDailyTaz?: boolean; // If true, use calculateDailyTaz instead of calculateSystemAz
 }
 
 export function HistogramChart({
@@ -47,7 +44,6 @@ export function HistogramChart({
   metricMode = "cop",
   statsTitle,
   binSize = 0.5,
-  useDailyTaz = false,
 }: HistogramChartProps) {
   const { t } = useTranslation();
   const barColor = CHART_COLORS.primary;
@@ -73,84 +69,39 @@ export function HistogramChart({
       // Filter out unrealistic data first
       const filteredData = filterRealisticDataForCharts(data);
 
-      // Calculate energy consumption per system
+      // Sum energy values per system
+      const systemTotals = new Map<
+        string,
+        { thermal: number; electrical: number; thermalHeating: number; electricalHeating: number }
+      >();
+
+      filteredData.forEach((row) => {
+        const existing = systemTotals.get(row.heating_id) || {
+          thermal: 0,
+          electrical: 0,
+          thermalHeating: 0,
+          electricalHeating: 0,
+        };
+        existing.thermal += row.thermal_energy_kwh || 0;
+        existing.electrical += row.electrical_energy_kwh || 0;
+        existing.thermalHeating += row.thermal_energy_heating_kwh || 0;
+        existing.electricalHeating += row.electrical_energy_heating_kwh || 0;
+        systemTotals.set(row.heating_id, existing);
+      });
+
+      // Convert to SystemAzData format
       const systemData: SystemAzData[] = [];
-
-      if (useDailyTaz) {
-        // For daily data: calculate difference between first and last measurement
-        const systemMeasurements = new Map<string, typeof filteredData>();
-        filteredData.forEach((row) => {
-          if (!systemMeasurements.has(row.heating_id)) {
-            systemMeasurements.set(row.heating_id, []);
-          }
-          systemMeasurements.get(row.heating_id)?.push(row);
+      systemTotals.forEach((totals, heatingId) => {
+        systemData.push({
+          heatingId,
+          az: totals.electrical,
+          azHeating: totals.electricalHeating,
+          thermalTotal: totals.thermal,
+          electricalTotal: totals.electrical,
+          thermalHeatingTotal: totals.thermalHeating,
+          electricalHeatingTotal: totals.electricalHeating,
         });
-
-        systemMeasurements.forEach((measurements, heatingId) => {
-          if (measurements.length === 0) return;
-
-          // Sort by timestamp
-          const sorted = [...measurements].sort((a, b) => {
-            const timeA = a.created_at ? new Date(a.created_at).getTime() : 0;
-            const timeB = b.created_at ? new Date(b.created_at).getTime() : 0;
-            return timeA - timeB;
-          });
-
-          const first = sorted[0];
-          const last = sorted[sorted.length - 1];
-
-          const thermalDiff = (last.thermal_energy_kwh || 0) - (first.thermal_energy_kwh || 0);
-          const electricalDiff =
-            (last.electrical_energy_kwh || 0) - (first.electrical_energy_kwh || 0);
-          const thermalHeatingDiff =
-            (last.thermal_energy_heating_kwh || 0) - (first.thermal_energy_heating_kwh || 0);
-          const electricalHeatingDiff =
-            (last.electrical_energy_heating_kwh || 0) - (first.electrical_energy_heating_kwh || 0);
-
-          systemData.push({
-            heatingId,
-            az: electricalDiff, // In energy mode, az stores electrical energy for histogram display
-            azHeating: electricalHeatingDiff,
-            thermalTotal: thermalDiff,
-            electricalTotal: electricalDiff,
-            thermalHeatingTotal: thermalHeatingDiff,
-            electricalHeatingTotal: electricalHeatingDiff,
-          });
-        });
-      } else {
-        // For monthly/yearly data: sum energy values per system
-        const systemTotals = new Map<
-          string,
-          { thermal: number; electrical: number; thermalHeating: number; electricalHeating: number }
-        >();
-
-        filteredData.forEach((row) => {
-          const existing = systemTotals.get(row.heating_id) || {
-            thermal: 0,
-            electrical: 0,
-            thermalHeating: 0,
-            electricalHeating: 0,
-          };
-          existing.thermal += row.thermal_energy_kwh || 0;
-          existing.electrical += row.electrical_energy_kwh || 0;
-          existing.thermalHeating += row.thermal_energy_heating_kwh || 0;
-          existing.electricalHeating += row.electrical_energy_heating_kwh || 0;
-          systemTotals.set(row.heating_id, existing);
-        });
-
-        // Convert to SystemAzData format
-        systemTotals.forEach((totals, heatingId) => {
-          systemData.push({
-            heatingId,
-            az: totals.electrical,
-            azHeating: totals.electricalHeating,
-            thermalTotal: totals.thermal,
-            electricalTotal: totals.electrical,
-            thermalHeatingTotal: totals.thermalHeating,
-            electricalHeatingTotal: totals.electricalHeating,
-          });
-        });
-      }
+      });
 
       // Filter out systems with unrealistic COP values calculated from energy data
       // In energy mode, az fields contain energy values, not COP, so don't check them
@@ -196,9 +147,7 @@ export function HistogramChart({
 
     // COP mode: calculate AZ, then filter unrealistic calculated values
     const filteredData = filterRealisticDataForCharts(data);
-    const systemAzData = useDailyTaz
-      ? calculateDailyTaz(filteredData)
-      : calculateSystemAz(filteredData);
+    const systemAzData = calculateSystemAz(filteredData);
 
     // Filter out systems with unrealistic calculated COP values
     const filteredSystemAzData = filterSystemsByRealisticCOP(systemAzData);
@@ -212,7 +161,7 @@ export function HistogramChart({
       totalStats: totalHistogram.stats,
       heatingStats: heatingHistogram.stats,
     };
-  }, [data, metricMode, binSize, useDailyTaz]);
+  }, [data, metricMode, binSize]);
 
   // Use the chart legend hook (histogram doesn't need temperature lines, only toggles)
   const { activeKey, legendItems, handleLegendClick } = useChartLegend({

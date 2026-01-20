@@ -218,7 +218,7 @@ export type Database = {
       };
     };
     Views: {
-      daily_values: {
+      daily_values_view: {
         Row: {
           az: number | null;
           az_heating: number | null;
@@ -235,6 +235,98 @@ export type Database = {
           heating_id: string | null;
           heating_load_kw: number | null;
           heating_type: Database["public"]["Enums"]["heating_type"] | null;
+          model_idu: Database["public"]["Enums"]["model_idu"] | null;
+          model_odu: Database["public"]["Enums"]["model_odu"] | null;
+          name: string | null;
+          outdoor_temperature_c: number | null;
+          postal_code: string | null;
+          sw_idu: Database["public"]["Enums"]["sw_idu"] | null;
+          sw_odu: Database["public"]["Enums"]["sw_odu"] | null;
+          thermal_energy_heating_kwh: number | null;
+          thermal_energy_kwh: number | null;
+          thermometer_offset_k: number | null;
+          used_for_cooling: boolean | null;
+          used_for_dhw: boolean | null;
+          used_for_heating: boolean | null;
+          user_id: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "measurements_heating_id_fkey";
+            columns: ["heating_id"];
+            isOneToOne: false;
+            referencedRelation: "heating_systems";
+            referencedColumns: ["heating_id"];
+          },
+        ];
+      };
+      monthly_values_view: {
+        Row: {
+          az: number | null;
+          az_heating: number | null;
+          building_construction_year: number | null;
+          building_energy_standard: Database["public"]["Enums"]["building_energy_standard"] | null;
+          building_type: Database["public"]["Enums"]["building_type"] | null;
+          country: string | null;
+          created_at: string | null;
+          design_outdoor_temp_c: number | null;
+          electrical_energy_heating_kwh: number | null;
+          electrical_energy_kwh: number | null;
+          flow_temperature_c: number | null;
+          heated_area_m2: number | null;
+          heating_id: string | null;
+          heating_load_kw: number | null;
+          heating_type: Database["public"]["Enums"]["heating_type"] | null;
+          id: string | null;
+          is_manual_override: boolean | null;
+          last_auto_calculated_at: string | null;
+          model_idu: Database["public"]["Enums"]["model_idu"] | null;
+          model_odu: Database["public"]["Enums"]["model_odu"] | null;
+          month: number | null;
+          name: string | null;
+          outdoor_temperature_c: number | null;
+          outdoor_temperature_min_c: number | null;
+          outdoor_temperature_max_c: number | null;
+          postal_code: string | null;
+          sw_idu: Database["public"]["Enums"]["sw_idu"] | null;
+          sw_odu: Database["public"]["Enums"]["sw_odu"] | null;
+          thermal_energy_heating_kwh: number | null;
+          thermal_energy_kwh: number | null;
+          thermometer_offset_k: number | null;
+          used_for_cooling: boolean | null;
+          used_for_dhw: boolean | null;
+          used_for_heating: boolean | null;
+          user_id: string | null;
+          year: number | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "monthly_values_heating_id_fkey";
+            columns: ["heating_id"];
+            isOneToOne: false;
+            referencedRelation: "heating_systems";
+            referencedColumns: ["heating_id"];
+          },
+        ];
+      };
+      measurement_deltas_view: {
+        Row: {
+          az: number | null;
+          az_heating: number | null;
+          building_construction_year: number | null;
+          building_energy_standard: Database["public"]["Enums"]["building_energy_standard"] | null;
+          building_type: Database["public"]["Enums"]["building_type"] | null;
+          country: string | null;
+          created_at: string | null;
+          design_outdoor_temp_c: number | null;
+          electrical_energy_heating_kwh: number | null;
+          electrical_energy_kwh: number | null;
+          flow_temperature_c: number | null;
+          heated_area_m2: number | null;
+          heating_id: string | null;
+          heating_load_kw: number | null;
+          heating_type: Database["public"]["Enums"]["heating_type"] | null;
+          id: string | null;
           model_idu: Database["public"]["Enums"]["model_idu"] | null;
           model_odu: Database["public"]["Enums"]["model_odu"] | null;
           name: string | null;

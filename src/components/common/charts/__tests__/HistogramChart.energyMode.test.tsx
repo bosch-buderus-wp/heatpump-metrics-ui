@@ -239,67 +239,6 @@ describe("HistogramChart - Energy Mode", () => {
     },
   ];
 
-  const mockDailyData = [
-    // System 1: measurements throughout the day (cumulative counters)
-    {
-      heating_id: "sys1",
-      created_at: "2024-01-15T00:00:00Z",
-      electrical_energy_kwh: 1000,
-      electrical_energy_heating_kwh: 800,
-      thermal_energy_kwh: 4000,
-      thermal_energy_heating_kwh: 3200,
-    },
-    {
-      heating_id: "sys1",
-      created_at: "2024-01-15T06:00:00Z",
-      electrical_energy_kwh: 1003,
-      electrical_energy_heating_kwh: 802,
-      thermal_energy_kwh: 4012,
-      thermal_energy_heating_kwh: 3208,
-    },
-    {
-      heating_id: "sys1",
-      created_at: "2024-01-15T12:00:00Z",
-      electrical_energy_kwh: 1008,
-      electrical_energy_heating_kwh: 806,
-      thermal_energy_kwh: 4032,
-      thermal_energy_heating_kwh: 3224,
-    },
-    {
-      heating_id: "sys1",
-      created_at: "2024-01-15T18:00:00Z",
-      electrical_energy_kwh: 1015,
-      electrical_energy_heating_kwh: 812,
-      thermal_energy_kwh: 4060,
-      thermal_energy_heating_kwh: 3248,
-    },
-    {
-      heating_id: "sys1",
-      created_at: "2024-01-15T23:59:59Z",
-      electrical_energy_kwh: 1020,
-      electrical_energy_heating_kwh: 816,
-      thermal_energy_kwh: 4080,
-      thermal_energy_heating_kwh: 3264,
-    },
-    // System 2: measurements throughout the day
-    {
-      heating_id: "sys2",
-      created_at: "2024-01-15T00:00:00Z",
-      electrical_energy_kwh: 2000,
-      electrical_energy_heating_kwh: 1600,
-      thermal_energy_kwh: 8000,
-      thermal_energy_heating_kwh: 6400,
-    },
-    {
-      heating_id: "sys2",
-      created_at: "2024-01-15T23:59:59Z",
-      electrical_energy_kwh: 2018,
-      electrical_energy_heating_kwh: 1614,
-      thermal_energy_kwh: 8072,
-      thermal_energy_heating_kwh: 6456,
-    },
-  ];
-
   describe("Yearly Energy Aggregation", () => {
     it("aggregates all months per system to get yearly total", () => {
       render(<HistogramChart data={mockYearlyData} metricMode="energy" binSize={100} />);
@@ -341,52 +280,18 @@ describe("HistogramChart - Energy Mode", () => {
     });
   });
 
-  describe("Daily Energy Calculation (TAZ Method)", () => {
-    it("calculates daily total using first-last difference", () => {
-      render(
-        <HistogramChart data={mockDailyData} metricMode="energy" useDailyTaz={true} binSize={5} />,
-      );
-
-      const chartData = JSON.parse(screen.getByTestId("chart-data").textContent || "[]");
-
-      // Should have bins representing the distribution
-      expect(chartData.length).toBeGreaterThan(0);
-
-      // System 1: 1020 - 1000 = 20 kWh/day
-      // System 2: 2018 - 2000 = 18 kWh/day
-      // These should be binned appropriately
-    });
-
-    it("shows correct stats for daily totals in kWh", () => {
-      render(
-        <HistogramChart
-          data={mockDailyData}
-          metricMode="energy"
-          useDailyTaz={true}
-          statsTitle="Daily Stats"
-        />,
-      );
-
-      // Should show kWh unit in stats
-      const statsSection = screen.getByText("Daily Stats").parentElement;
-      expect(statsSection?.textContent).toContain("kWh");
-    });
-  });
-
   describe("Bin Sizing", () => {
     it("uses provided bin size when specified", () => {
-      render(
-        <HistogramChart data={mockDailyData} metricMode="energy" useDailyTaz={true} binSize={5} />,
-      );
+      render(<HistogramChart data={mockYearlyData} metricMode="energy" binSize={100} />);
 
       const chartData = JSON.parse(screen.getByTestId("chart-data").textContent || "[]");
 
       if (chartData.length > 0) {
         const binLabel = chartData[0].binLabel;
-        // With 5 kWh bins, should see ranges like "15-20", "20-25"
+        // With 100 kWh bins, should see ranges like "2400-2500", "2500-2600"
         const parts = binLabel.split("-").map(Number);
         if (parts.length === 2) {
-          expect(parts[1] - parts[0]).toBe(5);
+          expect(parts[1] - parts[0]).toBe(100);
         }
       }
     });

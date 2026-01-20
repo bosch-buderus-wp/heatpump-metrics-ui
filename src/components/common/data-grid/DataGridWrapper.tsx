@@ -101,13 +101,21 @@ export function DataGridWrapper<T = Record<string, unknown>>({
   // biome-ignore lint/suspicious/noExplicitAny: MUI type incompatibility between RefObject and MutableRefObject
   const [filteredData, handleFilterModelChange] = useDataGridFilter(apiRef as any, rows);
 
-  // Call onFilterChange callback when filtered data changes
+  // Create a stable key based on filtered row IDs to detect actual filter changes
+  const filteredDataKey = useMemo(() => {
+    return filteredData.map((row) => getRowId(row)).join(",");
+  }, [filteredData, getRowId]);
+
+  // Call onFilterChange callback when filtered data actually changes
   // Use useEffect to avoid calling setState during render
+  // Note: onFilterChange and filteredData are intentionally NOT in deps to avoid infinite loops
+  // We use filteredDataKey as a stable proxy to detect actual filter changes
+  // biome-ignore lint/correctness/useExhaustiveDependencies: intentional - using filteredDataKey as stable proxy for filteredData changes
   useEffect(() => {
-    if (onFilterChange) {
+    if (onFilterChange && filteredData.length > 0) {
       onFilterChange(filteredData);
     }
-  }, [filteredData, onFilterChange]);
+  }, [filteredDataKey]);
 
   // Handle filter model changes - always use comparison mode handler if provided
   const handleFilterChange = (model: GridFilterModel) => {

@@ -1,8 +1,4 @@
-import BarChartIcon from "@mui/icons-material/BarChart";
-import ElectricBoltIcon from "@mui/icons-material/ElectricBolt";
-import SpeedIcon from "@mui/icons-material/Speed";
-import TimelineIcon from "@mui/icons-material/Timeline";
-import { Button, ButtonGroup } from "@mui/material";
+// No longer need icon imports - using toggle components
 import { useQuery } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import { useCallback, useMemo, useState } from "react";
@@ -11,13 +7,13 @@ import { AzBarChart, type ChartDataRow, HistogramChart } from "../components/com
 import { DataGridWrapper } from "../components/common/data-grid";
 import { PageLayout } from "../components/common/layout";
 import { MonthYearPicker } from "../components/form";
+import { MetricModeToggle, ViewModeToggle } from "../components/ui";
 import { useComparisonMode } from "../hooks/useComparisonMode";
-import { applyThermometerOffset } from "../lib/dataTransformers";
 import { supabase } from "../lib/supabaseClient";
 import { commonHiddenColumns, getTimeSeriesColumns } from "../lib/tableHelpers";
 import type { Database } from "../types/database.types";
 
-type DailyValue = Database["public"]["Views"]["daily_values"]["Row"];
+type DailyValue = Database["public"]["Views"]["daily_values_view"]["Row"];
 type ViewMode = "timeSeries" | "distribution";
 type MetricMode = "cop" | "energy";
 
@@ -46,7 +42,7 @@ export default function Monthly() {
       const end = dayjs(`${year}-${month}-01`).endOf("month").format("YYYY-MM-DD");
 
       const { data, error } = await supabase
-        .from("daily_values")
+        .from("daily_values_view")
         .select("*")
         .gte("date", start)
         .lte("date", end)
@@ -54,14 +50,8 @@ export default function Monthly() {
 
       if (error) throw error;
 
-      // Apply thermometer offset correction to outdoor temperature
-      return (data as DailyValue[]).map((row) => {
-        const offset = row.thermometer_offset_k;
-        return {
-          ...row,
-          outdoor_temperature_c: applyThermometerOffset(row.outdoor_temperature_c, offset),
-        };
-      });
+      // outdoor_temperature_c is already corrected in the view
+      return data as DailyValue[];
     },
   });
 
@@ -77,12 +67,6 @@ export default function Monthly() {
     filteredDataForChart,
     dataGridComparisonProps,
   } = useComparisonMode(data);
-
-  // Sort data (not used)
-  const sortedData = useMemo(() => {
-    if (!data) return [];
-    return data;
-  }, [data]);
 
   // Get the data to use for histogram (filtered if available)
   const histogramDataSource = useMemo(() => {
@@ -104,38 +88,8 @@ export default function Monthly() {
       filters={
         <div className="filter-container">
           <MonthYearPicker month={month} year={year} onChange={handleMonthYearChange} />
-          <ButtonGroup size="small" variant="outlined">
-            <Button
-              onClick={() => setViewMode("timeSeries")}
-              variant={viewMode === "timeSeries" ? "contained" : "outlined"}
-              startIcon={<TimelineIcon />}
-            >
-              {t("charts.timeSeries")}
-            </Button>
-            <Button
-              onClick={() => setViewMode("distribution")}
-              variant={viewMode === "distribution" ? "contained" : "outlined"}
-              startIcon={<BarChartIcon />}
-            >
-              {t("charts.distribution")}
-            </Button>
-          </ButtonGroup>
-          <ButtonGroup size="small" variant="outlined">
-            <Button
-              onClick={() => setMetricMode("cop")}
-              variant={metricMode === "cop" ? "contained" : "outlined"}
-              startIcon={<SpeedIcon />}
-            >
-              {t("charts.copMode")}
-            </Button>
-            <Button
-              onClick={() => setMetricMode("energy")}
-              variant={metricMode === "energy" ? "contained" : "outlined"}
-              startIcon={<ElectricBoltIcon />}
-            >
-              {t("charts.energyMode")}
-            </Button>
-          </ButtonGroup>
+          <ViewModeToggle viewMode={viewMode} onChange={setViewMode} />
+          <MetricModeToggle metricMode={metricMode} onChange={setMetricMode} />
         </div>
       }
       chart={
@@ -162,7 +116,7 @@ export default function Monthly() {
       }
     >
       <DataGridWrapper
-        rows={sortedData}
+        rows={data || []}
         columns={columns}
         loading={isLoading}
         getRowId={(row) => `${row.heating_id}-${row.date}`}

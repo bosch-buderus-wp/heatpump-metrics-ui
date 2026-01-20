@@ -43,7 +43,7 @@ describe("tableHelpers", () => {
       expect(result.azHeating).toBeNull();
     });
 
-    it("treats null thermal energy as 0 in calculation", () => {
+    it("returns null when thermal energy is null (cannot calculate COP without thermal data)", () => {
       const row = {
         thermal_energy_kwh: null,
         electrical_energy_kwh: 25,
@@ -53,8 +53,9 @@ describe("tableHelpers", () => {
 
       const result = computeAz(row);
 
-      expect(result.az).toBe(0); // 0 / 25
-      expect(result.azHeating).toBe(0); // 0 / 20
+      // Should return null because we can't calculate COP when thermal energy is missing
+      expect(result.az).toBeNull();
+      expect(result.azHeating).toBeNull();
     });
 
     it("handles realistic heat pump values", () => {

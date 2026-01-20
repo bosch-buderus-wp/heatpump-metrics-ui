@@ -1,8 +1,4 @@
-import BarChartIcon from "@mui/icons-material/BarChart";
-import ElectricBoltIcon from "@mui/icons-material/ElectricBolt";
-import SpeedIcon from "@mui/icons-material/Speed";
-import TimelineIcon from "@mui/icons-material/Timeline";
-import { Button, ButtonGroup } from "@mui/material";
+import { Checkbox, FormControlLabel } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -10,15 +6,13 @@ import { useTranslation } from "react-i18next";
 import { AzBarChart, type ChartDataRow, HistogramChart } from "../components/common/charts";
 import { DataGridWrapper } from "../components/common/data-grid";
 import { PageLayout } from "../components/common/layout";
+import { MetricModeToggle, ViewModeToggle } from "../components/ui";
 import { useComparisonMode } from "../hooks/useComparisonMode";
-import { applyThermometerOffset, flattenHeatingSystemsFields } from "../lib/dataTransformers";
 import { supabase } from "../lib/supabaseClient";
-import { commonHiddenColumns, computeAz, getTimeSeriesColumns } from "../lib/tableHelpers";
+import { commonHiddenColumns, getTimeSeriesColumns } from "../lib/tableHelpers";
 import type { Database } from "../types/database.types";
 
-type MonthlyValueWithSystem = Database["public"]["Tables"]["monthly_values"]["Row"] & {
-  heating_systems: Database["public"]["Tables"]["heating_systems"]["Row"] | null;
-};
+type MonthlyValueViewRow = Database["public"]["Views"]["monthly_values_view"]["Row"];
 type ViewMode = "timeSeries" | "distribution";
 type MetricMode = "cop" | "energy";
 
@@ -26,13 +20,13 @@ export default function Yearly() {
   const { t } = useTranslation();
   const defaultYear = Number(dayjs().subtract(1, "month").format("YYYY"));
   const [year, setYear] = useState(defaultYear);
-  const [filteredData, setFilteredData] = useState<Array<Record<string, unknown>>>([]);
+  const [filteredData, setFilteredData] = useState<MonthlyValueViewRow[]>([]);
   const [viewMode, setViewMode] = useState<ViewMode>("timeSeries");
   const [metricMode, setMetricMode] = useState<MetricMode>("cop");
   const [completeDataOnly, setCompleteDataOnly] = useState(true);
 
   // Wrap setFilteredData in useCallback to prevent infinite loops in DataGridWrapper
-  const handleFilterChange = useCallback((data: Array<Record<string, unknown>>) => {
+  const handleFilterChange = useCallback((data: MonthlyValueViewRow[]) => {
     setFilteredData(data);
   }, []);
 
@@ -50,16 +44,16 @@ export default function Yearly() {
   // Define columns for Yearly page
   const columns = useMemo(() => getTimeSeriesColumns(t, "month"), [t]);
 
-  const { data, isLoading, error } = useQuery<MonthlyValueWithSystem[]>({
+  const { data, isLoading, error } = useQuery<MonthlyValueViewRow[]>({
     queryKey: ["yearly", year],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("monthly_values")
-        .select("*, heating_systems(*)")
+        .from("monthly_values_view")
+        .select("*")
         .eq("year", year);
 
       if (error) throw error;
-      return data as MonthlyValueWithSystem[];
+      return data as MonthlyValueViewRow[];
     },
   });
 
@@ -88,7 +82,8 @@ export default function Yearly() {
 
   // Filter data to only include systems with complete data
   const completeDataFilteredData = useMemo(() => {
-    if (!data || !completeDataOnly) return data;
+    if (!data) return data;
+    if (!completeDataOnly) return data;
 
     // Count months per system
     const systemMonthCounts = new Map<string, Set<number>>();
@@ -113,30 +108,47 @@ export default function Yearly() {
       }
     });
 
-    return data.filter((row) => completeSystemIds.has(row.heating_id));
+    const filtered = data.filter((row) => row.heating_id && completeSystemIds.has(row.heating_id));
+
+    // Return original data if filter didn't remove anything to maintain reference stability
+    return filtered.length === data.length ? data : filtered;
   }, [data, completeDataOnly, expectedMonths]);
 
-  // Calculate AZ values from energy data and prepare for display
-  const sortedData = useMemo(() => {
-    if (!completeDataFilteredData) return [];
-
-    // Add calculated AZ values to each row using the shared computeAz function
-    // Also flatten heating_systems fields to top level for filtering
-    // Apply thermometer offset correction to outdoor temperatures
-    return completeDataFilteredData.map((row) => {
-      const { az, azHeating } = computeAz(row);
-      const offset = row.heating_systems?.thermometer_offset_k;
-
-      return flattenHeatingSystemsFields({
-        ...row,
-        az,
-        az_heating: azHeating,
-        outdoor_temperature_c: applyThermometerOffset(row.outdoor_temperature_c, offset),
-        outdoor_temperature_min_c: applyThermometerOffset(row.outdoor_temperature_min_c, offset),
-        outdoor_temperature_max_c: applyThermometerOffset(row.outdoor_temperature_max_c, offset),
-      });
-    });
-  }, [completeDataFilteredData]);
+  // Memoize filter section to prevent unnecessary re-renders
+  const filterSection = useMemo(
+    () => (
+      <div className="filter-container">
+        <div className="flex-center-gap-sm">
+          <select
+            id="yearly-year-select"
+            value={year}
+            onChange={(e) => setYear(Number(e.target.value))}
+            className="form-select page-filter-select-year"
+          >
+            {years.map((y) => (
+              <option key={y} value={y}>
+                {y}
+              </option>
+            ))}
+          </select>
+          {viewMode === "distribution" && (
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={completeDataOnly}
+                  onChange={(e) => setCompleteDataOnly(e.target.checked)}
+                />
+              }
+              label={t("charts.completeDataOnly")}
+            />
+          )}
+        </div>
+        <ViewModeToggle viewMode={viewMode} onChange={setViewMode} />
+        <MetricModeToggle metricMode={metricMode} onChange={setMetricMode} />
+      </div>
+    ),
+    [year, years, viewMode, metricMode, completeDataOnly, t],
+  );
 
   // Comparison mode hook - handles all filter logic
   const {
@@ -144,7 +156,7 @@ export default function Yearly() {
     comparisonGroupsForChart,
     filteredDataForChart,
     dataGridComparisonProps,
-  } = useComparisonMode(sortedData);
+  } = useComparisonMode(completeDataFilteredData);
 
   // Get the data to use for histogram (filtered if available)
   const histogramDataSource = useMemo(() => {
@@ -163,66 +175,7 @@ export default function Yearly() {
       infoKey="yearly.info"
       error={error}
       isLoading={isLoading}
-      filters={
-        <div className="filter-container">
-          <div className="flex-center-gap-sm">
-            <select
-              id="yearly-year-select"
-              value={year}
-              onChange={(e) => setYear(Number(e.target.value))}
-              className="form-select page-filter-select-year"
-            >
-              {years.map((y) => (
-                <option key={y} value={y}>
-                  {y}
-                </option>
-              ))}
-            </select>
-            {viewMode === "distribution" && (
-              <label className="page-complete-data-checkbox">
-                <input
-                  type="checkbox"
-                  checked={completeDataOnly}
-                  onChange={(e) => setCompleteDataOnly(e.target.checked)}
-                />
-                {t("charts.completeDataOnly")}
-              </label>
-            )}
-          </div>
-          <ButtonGroup size="small" variant="outlined">
-            <Button
-              onClick={() => setViewMode("timeSeries")}
-              variant={viewMode === "timeSeries" ? "contained" : "outlined"}
-              startIcon={<TimelineIcon />}
-            >
-              {t("charts.timeSeries")}
-            </Button>
-            <Button
-              onClick={() => setViewMode("distribution")}
-              variant={viewMode === "distribution" ? "contained" : "outlined"}
-              startIcon={<BarChartIcon />}
-            >
-              {t("charts.distribution")}
-            </Button>
-          </ButtonGroup>
-          <ButtonGroup size="small" variant="outlined">
-            <Button
-              onClick={() => setMetricMode("cop")}
-              variant={metricMode === "cop" ? "contained" : "outlined"}
-              startIcon={<SpeedIcon />}
-            >
-              {t("charts.copMode")}
-            </Button>
-            <Button
-              onClick={() => setMetricMode("energy")}
-              variant={metricMode === "energy" ? "contained" : "outlined"}
-              startIcon={<ElectricBoltIcon />}
-            >
-              {t("charts.energyMode")}
-            </Button>
-          </ButtonGroup>
-        </div>
-      }
+      filters={filterSection}
       chart={
         viewMode === "timeSeries" ? (
           <AzBarChart
@@ -247,7 +200,7 @@ export default function Yearly() {
       }
     >
       <DataGridWrapper
-        rows={sortedData}
+        rows={completeDataFilteredData || []}
         columns={columns}
         loading={isLoading}
         getRowId={(row) =>

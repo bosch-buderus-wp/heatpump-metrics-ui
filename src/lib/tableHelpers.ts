@@ -1,8 +1,8 @@
-import type { GridColDef } from "@mui/x-data-grid";
+import type { GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import dayjs from "dayjs";
 import type { TFunction } from "i18next";
 import React from "react";
-import { validateMeasurementData } from "./dataQuality";
+import { type DataQualityIssue, validateMeasurementData } from "./dataQuality";
 
 /**
  * Common column visibility settings for hiding system details across all pages
@@ -66,12 +66,16 @@ export function computeAz(row: EnergyRow) {
     thermal_energy_heating_kwh,
     electrical_energy_heating_kwh,
   } = row;
-  const az = electrical_energy_kwh
-    ? (thermal_energy_kwh ?? 0) / (electrical_energy_kwh || 1)
-    : null;
-  const azHeating = electrical_energy_heating_kwh
-    ? (thermal_energy_heating_kwh ?? 0) / (electrical_energy_heating_kwh || 1)
-    : null;
+  const az =
+    electrical_energy_kwh && electrical_energy_kwh > 0 && thermal_energy_kwh != null
+      ? thermal_energy_kwh / electrical_energy_kwh
+      : null;
+  const azHeating =
+    electrical_energy_heating_kwh &&
+    electrical_energy_heating_kwh > 0 &&
+    thermal_energy_heating_kwh != null
+      ? thermal_energy_heating_kwh / electrical_energy_heating_kwh
+      : null;
   return { az, azHeating };
 }
 
@@ -89,7 +93,7 @@ export function getAllDataGridColumns(t: TFunction): Record<string, GridColDef> 
       sortable: false,
       filterable: false,
       hideable: false,
-      renderCell: (params: any) => {
+      renderCell: (params: GridRenderCellParams) => {
         // Validate measurement data (same rules for hourly/daily/monthly)
         const validation = validateMeasurementData(params.row);
 
@@ -97,12 +101,14 @@ export function getAllDataGridColumns(t: TFunction): Record<string, GridColDef> 
           return null;
         }
 
-        const hasErrors = validation.issues.some((issue: any) => issue.severity === "error");
+        const hasErrors = validation.issues.some(
+          (issue: DataQualityIssue) => issue.severity === "error",
+        );
         const icon = hasErrors ? "⚠️" : "⚡";
 
         // Use translated messages if available, otherwise fall back to English message
         const title = validation.issues
-          .map((issue: any) => {
+          .map((issue: DataQualityIssue) => {
             if (issue.translationKey) {
               return t(issue.translationKey, issue.translationParams || {});
             }
@@ -198,9 +204,9 @@ export function getAllDataGridColumns(t: TFunction): Record<string, GridColDef> 
       width: 150,
       type: "number",
       valueGetter: (_value, row) => {
-        // If az is already in the row (from daily_values view), use it directly
+        // If az is already in the row (from views like daily_values_view), use it directly
+        // Otherwise compute it from energy fields (e.g., for measurement_deltas_view)
         if (row.az != null) return row.az;
-        // Otherwise compute it from energy fields
         const { az } = computeAz(row);
         return az ?? null;
       },
@@ -213,9 +219,9 @@ export function getAllDataGridColumns(t: TFunction): Record<string, GridColDef> 
       width: 160,
       type: "number",
       valueGetter: (_value, row) => {
-        // If az_heating is already in the row (from daily_values view), use it directly
+        // If az_heating is already in the row (from views like daily_values_view), use it directly
+        // Otherwise compute it from energy fields (e.g., for measurement_deltas_view)
         if (row.az_heating != null) return row.az_heating;
-        // Otherwise compute it from energy fields
         const { azHeating } = computeAz(row);
         return azHeating ?? null;
       },

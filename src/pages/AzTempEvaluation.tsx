@@ -5,12 +5,11 @@ import { AzScatterChart, type ScatterDataPoint } from "../components/common/char
 import { DataGridWrapper } from "../components/common/data-grid";
 import { PageLayout } from "../components/common/layout";
 import { useComparisonMode } from "../hooks/useComparisonMode";
-import { applyThermometerOffset } from "../lib/dataTransformers";
 import { supabase } from "../lib/supabaseClient";
 import { commonHiddenColumns, getTimeSeriesColumns } from "../lib/tableHelpers";
 import type { Database } from "../types/database.types";
 
-type DailyValue = Database["public"]["Views"]["daily_values"]["Row"];
+type DailyValue = Database["public"]["Views"]["daily_values_view"]["Row"];
 
 export default function AzTempEvaluation() {
   const { t } = useTranslation();
@@ -41,25 +40,18 @@ export default function AzTempEvaluation() {
   // Define columns for AzTempEvaluation page (same as Monthly)
   const columns = useMemo(() => getTimeSeriesColumns(t, "date"), [t]);
 
-  // Fetch all daily values with thermometer offset
+  // Fetch all daily values (outdoor_temperature_c is already corrected in the view)
   const { data, isLoading, error } = useQuery<DailyValue[]>({
     queryKey: ["daily_all"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("daily_values")
+        .from("daily_values_view")
         .select("*")
         .order("date", { ascending: false });
 
       if (error) throw error;
 
-      // Apply thermometer offset correction to outdoor temperature
-      return (data as DailyValue[]).map((row) => {
-        const offset = row.thermometer_offset_k;
-        return {
-          ...row,
-          outdoor_temperature_c: applyThermometerOffset(row.outdoor_temperature_c, offset),
-        };
-      });
+      return data as DailyValue[];
     },
   });
 
