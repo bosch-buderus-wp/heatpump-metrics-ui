@@ -69,7 +69,7 @@
       "bash -c 'npm test'"
     ],
     "*.json": [
-      "biome check --write"
+      "biome check --write --files-ignore-unknown=true"
     ]
   }
 }
