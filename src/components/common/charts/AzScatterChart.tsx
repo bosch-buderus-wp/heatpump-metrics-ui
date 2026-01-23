@@ -4,11 +4,9 @@ import { ResponsiveScatterPlot } from "@nivo/scatterplot";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useChartLegend } from "../../../hooks/useChartLegend";
-import { computeAzTemperatureRegression } from "../../../lib/chartDataProcessing";
 import { CHART_COLORS } from "../../../lib/chartTheme";
 import { filterRealisticDataForCharts } from "../../../lib/dataQuality";
-import type { RegressionResult } from "../../../lib/regressionUtils";
-import { generateCurvePoints } from "../../../lib/regressionUtils";
+import { generateLoessCurvePoints, loessSmooth } from "../../../lib/regressionUtils";
 
 export interface ScatterDataPoint {
   az?: number | null;
@@ -66,11 +64,6 @@ export function AzScatterChart({ data, currentUserId }: AzScatterChartProps) {
     }
   };
 
-  // Calculate predicted COP at given temperature
-  const predictCOP = (regression: RegressionResult, temperature: number): number => {
-    return regression.slope * temperature + regression.intercept;
-  };
-
   // Use the chart legend hook - restrict clicks to only AZ toggles
   // (regression curve and user data series should not be clickable)
   const { activeKey, legendItems, handleLegendClick } = useChartLegend({
@@ -83,8 +76,9 @@ export function AzScatterChart({ data, currentUserId }: AzScatterChartProps) {
   });
 
   // Transform data for scatter plot - create both series but only populate the active one
-  const { scatterData, regression } = useMemo(() => {
-    if (!data || data.length === 0) return { scatterData: [], activePoints: [], regression: null };
+  const { scatterData, loessSmoother } = useMemo(() => {
+    if (!data || data.length === 0)
+      return { scatterData: [], activePoints: [], loessSmoother: null };
 
     // Filter out unrealistic data before processing
     const realisticData = filterRealisticDataForCharts(data);
@@ -126,16 +120,16 @@ export function AzScatterChart({ data, currentUserId }: AzScatterChartProps) {
       })
       .filter((p) => p !== null);
 
-    // Compute regression on the active points
-    const regressionResult = computeAzTemperatureRegression(points);
+    // Create LOESS smoother for both curve and stats predictions
+    const smoother = points.length >= 3 ? loessSmooth(points, 0.25) : null;
 
-    // Generate curve points if regression is valid
+    // Generate LOESS curve points for smoother, non-linear fit
     let curveData: ScatterPointData[] = [];
-    if (regressionResult && points.length > 0) {
+    if (points.length >= 3) {
       const xValues = points.map((p) => p.x);
       const xMin = Math.min(...xValues);
       const xMax = Math.max(...xValues);
-      const curvePoints = generateCurvePoints(regressionResult, xMin, xMax, 50);
+      const curvePoints = generateLoessCurvePoints(points, xMin, xMax, 100, 0.25);
       curveData = curvePoints.map((p) => ({ x: p.x, y: p.y }));
     }
 
@@ -187,7 +181,7 @@ export function AzScatterChart({ data, currentUserId }: AzScatterChartProps) {
     return {
       scatterData: scatterSeries,
       activePoints: points as ScatterPointData[],
-      regression: regressionResult,
+      loessSmoother: smoother,
     };
   }, [data, activeKey, azHeatingKey, azTotalKey, temperatureMode, t, currentUserId]);
 
@@ -238,7 +232,7 @@ export function AzScatterChart({ data, currentUserId }: AzScatterChartProps) {
         <ResponsiveScatterPlot
           // biome-ignore lint/suspicious/noExplicitAny: Nivo's ScatterPlot type is complex
           data={scatterData as any}
-          margin={{ top: 10, right: 60, bottom: 60, left: 60 }}
+          margin={{ top: 10, right: 60, bottom: 70, left: 50 }}
           xScale={{ type: "linear", min: "auto", max: "auto" }}
           yScale={{ type: "linear", min: "auto", max: "auto" }}
           blendMode="normal"
@@ -277,7 +271,7 @@ export function AzScatterChart({ data, currentUserId }: AzScatterChartProps) {
             tickRotation: 0,
             legend: getXAxisLabel(),
             legendPosition: "middle",
-            legendOffset: 30,
+            legendOffset: 32,
           }}
           axisLeft={{
             tickSize: 5,
@@ -285,7 +279,7 @@ export function AzScatterChart({ data, currentUserId }: AzScatterChartProps) {
             tickRotation: 0,
             legend: t("charts.azValue"),
             legendPosition: "middle",
-            legendOffset: -50,
+            legendOffset: -40,
           }}
           tooltip={({ node }) => {
             const pointData = node.data as ScatterPointData;
@@ -325,8 +319,8 @@ export function AzScatterChart({ data, currentUserId }: AzScatterChartProps) {
               direction: "row",
               justify: false,
               translateX: 0,
-              translateY: 60,
-              itemsSpacing: 20,
+              translateY: 70,
+              itemsSpacing: 2,
               itemWidth: 180,
               itemHeight: 20,
               itemDirection: "left-to-right",
@@ -348,7 +342,7 @@ export function AzScatterChart({ data, currentUserId }: AzScatterChartProps) {
             },
           ]}
         />
-        {regression && (
+        {loessSmoother && (
           <div className="chart-stats chart-stats-absolute">
             <div className="chart-stats-header">
               <h3 className="chart-stats-title chart-stats-title-no-margin">
@@ -373,7 +367,7 @@ export function AzScatterChart({ data, currentUserId }: AzScatterChartProps) {
                 {/* Reference temperature predictions */}
                 <div className="chart-stats-grid">
                   {getReferenceTemperatures(temperatureMode).map((temp) => {
-                    const predictedCOP = predictCOP(regression, temp);
+                    const predictedCOP = loessSmoother(temp);
                     return (
                       <Tooltip key={temp} title={t("charts.predictedCopTooltip")} placement="top">
                         <div className="chart-stat-item">
