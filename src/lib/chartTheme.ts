@@ -14,7 +14,8 @@ export const CHART_COLORS = {
   flowTemp: "#ef4444", // Red for flow temperature
 
   // Statistical/analysis colors
-  regression: "#ff6b6b", // Red for regression curves
+  regression: "#176f50ff", // Red for regression curves (community average)
+  userRegression: "#ff99009f", // Dark orange for user's regression curve
 
   // Comparison mode colors (used for both chart bars and filter UI)
   group1: "#23a477ff", // Green for group 1 (charts and filters)

@@ -48,9 +48,15 @@
   margin-top: var(--spacing-sm);
 }
 
-.chart-stats-grid {
+.chart-stats-grid-4 {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-sm);
+}
+
+.chart-stats-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: var(--spacing-sm);
 }
 
@@ -133,7 +139,6 @@
   flex-direction: column;
   align-items: flex-end;
   gap: var(--spacing-sm);
-  margin-top: var(--spacing-lg);
   margin-left: auto;
   margin-right: var(--spacing-lg);
   padding: var(--spacing-md) var(--spacing-lg);

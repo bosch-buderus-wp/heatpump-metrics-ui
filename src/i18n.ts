@@ -24,6 +24,8 @@ const resources = {
         measurements: "Messwerte",
         systems: "Anlagen",
         daily: "Tageswerte",
+        azTempEvaluation: "AZ-Temperatur",
+        heatingCurve: "Heizkurve",
         myAccount: "Mein Konto",
         login: "Anmelden",
         logout: "Abmelden",
@@ -175,6 +177,16 @@ const resources = {
       azTempEvaluation: {
         title: "Arbeitszahl-Temperatur-Analyse",
         info: "Streudiagramm zur Visualisierung des Zusammenhangs zwischen Arbeitszahl und Temperatur.",
+      },
+      heatingCurve: {
+        title: "Heizkurve",
+        info: "Streudiagramm zur Visualisierung des Zusammenhangs zwischen Vorlauftemperatur und Außentemperatur.",
+        chartLegend: "Vorlauftemperatur",
+        statsTitle: "Vorlauftemperatur",
+        flowAt: "VT bei",
+        predictedFlowTooltip: "Vorhergesagte Vorlauftemperatur basierend auf der Regressionskurve",
+        myRegressionCurve: "Meine Heizkurve",
+        regressionCurve: "Durchschnittliche Heizkurve",
       },
       auth: {
         email: "E-Mail",
@@ -430,6 +442,8 @@ const resources = {
         measurements: "Measurements",
         systems: "Heating Systems",
         daily: "Daily Values",
+        azTempEvaluation: "COP-Temperature",
+        heatingCurve: "Heating Curve",
         myAccount: "My Account",
         login: "Login",
         logout: "Logout",
@@ -453,6 +467,15 @@ const resources = {
       azTempEvaluation: {
         title: "COP-Temperature Analysis",
         info: "Scatter plot visualizing the relationship between COP and temperature.",
+      },
+      heatingCurve: {
+        title: "Heating Curve",
+        info: "Scatter plot visualizing the relationship between flow temperature and outdoor temperature.",
+        chartLegend: "Flow Temperature",
+        statsTitle: "Flow Temperature",
+        flowAt: "Flow at",
+        predictedFlowTooltip: "Predicted flow temperature based on regression curve",
+        myRegressionCurve: "My Regression Curve",
       },
       common: {
         date: "Date",

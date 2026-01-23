@@ -365,7 +365,7 @@ export function AzScatterChart({ data, currentUserId }: AzScatterChartProps) {
             {statsExpanded && (
               <div className="chart-stats-expanded">
                 {/* Reference temperature predictions */}
-                <div className="chart-stats-grid">
+                <div className="chart-stats-grid-4">
                   {getReferenceTemperatures(temperatureMode).map((temp) => {
                     const predictedCOP = loessSmoother(temp);
                     return (

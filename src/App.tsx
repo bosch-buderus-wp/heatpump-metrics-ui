@@ -4,6 +4,7 @@ import { Layout } from "./components/common/layout";
 import AuthCallback from "./pages/AuthCallback";
 import AzTempEvaluation from "./pages/AzTempEvaluation";
 import Daily from "./pages/Daily";
+import HeatingCurve from "./pages/HeatingCurve";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Monthly from "./pages/Monthly";
@@ -23,6 +24,7 @@ export default function App() {
         <Route path="/daily" element={<Daily />} />
         <Route path="/systems" element={<Systems />} />
         <Route path="/az-temp-evaluation" element={<AzTempEvaluation />} />
+        <Route path="/heating-curve" element={<HeatingCurve />} />
         <Route path="/login" element={<Login />} />
         <Route path="/my-account" element={<MyAccount />} />
         <Route path="/auth/callback" element={<AuthCallback />} />
