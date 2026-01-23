@@ -205,7 +205,7 @@ export function HeatingCurveChart({ data, currentUserId }: HeatingCurveChartProp
     }
 
     return items;
-  }, [heatingCurveKey, barColor, userColor, currentUserId, scatterData, t]);
+  }, [heatingCurveKey, currentUserId, scatterData, t]);
 
   if (!data || data.length === 0) {
     return (
