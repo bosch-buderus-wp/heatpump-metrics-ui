@@ -133,6 +133,7 @@ export default function Yearly() {
           </select>
           {viewMode === "distribution" && (
             <FormControlLabel
+              className="page-complete-data-checkbox"
               control={
                 <Checkbox
                   checked={completeDataOnly}
