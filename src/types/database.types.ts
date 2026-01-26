@@ -596,3 +596,16 @@ export const Constants = {
     },
   },
 } as const;
+
+// Additional types for postal codes and heating systems with location
+export interface PostalCode {
+  postal_code: string;
+  country: string;
+  latitude_deg: number;
+  longitude_deg: number;
+}
+
+export interface HeatingSystemWithLocation extends Tables<"heating_systems"> {
+  latitude_deg: number | null;
+  longitude_deg: number | null;
+}

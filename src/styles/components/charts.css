@@ -185,3 +185,132 @@
   font-weight: 700;
   color: var(--primary-color);
 }
+
+/* Geo Map Styles */
+.geo-map-container {
+  width: 100%;
+  height: 400px;
+  position: relative;
+  user-select: none;
+}
+
+.geo-map-container--dragging {
+  cursor: grabbing;
+}
+
+.geo-map-container--idle {
+  cursor: grab;
+}
+
+.geo-map-zoom-controls {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: var(--radius-base);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.geo-map-zoom-btn-top {
+  border-radius: 4px 4px 0 0;
+}
+
+.geo-map-zoom-btn-bottom {
+  border-radius: 0 0 4px 4px;
+}
+
+/* Geo Map Popover */
+.geo-map-popover {
+  padding: 10px;
+  max-width: 260px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  border-radius: var(--radius-lg);
+}
+
+.geo-map-popover-header {
+  margin-bottom: 4px;
+  font-size: 13px;
+}
+
+.geo-map-popover-names {
+  margin-bottom: 6px;
+  max-height: 100px;
+  overflow-y: auto;
+}
+
+.geo-map-popover-more {
+  font-size: 10px;
+}
+
+.geo-map-popover-single-name {
+  font-weight: 500;
+  font-size: 12px;
+}
+
+.geo-map-popover-details {
+  border-top: 1px solid var(--divider-color, rgba(0, 0, 0, 0.12));
+  padding-top: 4px;
+}
+
+/* Geo Map Info Row */
+.geo-map-info-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  line-height: 1.3;
+}
+
+.geo-map-info-row .MuiSvgIcon-root {
+  font-size: 13px;
+  color: var(--text-secondary, rgba(0, 0, 0, 0.6));
+}
+
+.geo-map-info-value {
+  color: var(--text-secondary, rgba(0, 0, 0, 0.6));
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 200px;
+  font-size: 11px;
+  line-height: 1.3;
+}
+
+/* Geo Map System Name Link */
+.geo-map-system-link {
+  font-size: 12px;
+  cursor: pointer;
+  text-decoration: underline;
+  display: block;
+  padding: 1px 0;
+  line-height: 1.4;
+}
+
+.geo-map-system-link--selected {
+  font-weight: 600;
+  color: var(--primary-color);
+  text-decoration-color: var(--primary-color);
+}
+
+.geo-map-system-link--unselected {
+  font-weight: 400;
+  color: var(--text-primary, rgba(0, 0, 0, 0.87));
+  text-decoration-color: transparent;
+}
+
+.geo-map-system-link:hover {
+  color: var(--primary-color);
+  text-decoration-color: var(--primary-color);
+}
+
+/* Geo Map Marker Styles */
+.geo-map-marker-text {
+  font-size: 11px;
+  font-weight: bold;
+  fill: white;
+  pointer-events: none;
+  user-select: none;
+}

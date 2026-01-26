@@ -6,3 +6,4 @@ export type { HeatingCurveDataPoint } from "./HeatingCurveChart";
 export { HeatingCurveChart } from "./HeatingCurveChart";
 export type { HistogramBin } from "./HistogramChart";
 export { HistogramChart } from "./HistogramChart";
+export { SystemsGeoMap } from "./SystemsGeoMap";

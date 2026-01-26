@@ -50,6 +50,7 @@ const resources = {
         previousDay: "Vorheriger Tag",
         nextDay: "Nächster Tag",
         confirm: "Bestätigen",
+        andMore: "... und {{count}} weitere",
         az_short: "AZ",
         az: "Arbeitszahl",
         azTotal: "Arbeitszahl (gesamt)",
@@ -161,6 +162,9 @@ const resources = {
       systems: {
         title: "Heizungsanlagen",
         info: "Übersicht aller eingetragenen Heizungsanlagen",
+        unnamedSystem: "Unbenannte Anlage",
+        systemDetails: "Anlagendetails",
+        systemsAtLocation: "{{count}} Anlagen an diesem Ort",
       },
       yearly: {
         title: "Jahresübersicht",
@@ -451,6 +455,9 @@ const resources = {
       systems: {
         title: "Heating Systems",
         info: "Overview of all registered heating systems",
+        unnamedSystem: "Unnamed System",
+        systemDetails: "System Details",
+        systemsAtLocation: "{{count}} systems at this location",
       },
       yearly: {
         title: "Yearly Overview",
@@ -497,6 +504,7 @@ const resources = {
         previousDay: "Previous Day",
         nextDay: "Next Day",
         confirm: "Confirm",
+        andMore: "... and {{count}} more",
         az_short: "COP",
         az: "COP",
         azTotal: "COP (total)",
