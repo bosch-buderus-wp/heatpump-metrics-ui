@@ -9,6 +9,7 @@ import { PageLayout } from "../components/common/layout";
 import { MonthYearPicker } from "../components/form";
 import { MetricModeToggle, ViewModeToggle } from "../components/ui";
 import { useComparisonMode } from "../hooks/useComparisonMode";
+import { createFilterValueResolver } from "../lib/filterValueResolver";
 import { supabase } from "../lib/supabaseClient";
 import { commonHiddenColumns, getTimeSeriesColumns } from "../lib/tableHelpers";
 import type { Database } from "../types/database.types";
@@ -34,6 +35,10 @@ export default function Monthly() {
 
   // Define columns for Monthly page
   const columns = useMemo(() => getTimeSeriesColumns(t, "date"), [t]);
+  const filterValueResolver = useMemo(
+    () => createFilterValueResolver<DailyValue>(columns),
+    [columns],
+  );
 
   const { data, isLoading, error } = useQuery<DailyValue[]>({
     queryKey: ["daily", month, year],
@@ -66,7 +71,7 @@ export default function Monthly() {
     comparisonGroupsForChart,
     filteredDataForChart,
     dataGridComparisonProps,
-  } = useComparisonMode(data);
+  } = useComparisonMode(data, filterValueResolver);
 
   // Get the data to use for histogram (filtered if available)
   const histogramDataSource = useMemo(() => {

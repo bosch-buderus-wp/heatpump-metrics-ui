@@ -8,6 +8,7 @@ import { DataGridWrapper } from "../components/common/data-grid";
 import { PageLayout } from "../components/common/layout";
 import { MetricModeToggle, ViewModeToggle } from "../components/ui";
 import { useComparisonMode } from "../hooks/useComparisonMode";
+import { createFilterValueResolver } from "../lib/filterValueResolver";
 import { supabase } from "../lib/supabaseClient";
 import { commonHiddenColumns, getTimeSeriesColumns } from "../lib/tableHelpers";
 import type { Database } from "../types/database.types";
@@ -43,6 +44,10 @@ export default function Yearly() {
 
   // Define columns for Yearly page
   const columns = useMemo(() => getTimeSeriesColumns(t, "month"), [t]);
+  const filterValueResolver = useMemo(
+    () => createFilterValueResolver<MonthlyValueViewRow>(columns),
+    [columns],
+  );
 
   const { data, isLoading, error } = useQuery<MonthlyValueViewRow[]>({
     queryKey: ["yearly", year],
@@ -157,7 +162,7 @@ export default function Yearly() {
     comparisonGroupsForChart,
     filteredDataForChart,
     dataGridComparisonProps,
-  } = useComparisonMode(completeDataFilteredData);
+  } = useComparisonMode(completeDataFilteredData, filterValueResolver);
 
   // Get the data to use for histogram (filtered if available)
   const histogramDataSource = useMemo(() => {

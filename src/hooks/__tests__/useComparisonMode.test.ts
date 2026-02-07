@@ -129,6 +129,55 @@ describe("useComparisonMode", () => {
       expect(filtered.every((row) => row.az > 3)).toBe(true);
     });
 
+    it("should filter data using a custom resolver", () => {
+      const mockData = [
+        { id: 1, az_heating: 3.7 },
+        { id: 2, az_heating: 4.4 },
+        { id: 3, az_heating: 4.0 },
+      ];
+
+      const resolver = (row: { az_heating?: number }, field: string) => {
+        if (field === "azHeating") return row.az_heating;
+        return (row as Record<string, unknown>)[field];
+      };
+
+      const { result } = renderHook(() => useComparisonMode(mockData, resolver));
+
+      const filterModel: GridFilterModel = {
+        items: [{ field: "azHeating", operator: ">", value: 4 }],
+      };
+
+      const filtered = result.current.applyFiltersToData(mockData, filterModel);
+      expect(filtered.length).toBe(1);
+      expect(filtered[0].az_heating).toBe(4.4);
+    });
+
+    it("should ignore incomplete filter items like DataGrid does", () => {
+      const mockData = [
+        { id: 1, az_heating: 3.7, name: "A" },
+        { id: 2, az_heating: 4.4, name: "B" },
+        { id: 3, az_heating: 4.0, name: "C" },
+      ];
+
+      const resolver = (row: { az_heating?: number; name?: string }, field: string) => {
+        if (field === "azHeating") return row.az_heating;
+        return (row as Record<string, unknown>)[field];
+      };
+
+      const { result } = renderHook(() => useComparisonMode(mockData, resolver));
+
+      const filterModel: GridFilterModel = {
+        items: [
+          { field: "azHeating", operator: ">", value: 3 },
+          // Simulates a second, not yet configured filter row in DataGrid UI
+          { field: "name", operator: "contains", value: "" },
+        ],
+      };
+
+      const filtered = result.current.applyFiltersToData(mockData, filterModel);
+      expect(filtered.length).toBe(3);
+    });
+
     it("should filter data with '>=' operator", () => {
       const mockData = [
         { id: 1, az: 2.5, name: "Low" },

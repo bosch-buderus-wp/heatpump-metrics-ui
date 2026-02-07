@@ -5,6 +5,7 @@ import { AzScatterChart, type ScatterDataPoint } from "../components/common/char
 import { DataGridWrapper } from "../components/common/data-grid";
 import { PageLayout } from "../components/common/layout";
 import { useComparisonMode } from "../hooks/useComparisonMode";
+import { createFilterValueResolver } from "../lib/filterValueResolver";
 import { supabase } from "../lib/supabaseClient";
 import { commonHiddenColumns, getTimeSeriesColumns } from "../lib/tableHelpers";
 import type { Database } from "../types/database.types";
@@ -39,6 +40,10 @@ export default function AzTempEvaluation() {
 
   // Define columns for AzTempEvaluation page (same as Monthly)
   const columns = useMemo(() => getTimeSeriesColumns(t, "date"), [t]);
+  const filterValueResolver = useMemo(
+    () => createFilterValueResolver<DailyValue>(columns),
+    [columns],
+  );
 
   // Fetch all daily values (outdoor_temperature_c is already corrected in the view)
   const { data, isLoading, error } = useQuery<DailyValue[]>({
@@ -56,7 +61,7 @@ export default function AzTempEvaluation() {
   });
 
   // Use comparison mode hook
-  const { dataGridComparisonProps } = useComparisonMode(data);
+  const { dataGridComparisonProps } = useComparisonMode(data, filterValueResolver);
 
   // Prepare scatter plot data (use filtered data if available)
   const scatterData: ScatterDataPoint[] = useMemo(() => {

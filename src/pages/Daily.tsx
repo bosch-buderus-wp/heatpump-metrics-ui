@@ -9,6 +9,7 @@ import { ConfirmDialog, MetricModeToggle, ViewModeToggle } from "../components/u
 import { useComparisonMode } from "../hooks/useComparisonMode";
 import { useDeleteMeasurement } from "../hooks/useDeleteOperations";
 import { filterRealisticDataForCharts } from "../lib/dataQuality";
+import { createFilterValueResolver } from "../lib/filterValueResolver";
 import { supabase } from "../lib/supabaseClient";
 import { commonHiddenColumns, getTimeSeriesColumns } from "../lib/tableHelpers";
 import type { Database } from "../types/database.types";
@@ -37,6 +38,10 @@ export default function Daily() {
 
   // Define columns for Daily page
   const columns = useMemo(() => getTimeSeriesColumns(t, "time"), [t]);
+  const filterValueResolver = useMemo(
+    () => createFilterValueResolver<MeasurementDeltaRow>(columns),
+    [columns],
+  );
 
   // Memoize filter section to prevent recreating on every render
   const filterSection = useMemo(
@@ -134,7 +139,7 @@ export default function Daily() {
     comparisonGroupsForChart,
     filteredDataForChart,
     dataGridComparisonProps,
-  } = useComparisonMode(sortedData);
+  } = useComparisonMode(sortedData, filterValueResolver);
 
   // Filter out unrealistic data for charts (hourly data)
   const realisticDataForChart = useMemo(() => {
