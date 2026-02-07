@@ -198,6 +198,7 @@ export function HistogramChart({
         indexBy="binLabel"
         margin={{ top: 10, right: 60, bottom: 70, left: 50 }}
         padding={0.3}
+        borderRadius={4}
         valueScale={{ type: "linear" }}
         indexScale={{ type: "band", round: true }}
         colors={barColor}
