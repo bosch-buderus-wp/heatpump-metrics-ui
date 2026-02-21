@@ -1,7 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { AzScatterChart, type ScatterDataPoint } from "../components/common/charts";
+import {
+  AzYearlyEnergyScatterChart,
+  type YearlyEnergyScatterDataPoint,
+} from "../components/common/charts";
 import { DataGridWrapper } from "../components/common/data-grid";
 import { PageLayout } from "../components/common/layout";
 import { useComparisonMode } from "../hooks/useComparisonMode";
@@ -10,13 +13,16 @@ import { supabase } from "../lib/supabaseClient";
 import { commonHiddenColumns, getTimeSeriesColumns } from "../lib/tableHelpers";
 import type { Database } from "../types/database.types";
 
-type DailyValue = Database["public"]["Views"]["daily_values_view"]["Row"];
+type MonthlyValue = Database["public"]["Views"]["monthly_values_view"]["Row"];
 
-export default function AzTempEvaluation() {
+export default function AzEnergyEvaluation() {
   const { t } = useTranslation();
-  const [filteredData, setFilteredData] = useState<DailyValue[] | null>(null);
+  const [filteredData, setFilteredData] = useState<MonthlyValue[] | null>(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth() + 1;
 
   // Get current user's ID
   useEffect(() => {
@@ -26,7 +32,7 @@ export default function AzTempEvaluation() {
   }, []);
 
   // Debounced filter change handler to prevent rapid updates
-  const handleFilterChange = useCallback((data: DailyValue[]) => {
+  const handleFilterChange = useCallback((data: MonthlyValue[]) => {
     // Clear any existing timeout
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
@@ -38,25 +44,29 @@ export default function AzTempEvaluation() {
     }, 300);
   }, []);
 
-  // Define columns for AzTempEvaluation page (same as Monthly)
-  const columns = useMemo(() => getTimeSeriesColumns(t, "date"), [t]);
+  // Define columns
+  const columns = useMemo(() => getTimeSeriesColumns(t, "month"), [t]);
   const filterValueResolver = useMemo(
-    () => createFilterValueResolver<DailyValue>(columns),
+    () => createFilterValueResolver<MonthlyValue>(columns),
     [columns],
   );
 
-  // Fetch all daily values (outdoor_temperature_c is already corrected in the view)
-  const { data, isLoading, error } = useQuery<DailyValue[]>({
-    queryKey: ["daily_all"],
+  // Fetch monthly values except the current (potentially incomplete) month
+  const { data, isLoading, error } = useQuery<MonthlyValue[]>({
+    queryKey: ["monthly_all_for_az_energy", currentYear, currentMonth],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("daily_values_view")
+        .from("monthly_values_view")
         .select("*")
-        .order("date", { ascending: false });
+        .not("year", "is", null)
+        .not("month", "is", null)
+        .or(`year.lt.${currentYear},and(year.eq.${currentYear},month.lt.${currentMonth})`)
+        .order("year", { ascending: false })
+        .order("month", { ascending: false });
 
       if (error) throw error;
 
-      return data as DailyValue[];
+      return data as MonthlyValue[];
     },
   });
 
@@ -64,29 +74,29 @@ export default function AzTempEvaluation() {
   const { dataGridComparisonProps } = useComparisonMode(data, filterValueResolver);
 
   // Prepare scatter plot data (use filtered data if available)
-  const scatterData: ScatterDataPoint[] = useMemo(() => {
+  const scatterData: YearlyEnergyScatterDataPoint[] = useMemo(() => {
     const dataToUse = filteredData !== null ? filteredData : data || [];
     return dataToUse.map((row) => ({
       heating_id: row.heating_id,
       user_id: row.user_id,
       name: row.name,
-      date: row.date,
-      az: row.az,
-      az_heating: row.az_heating,
-      outdoor_temperature_c: row.outdoor_temperature_c,
-      flow_temperature_c: row.flow_temperature_c,
+      year: row.year,
+      month: row.month,
+      heated_area_m2: row.heated_area_m2,
+      thermal_energy_heating_kwh: row.thermal_energy_heating_kwh,
+      electrical_energy_heating_kwh: row.electrical_energy_heating_kwh,
     }));
   }, [data, filteredData]);
 
   // Memoize the chart component to prevent unnecessary re-renders
   const chartComponent = useMemo(() => {
-    return <AzScatterChart data={scatterData} currentUserId={currentUserId} />;
+    return <AzYearlyEnergyScatterChart data={scatterData} currentUserId={currentUserId} />;
   }, [scatterData, currentUserId]);
 
   return (
     <PageLayout
-      titleKey="azTempEvaluation.title"
-      infoKey="azTempEvaluation.info"
+      titleKey="azEnergyEvaluation.title"
+      infoKey="azEnergyEvaluation.info"
       error={error}
       isLoading={isLoading}
       chart={chartComponent}
@@ -95,7 +105,11 @@ export default function AzTempEvaluation() {
         rows={data || []}
         columns={columns}
         loading={isLoading}
-        getRowId={(row) => `${row.heating_id}-${row.date}`}
+        getRowId={(row) =>
+          typeof row.id === "string" || typeof row.id === "number"
+            ? row.id
+            : `${row.heating_id}-${row.month}-${row.year}`
+        }
         columnVisibilityModel={commonHiddenColumns}
         onFilterChange={handleFilterChange}
         {...dataGridComparisonProps}

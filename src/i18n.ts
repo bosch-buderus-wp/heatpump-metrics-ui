@@ -25,6 +25,7 @@ const resources = {
         systems: "Anlagen",
         daily: "Tageswerte",
         azTempEvaluation: "AZ-Temperatur",
+        azEnergyEvaluation: "AZ-Jahresenergie",
         heatingCurve: "Heizkurve",
         myAccount: "Mein Konto",
         login: "Anmelden",
@@ -76,10 +77,17 @@ const resources = {
         monthlyEnergyStats: "Monatsverbrauch",
         yearlyEnergyStats: "Jahresverbrauch",
         azTempStats: "Arbeitszahlen",
+        azYearlyEnergyStats: "Arbeitszahlen",
         showStats: "Statistiken anzeigen",
         hideStats: "Statistiken ausblenden",
         regressionCurve: "Trendlinie",
         predictedCopTooltip: "Vorhergesagte AZ bei dieser Temperatur basierend auf Regression",
+        predictedCopTooltipEnergy:
+          "Vorhergesagte AZ bei dieser Jahresheizenergie pro m² basierend auf Regression",
+        yearlyHeatingEnergyPerArea: "Jahresheizenergie pro m²",
+        coverage: "Jahresanteil (gewichtet)",
+        observedMonths: "Beobachtete Kalendermonate",
+        extrapolatedFromPartialYear: "Aus Teiljahr hochgerechnet",
         myPrefix: "Meine ",
         metricMode: "Metrik",
         copMode: "Arbeitszahl",
@@ -181,6 +189,10 @@ const resources = {
       azTempEvaluation: {
         title: "Arbeitszahl-Temperatur-Analyse",
         info: "Streudiagramm zur Visualisierung des Zusammenhangs zwischen Arbeitszahl und Temperatur.",
+      },
+      azEnergyEvaluation: {
+        title: "Arbeitszahl-Jahresheizenergie-Analyse",
+        info: "Streudiagramm zur Visualisierung des Zusammenhangs zwischen Jahresheizenergie pro m² und Arbeitszahl (Heizung). Unvollständige Monatswerte werden auf das Kalenderjahr hochgerechnet. Die Hochrechnung nutzt saisonale Monatsgewichte (Winter höher, Sommer niedriger).",
       },
       heatingCurve: {
         title: "Heizkurve",
@@ -447,6 +459,7 @@ const resources = {
         systems: "Heating Systems",
         daily: "Daily Values",
         azTempEvaluation: "COP-Temperature",
+        azEnergyEvaluation: "COP-Yearly Energy",
         heatingCurve: "Heating Curve",
         myAccount: "My Account",
         login: "Login",
@@ -474,6 +487,10 @@ const resources = {
       azTempEvaluation: {
         title: "COP-Temperature Analysis",
         info: "Scatter plot visualizing the relationship between COP and temperature.",
+      },
+      azEnergyEvaluation: {
+        title: "COP-Yearly Heating Energy Analysis",
+        info: "Scatter plot visualizing the relationship between yearly heating energy per m² and COP (Heating). Incomplete monthly values are annualized to the calendar year. The annualization uses seasonal monthly weights (winter higher, summer lower).",
       },
       heatingCurve: {
         title: "Heating Curve",
@@ -530,10 +547,17 @@ const resources = {
         monthlyEnergyStats: "Monthly Consumption",
         yearlyEnergyStats: "Yearly Consumption",
         azTempStats: "COPs",
+        azYearlyEnergyStats: "COPs",
         showStats: "Show Statistics",
         hideStats: "Hide Statistics",
         regressionCurve: "Fitted Curve",
         predictedCopTooltip: "Predicted COP at this temperature based on regression",
+        predictedCopTooltipEnergy:
+          "Predicted COP at this yearly heating energy per m² based on regression",
+        yearlyHeatingEnergyPerArea: "Yearly heating energy per m²",
+        coverage: "Weighted year share",
+        observedMonths: "Observed calendar months",
+        extrapolatedFromPartialYear: "Extrapolated from partial year",
         myPrefix: "My ",
         metricMode: "Metric",
         copMode: "COP",

@@ -238,6 +238,85 @@ export function loessSmooth(data: DataPoint[], bandwidth = 0.3): ((x: number) =>
 }
 
 /**
+ * Compute weighted LOESS smoothing.
+ * Point weights are multiplied with the tricube distance weights.
+ *
+ * @param data - Array of {x, y} data points
+ * @param pointWeights - Per-point weights (same length as data, values > 0)
+ * @param bandwidth - Fraction of data to use for each local fit
+ * @returns Function that computes smoothed y value for any x
+ */
+export function loessSmoothWeighted(
+  data: DataPoint[],
+  pointWeights: number[],
+  bandwidth = 0.3,
+): ((x: number) => number) | null {
+  if (!data || data.length < 3 || pointWeights.length !== data.length) {
+    return null;
+  }
+
+  const weightedData = data.map((point, index) => ({
+    ...point,
+    weight: Math.max(0, Number.isFinite(pointWeights[index]) ? pointWeights[index] : 0),
+  }));
+
+  // Keep only positively weighted points
+  const filteredData = weightedData.filter((point) => point.weight > 0);
+  if (filteredData.length < 3) {
+    return null;
+  }
+
+  const sortedData = [...filteredData].sort((a, b) => a.x - b.x);
+  const n = sortedData.length;
+  const k = Math.max(3, Math.floor(bandwidth * n));
+
+  return (x: number): number => {
+    const distances = sortedData.map((point, index) => ({
+      index,
+      distance: Math.abs(point.x - x),
+    }));
+    distances.sort((a, b) => a.distance - b.distance);
+
+    const neighbors = distances.slice(0, k);
+    const maxDist = neighbors[k - 1].distance;
+
+    const weights = neighbors.map((neighbor) => {
+      const tricube = tricubeWeight(neighbor.distance, maxDist);
+      const pointWeight = sortedData[neighbor.index].weight;
+      return tricube * pointWeight;
+    });
+
+    const neighborPoints = neighbors.map((neighbor) => sortedData[neighbor.index]);
+
+    const sumW = weights.reduce((sum, weight) => sum + weight, 0);
+    if (sumW === 0) return sortedData[0].y;
+
+    const sumWX = neighborPoints.reduce((sum, point, index) => sum + weights[index] * point.x, 0);
+    const sumWY = neighborPoints.reduce((sum, point, index) => sum + weights[index] * point.y, 0);
+    const sumWXX = neighborPoints.reduce(
+      (sum, point, index) => sum + weights[index] * point.x * point.x,
+      0,
+    );
+    const sumWXY = neighborPoints.reduce(
+      (sum, point, index) => sum + weights[index] * point.x * point.y,
+      0,
+    );
+
+    const meanWX = sumWX / sumW;
+    const meanWY = sumWY / sumW;
+
+    const denominator = sumWXX - meanWX * sumWX;
+    if (Math.abs(denominator) < 1e-10) {
+      return meanWY;
+    }
+
+    const slope = (sumWXY - meanWX * sumWY) / denominator;
+    const intercept = meanWY - slope * meanWX;
+    return slope * x + intercept;
+  };
+}
+
+/**
  * Generate LOESS curve points for visualization.
  *
  * @param data - Original data points

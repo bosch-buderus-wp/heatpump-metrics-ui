@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import "./i18n";
 import { Layout } from "./components/common/layout";
 import AuthCallback from "./pages/AuthCallback";
+import AzEnergyEvaluation from "./pages/AzEnergyEvaluation";
 import AzTempEvaluation from "./pages/AzTempEvaluation";
 import Daily from "./pages/Daily";
 import HeatingCurve from "./pages/HeatingCurve";
@@ -24,6 +25,7 @@ export default function App() {
         <Route path="/daily" element={<Daily />} />
         <Route path="/systems" element={<Systems />} />
         <Route path="/az-temp-evaluation" element={<AzTempEvaluation />} />
+        <Route path="/az-energy-evaluation" element={<AzEnergyEvaluation />} />
         <Route path="/heating-curve" element={<HeatingCurve />} />
         <Route path="/login" element={<Login />} />
         <Route path="/my-account" element={<MyAccount />} />
