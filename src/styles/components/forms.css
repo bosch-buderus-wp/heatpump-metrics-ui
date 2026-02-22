@@ -104,6 +104,22 @@
   flex: 1;
 }
 
+/* Give labels more room in MonthlyEditor rows; inputs are short numeric values */
+.monthly-editor-fields-container .row.wide {
+  grid-template-columns: minmax(360px, 1fr) 170px auto;
+}
+
+.monthly-editor-field-wrapper .number-input-with-unit-wrapper {
+  width: 170px;
+  max-width: 170px;
+  min-width: 170px;
+  flex: 0 0 auto;
+}
+
+.monthly-editor-fields-container .row.wide > .monthly-editor-field-wrapper {
+  justify-self: end;
+}
+
 .monthly-editor-error {
   color: var(--error-color);
   font-size: var(--font-sm);

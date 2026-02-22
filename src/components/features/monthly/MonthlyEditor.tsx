@@ -230,6 +230,7 @@ export function MonthlyEditor({
                   onChange={(value) => setField(k as keyof MonthlyValue, value)}
                   unit={unit}
                   hasError={hasError !== undefined}
+                  displayDecimals={1}
                 />
                 {hasError && <span className="monthly-editor-error">⚠ {hasError}</span>}
               </div>

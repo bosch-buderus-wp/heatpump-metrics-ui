@@ -10,6 +10,7 @@ interface NumberInputWithUnitProps {
   disabled?: boolean;
   style?: React.CSSProperties;
   hasError?: boolean;
+  displayDecimals?: number;
 }
 
 export function NumberInputWithUnit({
@@ -24,13 +25,21 @@ export function NumberInputWithUnit({
   disabled = false,
   style,
   hasError = false,
+  displayDecimals,
 }: NumberInputWithUnitProps) {
+  const displayValue =
+    value == null
+      ? ""
+      : typeof displayDecimals === "number"
+        ? Math.round(value * 10 ** displayDecimals) / 10 ** displayDecimals
+        : value;
+
   return (
     <div className="number-input-with-unit-wrapper">
       <input
         id={id}
         type="number"
-        value={value ?? ""}
+        value={displayValue}
         onChange={(e) => onChange(e.target.value ? Number(e.target.value) : null)}
         placeholder={placeholder}
         min={min}

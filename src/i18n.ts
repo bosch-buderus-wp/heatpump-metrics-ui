@@ -405,10 +405,10 @@ const resources = {
       monthlyForm: {
         autoCalculatedInfo:
           "Diese Monatswerte wurden mit Hilfe der hochgeladenen Messwerte bestimmt (Letzte Aktualisierung: {{date}})",
-        electricalEnergy: "Eingesetzte el. Energie",
-        thermalEnergy: "Erzeugte Wärmeenergie",
-        electricalEnergyHeating: "Eingesetzte el. Energie Heizung",
-        thermalEnergyHeating: "Erzeugte Wärmeenergie Heizung",
+        electricalEnergy: "Eingesetzte el. Energie (Strom)",
+        thermalEnergy: "Erzeugte Wärmeenergie (Wärme)",
+        electricalEnergyHeating: "Eingesetzte el. Energie (Strom) - nur Heizung",
+        thermalEnergyHeating: "Erzeugte Wärmeenergie (Wärme) - nur Heizung",
         outdoorTempAvg: "Außentemperatur Ø",
         outdoorTempMin: "Außentemperatur min",
         outdoorTempMax: "Außentemperatur max",
@@ -847,10 +847,10 @@ const resources = {
       monthlyForm: {
         autoCalculatedInfo:
           "These monthly values were determined using uploaded measurements (Last update: {{date}})",
-        electricalEnergy: "Electrical energy used",
-        thermalEnergy: "Thermal energy generated",
-        electricalEnergyHeating: "Electrical energy heating",
-        thermalEnergyHeating: "Thermal energy heating",
+        electricalEnergy: "Electrical energy used (electricity)",
+        thermalEnergy: "Thermal energy generated (heat)",
+        electricalEnergyHeating: "Electrical energy used (electricity) - heating only",
+        thermalEnergyHeating: "Thermal energy generated (heat) - heating only",
         outdoorTempAvg: "Outdoor temperature avg",
         outdoorTempMin: "Outdoor temperature min",
         outdoorTempMax: "Outdoor temperature max",

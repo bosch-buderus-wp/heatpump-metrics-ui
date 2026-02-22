@@ -128,4 +128,23 @@ describe("NumberInputWithUnit", () => {
 
     expect(handleChange).toHaveBeenCalledWith(3.5);
   });
+
+  it("rounds displayed value when displayDecimals is provided", () => {
+    render(<NumberInputWithUnit value={3.46} onChange={vi.fn()} unit="kWh" displayDecimals={1} />);
+
+    const input = screen.getByRole("spinbutton");
+    expect(input).toHaveValue(3.5);
+  });
+
+  it("does not change onChange parsing when displayDecimals is provided", () => {
+    const handleChange = vi.fn();
+    render(
+      <NumberInputWithUnit value={3.46} onChange={handleChange} unit="kWh" displayDecimals={1} />,
+    );
+
+    const input = screen.getByRole("spinbutton");
+    fireEvent.change(input, { target: { value: "3.44" } });
+
+    expect(handleChange).toHaveBeenCalledWith(3.44);
+  });
 });
