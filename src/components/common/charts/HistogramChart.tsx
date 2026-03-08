@@ -12,6 +12,7 @@ import {
   filterRealisticDataForCharts,
   filterSystemsByRealisticCOP,
 } from "../../../lib/dataQuality";
+import { ResponsiveBarLabelsLayer } from "./ResponsiveBarLabelsLayer";
 
 export interface HistogramBin {
   binLabel: string;
@@ -223,12 +224,20 @@ export function HistogramChart({
           legendPosition: "middle",
           legendOffset: -40,
         }}
-        labelSkipWidth={12}
-        labelSkipHeight={12}
+        enableLabel={false}
         labelTextColor={{
           from: "color",
           modifiers: [["darker", 1.6]],
         }}
+        layers={[
+          "grid",
+          "axes",
+          "bars",
+          ResponsiveBarLabelsLayer,
+          "markers",
+          "legends",
+          "annotations",
+        ]}
         tooltip={({ indexValue, value }) => (
           <div className="chart-tooltip">
             <div className="chart-tooltip-header">

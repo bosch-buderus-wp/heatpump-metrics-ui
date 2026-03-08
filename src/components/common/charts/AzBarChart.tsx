@@ -10,6 +10,7 @@ import {
 import { CHART_COLORS } from "../../../lib/chartTheme";
 import { filterRealisticDataForCharts } from "../../../lib/dataQuality";
 import ChartTooltip from "./ChartTooltip";
+import { ResponsiveBarLabelsLayer } from "./ResponsiveBarLabelsLayer";
 import TemperatureLineLayer from "./TemperatureLineLayer";
 
 // Metric mode for the chart
@@ -229,13 +230,13 @@ export default function AzBarChart({
             legendPosition: "middle",
             legendOffset: -40,
           }}
-          labelSkipWidth={12}
-          labelSkipHeight={12}
+          enableLabel={false}
           labelTextColor={{ from: "color", modifiers: [["darker", 1.6]] }}
           layers={[
             "grid",
             "axes",
             "bars",
+            ResponsiveBarLabelsLayer,
             "markers",
             "legends",
             "annotations",
