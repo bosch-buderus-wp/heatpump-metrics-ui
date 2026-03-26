@@ -252,7 +252,7 @@ const Markers = ({
                     <>
                       {selectedPoint.systemNames.slice(0, 8).map((name, idx) => (
                         <SystemNameLink
-                          key={`${selectedPoint.id}-${idx}`}
+                          key={selectedPoint.heatingIds[idx] ?? `${selectedPoint.id}-${name}`}
                           name={name}
                           isSelected={idx === selectedSystemIndex}
                           onClick={() => handleSystemSelect(idx)}
