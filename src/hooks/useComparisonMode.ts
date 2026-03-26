@@ -173,6 +173,7 @@ export function useComparisonMode<T extends Record<string, unknown>>(
     comparisonMode,
     comparisonGroupsForChart,
     filteredDataForChart,
+    activeFilterModel,
     dataGridComparisonProps,
     applyFiltersToData,
   };

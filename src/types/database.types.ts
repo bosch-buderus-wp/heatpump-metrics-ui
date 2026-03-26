@@ -354,6 +354,15 @@ export type Database = {
       };
     };
     Functions: {
+      sample_daily_values_view_by_outdoor_temperature: {
+        Args: {
+          current_user_id?: string | null;
+          filter_model?: Json;
+          max_rows?: number;
+          outdoor_temperature_bin_width_k?: number;
+        };
+        Returns: Database["public"]["Views"]["daily_values_view"]["Row"][];
+      };
       calculate_monthly_value_for_month: {
         Args: {
           p_heating_id: string;

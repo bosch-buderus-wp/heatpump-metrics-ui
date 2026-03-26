@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import AzTempEvaluation from "../AzTempEvaluation";
+import HeatingCurve from "../HeatingCurve";
 
 const { mockRpc } = vi.hoisted(() => {
   const mockedDailyValues = [
@@ -14,8 +14,6 @@ const { mockRpc } = vi.hoisted(() => {
       heating_type: "air_water",
       model_idu: "Model1",
       model_odu: "Model2",
-      az: 3.5,
-      az_heating: 3.7,
       outdoor_temperature_c: -5,
       flow_temperature_c: 35,
       user_id: "user-123",
@@ -29,8 +27,6 @@ const { mockRpc } = vi.hoisted(() => {
       heating_type: "ground_water",
       model_idu: "Model3",
       model_odu: "Model4",
-      az: 4.2,
-      az_heating: 4.4,
       outdoor_temperature_c: 2,
       flow_temperature_c: 32,
       user_id: "user-456",
@@ -44,8 +40,6 @@ const { mockRpc } = vi.hoisted(() => {
       heating_type: "air_water",
       model_idu: "Model1",
       model_odu: "Model2",
-      az: 3.8,
-      az_heating: 4.0,
       outdoor_temperature_c: 5,
       flow_temperature_c: 30,
       user_id: "user-123",
@@ -85,14 +79,8 @@ vi.mock("react-i18next", () => ({
   useTranslation: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
-        "azTempEvaluation.title": "Temperature Evaluation",
-        "azTempEvaluation.info": "Analysis of COP vs Temperature",
-        "common.azTotal": "COP (total)",
-        "common.azHeating": "COP (heating)",
-        "common.outdoorTemperature": "Outdoor Temperature",
-        "common.flowTemperature": "Flow Temperature",
-        "charts.temperatureDelta": "Temperature Delta",
-        "charts.noData": "No data available",
+        "heatingCurve.title": "Heating Curve",
+        "heatingCurve.info": "Analysis of flow temperature vs outdoor temperature",
       };
       return translations[key] || key;
     },
@@ -103,8 +91,8 @@ vi.mock("react-i18next", () => ({
 }));
 
 vi.mock("../../components/common/charts", () => ({
-  AzScatterChart: ({ data }: { data: unknown[] }) => (
-    <div data-testid="scatter-chart">Chart with {data.length} points</div>
+  HeatingCurveChart: ({ data }: { data: unknown[] }) => (
+    <div data-testid="heating-curve-chart">Chart with {data.length} points</div>
   ),
 }));
 
@@ -120,14 +108,14 @@ vi.mock("../../components/common/data-grid", () => ({
       items: Array<{ field: string; operator: string; value?: unknown }>;
     }) => void;
   }) => (
-    <div className="MuiDataGrid-root" data-testid="data-grid">
+    <div data-testid="data-grid">
       <div>DataGrid with {rows.length} rows</div>
       <div data-testid="active-filter-count">{activeFilterModel?.items?.length ?? 0}</div>
       <button
         type="button"
         onClick={() =>
           onFilterModelChange?.({
-            items: [{ field: "azHeating", operator: ">=", value: "4" }],
+            items: [{ field: "outdoor_temperature_c", operator: "<=", value: "5" }],
           })
         }
       >
@@ -145,7 +133,7 @@ const createTestQueryClient = () =>
     },
   });
 
-describe("AzTempEvaluation Filter Functionality", () => {
+describe("HeatingCurve Filter Functionality", () => {
   let queryClient: QueryClient;
 
   beforeEach(() => {
@@ -156,7 +144,7 @@ describe("AzTempEvaluation Filter Functionality", () => {
   it("renders the page with RPC-backed chart data", async () => {
     render(
       <QueryClientProvider client={queryClient}>
-        <AzTempEvaluation />
+        <HeatingCurve />
       </QueryClientProvider>,
     );
 
@@ -170,7 +158,7 @@ describe("AzTempEvaluation Filter Functionality", () => {
   it("calls the outdoor-temperature sampling RPC with the active filter model", async () => {
     render(
       <QueryClientProvider client={queryClient}>
-        <AzTempEvaluation />
+        <HeatingCurve />
       </QueryClientProvider>,
     );
 
@@ -199,7 +187,7 @@ describe("AzTempEvaluation Filter Functionality", () => {
       expect.objectContaining({
         filter_model: {
           logic: "and",
-          items: [{ field: "az_heating", operator: ">=", value: 4 }],
+          items: [{ field: "outdoor_temperature_c", operator: "<=", value: 5 }],
         },
       }),
     );
