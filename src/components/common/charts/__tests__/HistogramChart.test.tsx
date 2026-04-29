@@ -165,14 +165,14 @@ describe("HistogramChart", () => {
     expect(screen.getByTestId("responsive-bar")).toBeInTheDocument();
   });
 
-  it("filters out unrealistic COP values (> 8.0 or < 0.0)", () => {
+  it("filters out unrealistic COP values (> 10.0 or < 0.0)", () => {
     const dataWithUnrealisticCOP = [
       ...mockData,
       {
         heating_id: "sys-unrealistic-high",
-        thermal_energy_kwh: 900,
-        electrical_energy_kwh: 100, // COP = 9.0 (unrealistic)
-        thermal_energy_heating_kwh: 810,
+        thermal_energy_kwh: 1100,
+        electrical_energy_kwh: 100, // COP = 11.0 (unrealistic)
+        thermal_energy_heating_kwh: 990,
         electrical_energy_heating_kwh: 90,
       },
       {

@@ -22,7 +22,7 @@ export interface DataQualityResult {
  * Values outside this range are almost certainly measurement errors
  */
 const COP_THRESHOLDS = {
-  MAX_REALISTIC: 8.0,
+  MAX_REALISTIC: 10.0,
   MIN_REALISTIC: 0.0,
 };
 
