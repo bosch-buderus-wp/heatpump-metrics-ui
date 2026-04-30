@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
+import { ChartFullscreenPanel } from "./ChartFullscreenPanel";
 
 interface PageLayoutProps {
   titleKey: string;
@@ -29,7 +30,7 @@ export function PageLayout({
 
       {filters && <div className="filters">{filters}</div>}
 
-      {chart}
+      {chart && <ChartFullscreenPanel title={t(titleKey)}>{chart}</ChartFullscreenPanel>}
 
       {isLoading && <div>{t("common.loading")}</div>}
       {error && <div className="error">{error.message}</div>}

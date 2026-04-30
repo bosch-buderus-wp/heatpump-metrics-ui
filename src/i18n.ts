@@ -95,6 +95,8 @@ const resources = {
         completeDataOnly: "Nur vollständige Daten",
         electricalEnergyTotal: "Stromverbrauch (gesamt)",
         electricalEnergyHeating: "Stromverbrauch (Heizung)",
+        openFullscreen: "Diagramm vergrößern",
+        closeFullscreen: "Vollbild schließen",
       },
       toolbar: {
         columns: "Spalten anzeigen/verbergen",
@@ -565,6 +567,8 @@ const resources = {
         completeDataOnly: "Complete data only",
         electricalEnergyTotal: "Energy Consumption (total)",
         electricalEnergyHeating: "Energy Consumption (heating)",
+        openFullscreen: "Enlarge chart",
+        closeFullscreen: "Close fullscreen",
       },
       toolbar: {
         columns: "Show/hide columns",
