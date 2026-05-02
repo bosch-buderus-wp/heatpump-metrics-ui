@@ -1,5 +1,5 @@
 import { ResponsiveBar } from "@nivo/bar";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useChartLegend } from "../../../hooks/useChartLegend";
 import {
@@ -12,6 +12,8 @@ import {
   filterRealisticDataForCharts,
   filterSystemsByRealisticCOP,
 } from "../../../lib/dataQuality";
+import { ChartUtilityFrame } from "../layout/ChartUtilityFrame";
+import { CollapsibleChartStats } from "../layout/CollapsibleChartStats";
 import { ResponsiveBarLabelsLayer } from "./ResponsiveBarLabelsLayer";
 
 export interface HistogramBin {
@@ -48,6 +50,7 @@ export function HistogramChart({
 }: HistogramChartProps) {
   const { t } = useTranslation();
   const barColor = CHART_COLORS.primary;
+  const [statsExpanded, setStatsExpanded] = useState(true);
 
   // Use different labels based on metric mode
   const totalKey =
@@ -182,129 +185,144 @@ export function HistogramChart({
     return { chartData: histogramData.heatingBins, stats: histogramData.heatingStats };
   }, [activeKey, histogramData, totalKey]);
 
-  if (!chartData || chartData.length === 0) {
-    return (
-      <div className="chart-no-data-card card">
-        <p className="muted">{t("charts.noData")}</p>
-      </div>
-    );
-  }
-
   return (
-    <div className="chart-container card">
-      <ResponsiveBar
-        // biome-ignore lint/suspicious/noExplicitAny: Nivo's BarDatum type is too strict for our flexible data structure
-        data={chartData as any}
-        keys={["count"]}
-        indexBy="binLabel"
-        margin={{ top: 10, right: 60, bottom: 70, left: 50 }}
-        padding={0.3}
-        borderRadius={4}
-        valueScale={{ type: "linear" }}
-        indexScale={{ type: "band", round: true }}
-        colors={barColor}
-        borderColor={{
-          from: "color",
-          modifiers: [["darker", 1.6]],
-        }}
-        axisTop={null}
-        axisRight={null}
-        axisBottom={{
-          tickSize: 5,
-          tickPadding: 5,
-          legend: metricMode === "energy" ? t("charts.electricalEnergyTotal") : t("charts.azValue"),
-          legendPosition: "middle",
-          legendOffset: 30,
-        }}
-        axisLeft={{
-          tickSize: 5,
-          tickPadding: 5,
-          tickRotation: 0,
-          legend: t("charts.systems"),
-          legendPosition: "middle",
-          legendOffset: -40,
-        }}
-        enableLabel={false}
-        labelTextColor={{
-          from: "color",
-          modifiers: [["darker", 1.6]],
-        }}
-        layers={[
-          "grid",
-          "axes",
-          "bars",
-          ResponsiveBarLabelsLayer,
-          "markers",
-          "legends",
-          "annotations",
-        ]}
-        tooltip={({ indexValue, value }) => (
-          <div className="chart-tooltip">
-            <div className="chart-tooltip-header">
-              {metricMode === "energy" ? t("charts.electricalEnergyTotal") : t("common.az")}:{" "}
-              {indexValue}
-              {metricMode === "energy" ? " kWh" : ""}
-            </div>
-            <div className="chart-tooltip-item">
-              <div
-                className="chart-tooltip-indicator chart-tooltip-indicator-bar chart-tooltip-indicator-custom"
-                style={{ backgroundColor: barColor }}
-              />
-              <span className="chart-tooltip-text">
-                {t("charts.systems")}: <strong>{value}</strong>
-              </span>
-            </div>
+    <ChartUtilityFrame
+      utility={
+        chartData && chartData.length > 0 ? (
+          <div className="chart-stats">
+            <CollapsibleChartStats
+              title={statsTitle ?? activeKey}
+              expanded={statsExpanded}
+              onToggle={() => setStatsExpanded(!statsExpanded)}
+              expandLabel={t("charts.showStats")}
+              collapseLabel={t("charts.hideStats")}
+            >
+              <div className="chart-stats-grid-2">
+                <div className="chart-stat-item">
+                  <span className="chart-stat-label">{t("charts.mean")}</span>
+                  <span className="chart-stat-value">
+                    {metricMode === "energy"
+                      ? `${Math.round(stats.mean)} kWh`
+                      : stats.mean.toFixed(2)}
+                  </span>
+                </div>
+                <div className="chart-stat-item">
+                  <span className="chart-stat-label">{t("charts.median")}</span>
+                  <span className="chart-stat-value">
+                    {metricMode === "energy"
+                      ? `${Math.round(stats.median)} kWh`
+                      : stats.median.toFixed(2)}
+                  </span>
+                </div>
+              </div>
+            </CollapsibleChartStats>
           </div>
-        )}
-        legends={[
-          {
-            dataFrom: "keys",
-            data: legendItems,
-            anchor: "bottom",
-            direction: "row",
-            justify: false,
-            translateX: 0,
-            translateY: 70,
-            itemsSpacing: 20,
-            itemWidth: 200,
-            itemHeight: 20,
-            itemDirection: "left-to-right",
-            itemOpacity: 0.85,
-            symbolSize: 20,
-            // biome-ignore lint/suspicious/noExplicitAny: Nivo's onClick type expects MouseEvent parameter we don't need
-            onClick: handleLegendClick as any,
-            effects: [
-              {
-                on: "hover",
-                style: {
-                  itemOpacity: 1,
-                },
-              },
-            ],
-          },
-        ]}
-        role="application"
-        ariaLabel="COP Histogram"
-      />
-      <div className="chart-stats">
-        {statsTitle && <h3 className="chart-stats-title">{statsTitle}</h3>}
-        <div>
-          <div className="chart-stat-item">
-            <span className="chart-stat-label">{t("charts.mean")}</span>
-            <span className="chart-stat-value">
-              {metricMode === "energy" ? `${Math.round(stats.mean)} kWh` : stats.mean.toFixed(2)}
-            </span>
-          </div>
-          <div className="chart-stat-item">
-            <span className="chart-stat-label">{t("charts.median")}</span>
-            <span className="chart-stat-value">
-              {metricMode === "energy"
-                ? `${Math.round(stats.median)} kWh`
-                : stats.median.toFixed(2)}
-            </span>
-          </div>
+        ) : undefined
+      }
+    >
+      {!chartData || chartData.length === 0 ? (
+        <div className="chart-no-data-card">
+          <p className="muted">{t("charts.noData")}</p>
         </div>
-      </div>
-    </div>
+      ) : (
+        <div className="chart-container">
+          <ResponsiveBar
+            // biome-ignore lint/suspicious/noExplicitAny: Nivo's BarDatum type is too strict for our flexible data structure
+            data={chartData as any}
+            keys={["count"]}
+            indexBy="binLabel"
+            margin={{ top: 10, right: 60, bottom: 70, left: 50 }}
+            padding={0.3}
+            borderRadius={4}
+            valueScale={{ type: "linear" }}
+            indexScale={{ type: "band", round: true }}
+            colors={barColor}
+            borderColor={{
+              from: "color",
+              modifiers: [["darker", 1.6]],
+            }}
+            axisTop={null}
+            axisRight={null}
+            axisBottom={{
+              tickSize: 5,
+              tickPadding: 5,
+              legend:
+                metricMode === "energy" ? t("charts.electricalEnergyTotal") : t("charts.azValue"),
+              legendPosition: "middle",
+              legendOffset: 30,
+            }}
+            axisLeft={{
+              tickSize: 5,
+              tickPadding: 5,
+              tickRotation: 0,
+              legend: t("charts.systems"),
+              legendPosition: "middle",
+              legendOffset: -40,
+            }}
+            enableLabel={false}
+            labelTextColor={{
+              from: "color",
+              modifiers: [["darker", 1.6]],
+            }}
+            layers={[
+              "grid",
+              "axes",
+              "bars",
+              ResponsiveBarLabelsLayer,
+              "markers",
+              "legends",
+              "annotations",
+            ]}
+            tooltip={({ indexValue, value }) => (
+              <div className="chart-tooltip">
+                <div className="chart-tooltip-header">
+                  {metricMode === "energy" ? t("charts.electricalEnergyTotal") : t("common.az")}:{" "}
+                  {indexValue}
+                  {metricMode === "energy" ? " kWh" : ""}
+                </div>
+                <div className="chart-tooltip-item">
+                  <div
+                    className="chart-tooltip-indicator chart-tooltip-indicator-bar chart-tooltip-indicator-custom"
+                    style={{ backgroundColor: barColor }}
+                  />
+                  <span className="chart-tooltip-text">
+                    {t("charts.systems")}: <strong>{value}</strong>
+                  </span>
+                </div>
+              </div>
+            )}
+            legends={[
+              {
+                dataFrom: "keys",
+                data: legendItems,
+                anchor: "bottom",
+                direction: "row",
+                justify: false,
+                translateX: 0,
+                translateY: 70,
+                itemsSpacing: 20,
+                itemWidth: 200,
+                itemHeight: 20,
+                itemDirection: "left-to-right",
+                itemOpacity: 0.85,
+                symbolSize: 20,
+                // biome-ignore lint/suspicious/noExplicitAny: Nivo's onClick type expects MouseEvent parameter we don't need
+                onClick: handleLegendClick as any,
+                effects: [
+                  {
+                    on: "hover",
+                    style: {
+                      itemOpacity: 1,
+                    },
+                  },
+                ],
+              },
+            ]}
+            role="application"
+            ariaLabel="COP Histogram"
+          />
+        </div>
+      )}
+    </ChartUtilityFrame>
   );
 }

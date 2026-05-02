@@ -1,5 +1,4 @@
-import { ExpandLess, ExpandMore } from "@mui/icons-material";
-import { Button, ButtonGroup, IconButton, Tooltip } from "@mui/material";
+import { Button, ButtonGroup, Tooltip } from "@mui/material";
 import { ResponsiveScatterPlot } from "@nivo/scatterplot";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -7,6 +6,8 @@ import { useChartLegend } from "../../../hooks/useChartLegend";
 import { CHART_COLORS } from "../../../lib/chartTheme";
 import { filterRealisticDataForCharts } from "../../../lib/dataQuality";
 import { generateLoessCurvePoints, loessSmooth } from "../../../lib/regressionUtils";
+import { ChartUtilityFrame } from "../layout/ChartUtilityFrame";
+import { CollapsibleChartStats } from "../layout/CollapsibleChartStats";
 
 export interface ScatterDataPoint {
   az?: number | null;
@@ -228,7 +229,35 @@ export function AzScatterChart({ data, currentUserId }: AzScatterChartProps) {
           </Button>
         </ButtonGroup>
       </div>
-      <div className="chart-container-relative card">
+      <ChartUtilityFrame
+        utility={
+          loessSmoother ? (
+            <CollapsibleChartStats
+              title={t("charts.azTempStats")}
+              expanded={statsExpanded}
+              onToggle={() => setStatsExpanded(!statsExpanded)}
+              expandLabel={t("charts.showStats")}
+              collapseLabel={t("charts.hideStats")}
+            >
+              <div className="chart-stats-grid-4">
+                {getReferenceTemperatures(temperatureMode).map((temp) => {
+                  const predictedCOP = loessSmoother(temp);
+                  return (
+                    <Tooltip key={temp} title={t("charts.predictedCopTooltip")} placement="top">
+                      <div className="chart-stat-item">
+                        <span className="chart-stat-label">
+                          {t("common.az_short")} {temp}°C
+                        </span>
+                        <span className="chart-stat-value">{predictedCOP.toFixed(2)}</span>
+                      </div>
+                    </Tooltip>
+                  );
+                })}
+              </div>
+            </CollapsibleChartStats>
+          ) : undefined
+        }
+      >
         <ResponsiveScatterPlot
           // biome-ignore lint/suspicious/noExplicitAny: Nivo's ScatterPlot type is complex
           data={scatterData as any}
@@ -342,49 +371,7 @@ export function AzScatterChart({ data, currentUserId }: AzScatterChartProps) {
             },
           ]}
         />
-        {loessSmoother && (
-          <div className="chart-stats chart-stats-absolute">
-            <div className="chart-stats-header">
-              <h3 className="chart-stats-title chart-stats-title-no-margin">
-                {t("charts.azTempStats")}
-              </h3>
-              <Tooltip title={statsExpanded ? t("charts.hideStats") : t("charts.showStats")}>
-                <IconButton
-                  size="small"
-                  onClick={() => setStatsExpanded(!statsExpanded)}
-                  sx={{ ml: 1, p: 0.5 }}
-                >
-                  {statsExpanded ? (
-                    <ExpandLess fontSize="small" />
-                  ) : (
-                    <ExpandMore fontSize="small" />
-                  )}
-                </IconButton>
-              </Tooltip>
-            </div>
-            {statsExpanded && (
-              <div className="chart-stats-expanded">
-                {/* Reference temperature predictions */}
-                <div className="chart-stats-grid-4">
-                  {getReferenceTemperatures(temperatureMode).map((temp) => {
-                    const predictedCOP = loessSmoother(temp);
-                    return (
-                      <Tooltip key={temp} title={t("charts.predictedCopTooltip")} placement="top">
-                        <div className="chart-stat-item">
-                          <span className="chart-stat-label">
-                            {t("common.az_short")} {temp}°C
-                          </span>
-                          <span className="chart-stat-value">{predictedCOP.toFixed(2)}</span>
-                        </div>
-                      </Tooltip>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
+      </ChartUtilityFrame>
     </>
   );
 }

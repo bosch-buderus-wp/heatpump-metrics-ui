@@ -5,7 +5,7 @@ import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AzBarChart, type ChartDataRow, HistogramChart } from "../components/common/charts";
 import { DataGridWrapper } from "../components/common/data-grid";
-import { PageLayout } from "../components/common/layout";
+import { ChartUtilityFrame, PageLayout } from "../components/common/layout";
 import { MonthYearPicker } from "../components/form";
 import { MetricModeToggle, ViewModeToggle } from "../components/ui";
 import { useComparisonMode } from "../hooks/useComparisonMode";
@@ -90,7 +90,7 @@ export default function Monthly() {
       infoKey="monthly.info"
       error={error}
       isLoading={isLoading}
-      filters={
+      chartControls={
         <div className="filter-container">
           <MonthYearPicker month={month} year={year} onChange={handleMonthYearChange} />
           <ViewModeToggle viewMode={viewMode} onChange={setViewMode} />
@@ -99,15 +99,19 @@ export default function Monthly() {
       }
       chart={
         viewMode === "timeSeries" ? (
-          <AzBarChart
-            data={comparisonMode ? [] : ((filteredDataForChart || filteredData) as ChartDataRow[])}
-            comparisonGroups={comparisonGroupsForChart}
-            indexField="date"
-            indexLabel="common.date"
-            indexFormatter={(date) => dayjs(date).format("DD")}
-            aggregateData={true}
-            metricMode={metricMode}
-          />
+          <ChartUtilityFrame>
+            <AzBarChart
+              data={
+                comparisonMode ? [] : ((filteredDataForChart || filteredData) as ChartDataRow[])
+              }
+              comparisonGroups={comparisonGroupsForChart}
+              indexField="date"
+              indexLabel="common.date"
+              indexFormatter={(date) => dayjs(date).format("DD")}
+              aggregateData={true}
+              metricMode={metricMode}
+            />
+          </ChartUtilityFrame>
         ) : (
           <HistogramChart
             data={histogramDataSource}

@@ -1,5 +1,4 @@
-import { ExpandLess, ExpandMore } from "@mui/icons-material";
-import { IconButton, Tooltip } from "@mui/material";
+import { Tooltip } from "@mui/material";
 import { ResponsiveScatterPlot } from "@nivo/scatterplot";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -7,6 +6,8 @@ import { computeAzTemperatureRegression } from "../../../lib/chartDataProcessing
 import { CHART_COLORS } from "../../../lib/chartTheme";
 import type { RegressionResult } from "../../../lib/regressionUtils";
 import { generateCurvePoints } from "../../../lib/regressionUtils";
+import { ChartUtilityFrame } from "../layout/ChartUtilityFrame";
+import { CollapsibleChartStats } from "../layout/CollapsibleChartStats";
 
 export interface HeatingCurveDataPoint {
   outdoor_temperature_c?: number | null;
@@ -216,7 +217,39 @@ export function HeatingCurveChart({ data, currentUserId }: HeatingCurveChartProp
   }
 
   return (
-    <div className="chart-container-relative card">
+    <ChartUtilityFrame
+      utility={
+        regression ? (
+          <CollapsibleChartStats
+            title={t("heatingCurve.statsTitle")}
+            expanded={statsExpanded}
+            onToggle={() => setStatsExpanded(!statsExpanded)}
+            expandLabel={t("charts.showStats")}
+            collapseLabel={t("charts.hideStats")}
+          >
+            <div className="chart-stats-grid-3">
+              {referenceTemperatures.map((temp) => {
+                const predictedFlow = predictFlowTemp(regression, temp);
+                return (
+                  <Tooltip
+                    key={temp}
+                    title={t("heatingCurve.predictedFlowTooltip")}
+                    placement="top"
+                  >
+                    <div className="chart-stat-item">
+                      <span className="chart-stat-label">
+                        {t("heatingCurve.flowAt")} {temp}°C
+                      </span>
+                      <span className="chart-stat-value">{predictedFlow.toFixed(1)}°C</span>
+                    </div>
+                  </Tooltip>
+                );
+              })}
+            </div>
+          </CollapsibleChartStats>
+        ) : undefined
+      }
+    >
       <ResponsiveScatterPlot
         // biome-ignore lint/suspicious/noExplicitAny: Nivo's ScatterPlot type is complex
         data={scatterData as any}
@@ -325,48 +358,6 @@ export function HeatingCurveChart({ data, currentUserId }: HeatingCurveChartProp
           },
         ]}
       />
-      {regression && (
-        <div className="chart-stats chart-stats-absolute">
-          <div className="chart-stats-header">
-            <h3 className="chart-stats-title chart-stats-title-no-margin">
-              {t("heatingCurve.statsTitle")}
-            </h3>
-            <Tooltip title={statsExpanded ? t("charts.hideStats") : t("charts.showStats")}>
-              <IconButton
-                size="small"
-                onClick={() => setStatsExpanded(!statsExpanded)}
-                sx={{ ml: 1, p: 0.5 }}
-              >
-                {statsExpanded ? <ExpandLess fontSize="small" /> : <ExpandMore fontSize="small" />}
-              </IconButton>
-            </Tooltip>
-          </div>
-          {statsExpanded && (
-            <div className="chart-stats-expanded">
-              {/* Reference temperature predictions */}
-              <div className="chart-stats-grid-3">
-                {referenceTemperatures.map((temp) => {
-                  const predictedFlow = predictFlowTemp(regression, temp);
-                  return (
-                    <Tooltip
-                      key={temp}
-                      title={t("heatingCurve.predictedFlowTooltip")}
-                      placement="top"
-                    >
-                      <div className="chart-stat-item">
-                        <span className="chart-stat-label">
-                          {t("heatingCurve.flowAt")} {temp}°C
-                        </span>
-                        <span className="chart-stat-value">{predictedFlow.toFixed(1)}°C</span>
-                      </div>
-                    </Tooltip>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-    </div>
+    </ChartUtilityFrame>
   );
 }

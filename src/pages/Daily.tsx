@@ -4,7 +4,7 @@ import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AzBarChart, type ChartDataRow, HistogramChart } from "../components/common/charts";
 import { DataGridWrapper } from "../components/common/data-grid";
-import { PageLayout } from "../components/common/layout";
+import { ChartUtilityFrame, PageLayout } from "../components/common/layout";
 import { ConfirmDialog, MetricModeToggle, ViewModeToggle } from "../components/ui";
 import { useComparisonMode } from "../hooks/useComparisonMode";
 import { useDeleteMeasurement } from "../hooks/useDeleteOperations";
@@ -210,48 +210,50 @@ export default function Daily() {
       infoKey="daily.info"
       error={error}
       isLoading={isLoading}
-      filters={filterSection}
+      chartControls={filterSection}
       chart={
         viewMode === "timeSeries" ? (
-          <AzBarChart
-            data={
-              comparisonMode
-                ? []
-                : ((realisticDataForChart ||
-                    filterRealisticDataForCharts(filteredData, true)) as ChartDataRow[])
-            }
-            comparisonGroups={realisticComparisonGroups}
-            indexField="hour"
-            indexLabel="common.hour"
-            indexValues={[
-              "0",
-              "1",
-              "2",
-              "3",
-              "4",
-              "5",
-              "6",
-              "7",
-              "8",
-              "9",
-              "10",
-              "11",
-              "12",
-              "13",
-              "14",
-              "15",
-              "16",
-              "17",
-              "18",
-              "19",
-              "20",
-              "21",
-              "22",
-              "23",
-            ]}
-            aggregateData={true}
-            metricMode={metricMode}
-          />
+          <ChartUtilityFrame>
+            <AzBarChart
+              data={
+                comparisonMode
+                  ? []
+                  : ((realisticDataForChart ||
+                      filterRealisticDataForCharts(filteredData, true)) as ChartDataRow[])
+              }
+              comparisonGroups={realisticComparisonGroups}
+              indexField="hour"
+              indexLabel="common.hour"
+              indexValues={[
+                "0",
+                "1",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9",
+                "10",
+                "11",
+                "12",
+                "13",
+                "14",
+                "15",
+                "16",
+                "17",
+                "18",
+                "19",
+                "20",
+                "21",
+                "22",
+                "23",
+              ]}
+              aggregateData={true}
+              metricMode={metricMode}
+            />
+          </ChartUtilityFrame>
         ) : (
           <HistogramChart
             data={histogramDataSource}

@@ -420,7 +420,7 @@ describe("HistogramChart - Energy Mode", () => {
       expect(screen.getByText("charts.median")).toBeInTheDocument();
 
       // Stats should include kWh unit
-      const statsContainer = screen.getByText("Energy Stats").parentElement;
+      const statsContainer = screen.getByText("Energy Stats").closest(".chart-stats");
       expect(statsContainer?.textContent).toContain("kWh");
     });
 
@@ -429,7 +429,7 @@ describe("HistogramChart - Energy Mode", () => {
         <HistogramChart data={mockYearlyData} metricMode="energy" statsTitle="Energy Stats" />,
       );
 
-      const statsContainer = screen.getByText("Energy Stats").parentElement;
+      const statsContainer = screen.getByText("Energy Stats").closest(".chart-stats");
       const text = statsContainer?.textContent || "";
 
       // Should have whole numbers like "2515 kWh", not "2515.45 kWh"

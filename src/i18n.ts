@@ -8,7 +8,7 @@ const resources = {
       home: {
         title: "Willkommen",
         intro:
-          "Dieses Projekt sammelt und visualisiert Leistungsdaten von Bosch CS5800/6800i und Buderus WLW176/186 Wärmepumpen, um Wärmepumpenbesitzern bei der Optimierung zu helfen und Wärmepumpeninteressierten bei der Entscheidung zu helfen.",
+          "Dieses Projekt sammelt und visualisiert Leistungsdaten von Bosch CS5800/6800i und Buderus WLW176/186i Wärmepumpen, um Wärmepumpenbesitzern bei der Optimierung zu helfen und Wärmepumpeninteressierten bei der Entscheidung zu helfen.",
         stats: {
           systems: "Erfasste Anlagen",
           monthly: "Monatswerte",
@@ -444,7 +444,7 @@ const resources = {
       home: {
         title: "Welcome",
         intro:
-          "This project collects and visualizes performance data from Bosch CS5800/6800i and Buderus WLW176/186 heat pumps to help heat pump owners optimize their systems and help prospective buyers make informed decisions.",
+          "This project collects and visualizes performance data from Bosch CS5800/6800i and Buderus WLW176/186i heat pumps to help heat pump owners optimize their systems and help prospective buyers make informed decisions.",
         stats: {
           systems: "Registered Systems",
           monthly: "Monthly Values",

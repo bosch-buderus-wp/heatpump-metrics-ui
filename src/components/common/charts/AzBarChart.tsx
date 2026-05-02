@@ -177,8 +177,12 @@ export default function AzBarChart({
     );
   };
 
+  if (chartData.length === 0) {
+    return <div className="chart-no-data-card">{t("common.noData")}</div>;
+  }
+
   return (
-    <div className="chart-container card">
+    <div className="chart-container">
       {chartData.length > 0 ? (
         <ResponsiveBar
           // biome-ignore lint/suspicious/noExplicitAny: Nivo's BarDatum type is too strict for our flexible data structure
@@ -274,9 +278,7 @@ export default function AzBarChart({
           ariaLabel="COP Chart"
           groupMode={isComparisonMode ? "grouped" : "grouped"}
         />
-      ) : (
-        <div className="chart-no-data">{t("common.noData")}</div>
-      )}
+      ) : null}
     </div>
   );
 }

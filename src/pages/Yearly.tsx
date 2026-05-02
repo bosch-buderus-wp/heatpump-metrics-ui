@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AzBarChart, type ChartDataRow, HistogramChart } from "../components/common/charts";
 import { DataGridWrapper } from "../components/common/data-grid";
-import { PageLayout } from "../components/common/layout";
+import { ChartUtilityFrame, PageLayout } from "../components/common/layout";
 import { MetricModeToggle, ViewModeToggle } from "../components/ui";
 import { useComparisonMode } from "../hooks/useComparisonMode";
 import { createFilterValueResolver } from "../lib/filterValueResolver";
@@ -181,18 +181,22 @@ export default function Yearly() {
       infoKey="yearly.info"
       error={error}
       isLoading={isLoading}
-      filters={filterSection}
+      chartControls={filterSection}
       chart={
         viewMode === "timeSeries" ? (
-          <AzBarChart
-            data={comparisonMode ? [] : ((filteredDataForChart || filteredData) as ChartDataRow[])}
-            comparisonGroups={comparisonGroupsForChart}
-            indexField="month"
-            indexLabel="common.month"
-            indexValues={["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]}
-            aggregateData={true}
-            metricMode={metricMode}
-          />
+          <ChartUtilityFrame>
+            <AzBarChart
+              data={
+                comparisonMode ? [] : ((filteredDataForChart || filteredData) as ChartDataRow[])
+              }
+              comparisonGroups={comparisonGroupsForChart}
+              indexField="month"
+              indexLabel="common.month"
+              indexValues={["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]}
+              aggregateData={true}
+              metricMode={metricMode}
+            />
+          </ChartUtilityFrame>
         ) : (
           <HistogramChart
             data={histogramDataSource}

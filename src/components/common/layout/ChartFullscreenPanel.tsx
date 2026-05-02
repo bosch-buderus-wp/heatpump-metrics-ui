@@ -1,16 +1,27 @@
 import CloseIcon from "@mui/icons-material/Close";
-import FullscreenIcon from "@mui/icons-material/Fullscreen";
 import { IconButton, Tooltip } from "@mui/material";
-import type { ReactNode } from "react";
-import { useEffect, useState } from "react";
+import { createContext, type ReactNode, useContext, useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 
 interface ChartFullscreenPanelProps {
   title: string;
+  controls?: ReactNode;
   children: ReactNode;
 }
 
-export function ChartFullscreenPanel({ title, children }: ChartFullscreenPanelProps) {
+interface ChartFullscreenPanelContextValue {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+}
+
+const ChartFullscreenPanelContext = createContext<ChartFullscreenPanelContextValue | null>(null);
+
+export function useChartFullscreenPanel() {
+  return useContext(ChartFullscreenPanelContext);
+}
+
+export function ChartFullscreenPanel({ title, controls, children }: ChartFullscreenPanelProps) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
 
@@ -27,43 +38,43 @@ export function ChartFullscreenPanel({ title, children }: ChartFullscreenPanelPr
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [open]);
 
-  return (
-    <div className={`chart-panel ${open ? "chart-panel--fullscreen" : ""}`}>
-      {open && (
-        <button
-          type="button"
-          className="chart-fullscreen-backdrop"
-          onClick={() => setOpen(false)}
-          aria-label={t("charts.closeFullscreen")}
-        />
-      )}
+  const surface = (
+    <div className="chart-panel-surface">
+      {open ? (
+        <div className="chart-fullscreen-title">
+          <span>{title}</span>
+          <Tooltip title={t("charts.closeFullscreen")}>
+            <IconButton aria-label={t("charts.closeFullscreen")} onClick={() => setOpen(false)}>
+              <CloseIcon />
+            </IconButton>
+          </Tooltip>
+        </div>
+      ) : null}
 
-      <div className="chart-panel-surface">
-        {open ? (
-          <div className="chart-fullscreen-title">
-            <span>{title}</span>
-            <Tooltip title={t("charts.closeFullscreen")}>
-              <IconButton aria-label={t("charts.closeFullscreen")} onClick={() => setOpen(false)}>
-                <CloseIcon />
-              </IconButton>
-            </Tooltip>
-          </div>
-        ) : (
-          <div className="chart-panel-toolbar">
-            <Tooltip title={t("charts.openFullscreen")}>
-              <IconButton
-                aria-label={t("charts.openFullscreen")}
-                size="small"
-                onClick={() => setOpen(true)}
-              >
-                <FullscreenIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-          </div>
-        )}
-
-        <div className={open ? "chart-fullscreen-content" : undefined}>{children}</div>
+      <div className={open ? "chart-fullscreen-content" : undefined}>
+        {controls ? <div className="chart-panel-controls">{controls}</div> : null}
+        {children}
       </div>
     </div>
+  );
+
+  return (
+    <ChartFullscreenPanelContext.Provider value={{ open, setOpen }}>
+      {!open ? <div className="chart-panel">{surface}</div> : null}
+      {open
+        ? createPortal(
+            <div className="chart-panel chart-panel--fullscreen">
+              <button
+                type="button"
+                className="chart-fullscreen-backdrop"
+                onClick={() => setOpen(false)}
+                aria-label={t("charts.closeFullscreen")}
+              />
+              {surface}
+            </div>,
+            document.body,
+          )
+        : null}
+    </ChartFullscreenPanelContext.Provider>
   );
 }

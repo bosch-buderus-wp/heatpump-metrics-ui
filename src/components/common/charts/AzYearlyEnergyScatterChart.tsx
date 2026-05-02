@@ -1,10 +1,11 @@
-import { ExpandLess, ExpandMore } from "@mui/icons-material";
-import { IconButton, Tooltip } from "@mui/material";
+import { Tooltip } from "@mui/material";
 import { ResponsiveScatterPlot } from "@nivo/scatterplot";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { CHART_COLORS } from "../../../lib/chartTheme";
 import { loessSmoothWeighted } from "../../../lib/regressionUtils";
+import { ChartUtilityFrame } from "../layout/ChartUtilityFrame";
+import { CollapsibleChartStats } from "../layout/CollapsibleChartStats";
 
 export interface YearlyEnergyScatterDataPoint {
   heating_id?: string | null;
@@ -316,7 +317,39 @@ export function AzYearlyEnergyScatterChart({
   }
 
   return (
-    <div className="chart-container-relative card">
+    <ChartUtilityFrame
+      utility={
+        loessSmoother ? (
+          <CollapsibleChartStats
+            title={t("charts.azYearlyEnergyStats")}
+            expanded={statsExpanded}
+            onToggle={() => setStatsExpanded(!statsExpanded)}
+            expandLabel={t("charts.showStats")}
+            collapseLabel={t("charts.hideStats")}
+          >
+            <div className="chart-stats-grid-4">
+              {REFERENCE_ENERGY_VALUES.map((value) => {
+                const predictedCop = loessSmoother(value);
+                return (
+                  <Tooltip
+                    key={value}
+                    title={t("charts.predictedCopTooltipEnergy")}
+                    placement="top"
+                  >
+                    <div className="chart-stat-item">
+                      <span className="chart-stat-label chart-stat-label-mixedcase">
+                        {t("common.az_short")} {value} kWh/m²a
+                      </span>
+                      <span className="chart-stat-value">{predictedCop.toFixed(2)}</span>
+                    </div>
+                  </Tooltip>
+                );
+              })}
+            </div>
+          </CollapsibleChartStats>
+        ) : undefined
+      }
+    >
       <ResponsiveScatterPlot
         // biome-ignore lint/suspicious/noExplicitAny: Nivo's ScatterPlot type is complex
         data={scatterData as any}
@@ -504,47 +537,6 @@ export function AzYearlyEnergyScatterChart({
           },
         ]}
       />
-      {loessSmoother && (
-        <div className="chart-stats chart-stats-absolute">
-          <div className="chart-stats-header">
-            <h3 className="chart-stats-title chart-stats-title-no-margin">
-              {t("charts.azYearlyEnergyStats")}
-            </h3>
-            <Tooltip title={statsExpanded ? t("charts.hideStats") : t("charts.showStats")}>
-              <IconButton
-                size="small"
-                onClick={() => setStatsExpanded(!statsExpanded)}
-                sx={{ ml: 1, p: 0.5 }}
-              >
-                {statsExpanded ? <ExpandLess fontSize="small" /> : <ExpandMore fontSize="small" />}
-              </IconButton>
-            </Tooltip>
-          </div>
-          {statsExpanded && (
-            <div className="chart-stats-expanded">
-              <div className="chart-stats-grid-4">
-                {REFERENCE_ENERGY_VALUES.map((value) => {
-                  const predictedCop = loessSmoother(value);
-                  return (
-                    <Tooltip
-                      key={value}
-                      title={t("charts.predictedCopTooltipEnergy")}
-                      placement="top"
-                    >
-                      <div className="chart-stat-item">
-                        <span className="chart-stat-label chart-stat-label-mixedcase">
-                          {t("common.az_short")} {value} kWh/m²a
-                        </span>
-                        <span className="chart-stat-value">{predictedCop.toFixed(2)}</span>
-                      </div>
-                    </Tooltip>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-    </div>
+    </ChartUtilityFrame>
   );
 }

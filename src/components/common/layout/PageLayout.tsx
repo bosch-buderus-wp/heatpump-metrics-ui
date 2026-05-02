@@ -6,6 +6,7 @@ interface PageLayoutProps {
   titleKey: string;
   infoKey: string;
   filters?: ReactNode;
+  chartControls?: ReactNode;
   chart?: ReactNode;
   children: ReactNode;
   error?: Error | null;
@@ -16,6 +17,7 @@ export function PageLayout({
   titleKey,
   infoKey,
   filters,
+  chartControls,
   chart,
   children,
   error,
@@ -30,7 +32,11 @@ export function PageLayout({
 
       {filters && <div className="filters">{filters}</div>}
 
-      {chart && <ChartFullscreenPanel title={t(titleKey)}>{chart}</ChartFullscreenPanel>}
+      {chart && (
+        <ChartFullscreenPanel title={t(titleKey)} controls={chartControls}>
+          {chart}
+        </ChartFullscreenPanel>
+      )}
 
       {isLoading && <div>{t("common.loading")}</div>}
       {error && <div className="error">{error.message}</div>}

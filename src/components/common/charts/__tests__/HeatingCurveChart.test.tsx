@@ -175,7 +175,7 @@ describe("HeatingCurveChart", () => {
       expect(screen.queryByText(/Flow at -10°C/)).not.toBeInTheDocument();
 
       // Click to expand
-      const toggleButton = screen.getByRole("button");
+      const toggleButton = screen.getByLabelText("Show Statistics");
       fireEvent.click(toggleButton);
 
       // Stats should now be visible
@@ -188,7 +188,7 @@ describe("HeatingCurveChart", () => {
       render(<HeatingCurveChart data={mockData} />);
 
       // Expand stats
-      const toggleButton = screen.getByRole("button");
+      const toggleButton = screen.getByLabelText("Show Statistics");
       fireEvent.click(toggleButton);
 
       // Should show predictions for -10, 0, and 10°C

@@ -57,8 +57,7 @@ describe("AzBarChart", () => {
         />,
       );
 
-      // Chart container should be present (the div with class="card")
-      expect(container.querySelector(".card")).toBeTruthy();
+      expect(container.querySelector(".chart-container")).toBeTruthy();
     });
 
     it("should show no data message when data is empty", () => {
@@ -86,7 +85,7 @@ describe("AzBarChart", () => {
         />,
       );
 
-      expect(container.querySelector(".card")).toBeTruthy();
+      expect(container.querySelector(".chart-container")).toBeTruthy();
     });
   });
 
@@ -127,7 +126,7 @@ describe("AzBarChart", () => {
         />,
       );
 
-      const chartContainer = container.querySelector(".card");
+      const chartContainer = container.querySelector(".chart-container");
       expect(chartContainer).toBeTruthy();
     });
 
@@ -200,7 +199,7 @@ describe("AzBarChart", () => {
         />,
       );
 
-      const chartContainer = container.querySelector(".card");
+      const chartContainer = container.querySelector(".chart-container");
       expect(chartContainer).toBeTruthy();
     });
 
@@ -243,7 +242,7 @@ describe("AzBarChart", () => {
         />,
       );
 
-      const chartContainer = container.querySelector(".card");
+      const chartContainer = container.querySelector(".chart-container");
       expect(chartContainer).toBeTruthy();
     });
 
@@ -296,7 +295,7 @@ describe("AzBarChart", () => {
         />,
       );
 
-      const chartContainer = container.querySelector(".card");
+      const chartContainer = container.querySelector(".chart-container");
       expect(chartContainer).toBeTruthy();
     });
 
@@ -322,7 +321,7 @@ describe("AzBarChart", () => {
         />,
       );
 
-      const chartContainer = container.querySelector(".card");
+      const chartContainer = container.querySelector(".chart-container");
       expect(chartContainer).toBeTruthy();
     });
   });
@@ -355,7 +354,7 @@ describe("AzBarChart", () => {
         />,
       );
 
-      const chartContainer = container.querySelector(".card");
+      const chartContainer = container.querySelector(".chart-container");
       expect(chartContainer).toBeTruthy();
     });
 
@@ -374,7 +373,7 @@ describe("AzBarChart", () => {
         />,
       );
 
-      const chartContainer = container.querySelector(".card");
+      const chartContainer = container.querySelector(".chart-container");
       expect(chartContainer).toBeTruthy();
     });
   });
@@ -391,7 +390,7 @@ describe("AzBarChart", () => {
         />,
       );
 
-      const chartContainer = container.querySelector(".card");
+      const chartContainer = container.querySelector(".chart-container");
       expect(chartContainer).toBeTruthy();
     });
 
@@ -421,7 +420,7 @@ describe("AzBarChart", () => {
         />,
       );
 
-      const chartContainer = container.querySelector(".card");
+      const chartContainer = container.querySelector(".chart-container");
       expect(chartContainer).toBeTruthy();
     });
   });
