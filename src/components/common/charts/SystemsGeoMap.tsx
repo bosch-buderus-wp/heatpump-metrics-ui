@@ -223,8 +223,10 @@ const Markers = ({
           vertical: "bottom",
           horizontal: "center",
         }}
-        PaperProps={{
-          className: "geo-map-popover",
+        slotProps={{
+          paper: {
+            className: "geo-map-popover",
+          },
         }}
       >
         {selectedPoint &&

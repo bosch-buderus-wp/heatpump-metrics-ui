@@ -1,11 +1,12 @@
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [react()],
   base: "/",
   define: {
-    "process.env": {},
+    "process.env": "{}",
+    "process.env.NODE_ENV": JSON.stringify(mode),
   },
   build: {
     outDir: "dist",
@@ -34,4 +35,4 @@ export default defineConfig({
       },
     },
   },
-});
+}));

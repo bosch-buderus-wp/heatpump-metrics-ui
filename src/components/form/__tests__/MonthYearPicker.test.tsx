@@ -7,7 +7,7 @@ describe("MonthYearPicker", () => {
 
   beforeEach(() => {
     // Save original Date
-    originalDate = global.Date;
+    originalDate = globalThis.Date;
 
     // Mock Date to return a fixed date: January 15, 2025
     const mockDate = new Date(2025, 0, 15); // Month is 0-indexed
@@ -20,7 +20,7 @@ describe("MonthYearPicker", () => {
       return new originalDate(...args);
     };
     MockDateConstructor.prototype = originalDate.prototype;
-    vi.spyOn(global, "Date").mockImplementation(MockDateConstructor);
+    vi.spyOn(globalThis, "Date").mockImplementation(MockDateConstructor);
   });
 
   afterEach(() => {
@@ -62,7 +62,7 @@ describe("MonthYearPicker", () => {
       return new originalDate(...args);
     };
     MockDateConstructor.prototype = originalDate.prototype;
-    vi.spyOn(global, "Date").mockImplementation(MockDateConstructor);
+    vi.spyOn(globalThis, "Date").mockImplementation(MockDateConstructor);
 
     const handleChange = vi.fn();
     render(<MonthYearPicker month={1} year={2025} onChange={handleChange} />);
@@ -117,7 +117,7 @@ describe("MonthYearPicker", () => {
       return new originalDate(...args);
     };
     MockDateConstructor.prototype = originalDate.prototype;
-    vi.spyOn(global, "Date").mockImplementation(MockDateConstructor);
+    vi.spyOn(globalThis, "Date").mockImplementation(MockDateConstructor);
 
     render(<MonthYearPicker month={1} year={2025} onChange={vi.fn()} />);
 
@@ -148,7 +148,7 @@ describe("MonthYearPicker", () => {
       return new originalDate(...args);
     };
     MockDateConstructor.prototype = originalDate.prototype;
-    vi.spyOn(global, "Date").mockImplementation(MockDateConstructor);
+    vi.spyOn(globalThis, "Date").mockImplementation(MockDateConstructor);
 
     render(<MonthYearPicker month={1} year={2025} onChange={vi.fn()} />);
 
@@ -170,7 +170,7 @@ describe("MonthYearPicker", () => {
       return new originalDate(...args);
     };
     MockDateConstructor.prototype = originalDate.prototype;
-    vi.spyOn(global, "Date").mockImplementation(MockDateConstructor);
+    vi.spyOn(globalThis, "Date").mockImplementation(MockDateConstructor);
 
     const handleChange = vi.fn();
 
@@ -194,7 +194,7 @@ describe("MonthYearPicker", () => {
       return new originalDate(...args);
     };
     MockDateConstructor.prototype = originalDate.prototype;
-    vi.spyOn(global, "Date").mockImplementation(MockDateConstructor);
+    vi.spyOn(globalThis, "Date").mockImplementation(MockDateConstructor);
 
     const handleChange = vi.fn();
 

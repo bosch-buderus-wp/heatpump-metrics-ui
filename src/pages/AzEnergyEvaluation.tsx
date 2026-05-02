@@ -19,7 +19,7 @@ export default function AzEnergyEvaluation() {
   const { t } = useTranslation();
   const [filteredData, setFilteredData] = useState<MonthlyValue[] | null>(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const now = new Date();
   const currentYear = now.getFullYear();
   const currentMonth = now.getMonth() + 1;
