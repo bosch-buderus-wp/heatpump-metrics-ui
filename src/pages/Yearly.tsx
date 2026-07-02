@@ -161,23 +161,21 @@ export default function Yearly() {
   );
 
   // Comparison mode hook - handles all filter logic
-  const {
-    comparisonMode,
-    comparisonGroupsForChart,
-    filteredDataForChart,
-    dataGridComparisonProps,
-  } = useComparisonMode(completeDataFilteredData, filterValueResolver);
+  const { comparisonMode, comparisonGroupsForChart, dataGridComparisonProps } = useComparisonMode(
+    completeDataFilteredData,
+    filterValueResolver,
+  );
 
   // Get the data to use for histogram (filtered if available)
   const histogramDataSource = useMemo(() => {
-    return (filteredDataForChart || filteredData || displayData) as Array<{
+    return filteredData as Array<{
       heating_id: string;
       thermal_energy_kwh?: number | null;
       electrical_energy_kwh?: number | null;
       thermal_energy_heating_kwh?: number | null;
       electrical_energy_heating_kwh?: number | null;
     }>;
-  }, [displayData, filteredData, filteredDataForChart]);
+  }, [filteredData]);
 
   return (
     <PageLayout
@@ -191,9 +189,7 @@ export default function Yearly() {
         viewMode === "timeSeries" ? (
           <ChartUtilityFrame>
             <AzBarChart
-              data={
-                comparisonMode ? [] : ((filteredDataForChart || filteredData) as ChartDataRow[])
-              }
+              data={comparisonMode ? [] : (filteredData as ChartDataRow[])}
               comparisonGroups={comparisonGroupsForChart}
               indexField="month"
               indexLabel="common.month"

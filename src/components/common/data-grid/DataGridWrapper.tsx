@@ -114,16 +114,38 @@ export function DataGridWrapper<T = Record<string, unknown>>({
   );
 
   // Use custom hook to handle DataGrid filtering
-  // biome-ignore lint/suspicious/noExplicitAny: MUI type incompatibility between RefObject and MutableRefObject
-  const [filteredData, handleFilterModelChange] = useDataGridFilter(apiRef as any, filteredRows);
+  const [filteredData, handleFilterModelChange] = useDataGridFilter(
+    // biome-ignore lint/suspicious/noExplicitAny: MUI type incompatibility between RefObject and MutableRefObject
+    apiRef as any,
+    filteredRows,
+    getRowId,
+  );
 
-  // Create a stable key based on filtered row IDs to detect actual filter changes
+  // Track row identity plus values consumed by charts. Search changes the IDs;
+  // analysis modes such as "COP without system consumption" keep the IDs but
+  // change energy and COP values.
   const filteredDataKey = useMemo(() => {
-    return filteredData.map((row) => getRowId(row)).join(",");
+    return JSON.stringify(
+      filteredData.map((row) => {
+        const chartRow = row as Record<string, unknown>;
+        return [
+          getRowId(row),
+          chartRow.name,
+          chartRow.az,
+          chartRow.az_heating,
+          chartRow.thermal_energy_kwh,
+          chartRow.electrical_energy_kwh,
+          chartRow.thermal_energy_heating_kwh,
+          chartRow.electrical_energy_heating_kwh,
+          chartRow.outdoor_temperature_c,
+          chartRow.flow_temperature_c,
+        ];
+      }),
+    );
   }, [filteredData, getRowId]);
 
-  // Call onFilterChange only when the visible row selection changes. Depending
-  // on complete row objects here creates a feedback loop when parents derive rows.
+  // Avoid depending on complete row-array references here: parents derive rows
+  // from this callback, which would create a feedback loop.
   useEffect(() => {
     if (onFilterChange) {
       onFilterChange(filteredData);
@@ -173,6 +195,7 @@ export function DataGridWrapper<T = Record<string, unknown>>({
             },
           }}
           disableColumnFilter
+          onFilterModelChange={handleFilterModelChange}
           pageSizeOptions={[10, 25, 50, 100]}
           disableRowSelectionOnClick
           showCellVerticalBorder

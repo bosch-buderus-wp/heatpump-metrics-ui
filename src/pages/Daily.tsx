@@ -136,18 +136,16 @@ export default function Daily() {
   }, [displayData]);
 
   // Comparison mode hook - handles all filter logic
-  const {
-    comparisonMode,
-    comparisonGroupsForChart,
-    filteredDataForChart,
-    dataGridComparisonProps,
-  } = useComparisonMode(sortedData, filterValueResolver);
+  const { comparisonMode, comparisonGroupsForChart, dataGridComparisonProps } = useComparisonMode(
+    sortedData,
+    filterValueResolver,
+  );
 
   // Filter out unrealistic data for charts (hourly data)
-  const realisticDataForChart = useMemo(() => {
-    if (!filteredDataForChart) return null;
-    return filterRealisticDataForCharts(filteredDataForChart, true); // true = hourly data
-  }, [filteredDataForChart]);
+  const realisticDataForChart = useMemo(
+    () => filterRealisticDataForCharts(filteredData, true),
+    [filteredData],
+  );
 
   const realisticComparisonGroups = useMemo(() => {
     if (!comparisonGroupsForChart) return undefined;
@@ -162,7 +160,7 @@ export default function Daily() {
   // We can sum the deltas to get the same result as (last - first) cumulative values
   const histogramDataSource = useMemo(() => {
     // Determine which filtered data to use
-    const sourceData = filteredDataForChart || filteredData || sortedData;
+    const sourceData = filteredData;
 
     // Group deltas by heating_id and sum them
     const systemTotals = new Map<
@@ -204,7 +202,7 @@ export default function Daily() {
       electrical_energy_heating_kwh: totals.electrical_energy_heating_kwh,
       created_at: null, // Not needed for aggregated data
     }));
-  }, [filteredDataForChart, filteredData, sortedData]);
+  }, [filteredData]);
 
   return (
     <PageLayout
@@ -218,12 +216,7 @@ export default function Daily() {
         viewMode === "timeSeries" ? (
           <ChartUtilityFrame>
             <AzBarChart
-              data={
-                comparisonMode
-                  ? []
-                  : ((realisticDataForChart ||
-                      filterRealisticDataForCharts(filteredData, true)) as ChartDataRow[])
-              }
+              data={comparisonMode ? [] : (realisticDataForChart as ChartDataRow[])}
               comparisonGroups={realisticComparisonGroups}
               indexField="hour"
               indexLabel="common.hour"

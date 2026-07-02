@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { HeatingCurveChart, type HeatingCurveDataPoint } from "../components/common/charts";
 import { DataGridWrapper } from "../components/common/data-grid";
@@ -21,6 +21,10 @@ const FILTER_REQUEST_DEBOUNCE_MS = 700;
 export default function HeatingCurve() {
   const { t } = useTranslation();
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [filteredData, setFilteredData] = useState<DailyValue[] | null>(null);
+  const handleFilterChange = useCallback((rows: DailyValue[]) => {
+    setFilteredData(rows);
+  }, []);
 
   // Get current user's ID
   useEffect(() => {
@@ -74,7 +78,7 @@ export default function HeatingCurve() {
 
   // Prepare scatter plot data.
   const chartData: HeatingCurveDataPoint[] = useMemo(() => {
-    const dataToUse = data ?? [];
+    const dataToUse = filteredData ?? data ?? [];
     return dataToUse.map((row) => ({
       outdoor_temperature_c: row.outdoor_temperature_c,
       flow_temperature_c: row.flow_temperature_c,
@@ -83,7 +87,7 @@ export default function HeatingCurve() {
       date: row.date,
       user_id: row.user_id,
     }));
-  }, [data]);
+  }, [data, filteredData]);
 
   // Memoize the chart component to prevent unnecessary re-renders
   const chartComponent = useMemo(() => {
@@ -104,6 +108,7 @@ export default function HeatingCurve() {
         loading={isLoading}
         getRowId={(row) => `${row.heating_id}-${row.date}`}
         columnVisibilityModel={commonHiddenColumns}
+        onFilterChange={handleFilterChange}
         {...dataGridComparisonProps}
       />
     </PageLayout>

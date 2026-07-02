@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AzScatterChart, type ScatterDataPoint } from "../components/common/charts";
 import { DataGridWrapper } from "../components/common/data-grid";
@@ -22,6 +22,10 @@ const FILTER_REQUEST_DEBOUNCE_MS = 700;
 export default function AzTempEvaluation() {
   const { t } = useTranslation();
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [filteredData, setFilteredData] = useState<DailyValue[] | null>(null);
+  const handleFilterChange = useCallback((rows: DailyValue[]) => {
+    setFilteredData(rows);
+  }, []);
 
   // Get current user's ID
   useEffect(() => {
@@ -78,7 +82,7 @@ export default function AzTempEvaluation() {
 
   // Prepare scatter plot data (use filtered data if available)
   const scatterData: ScatterDataPoint[] = useMemo(() => {
-    const dataToUse = displayData ?? [];
+    const dataToUse = filteredData ?? displayData ?? [];
     return dataToUse.map((row) => ({
       heating_id: row.heating_id,
       user_id: row.user_id,
@@ -89,7 +93,7 @@ export default function AzTempEvaluation() {
       outdoor_temperature_c: row.outdoor_temperature_c,
       flow_temperature_c: row.flow_temperature_c,
     }));
-  }, [displayData]);
+  }, [displayData, filteredData]);
 
   // Memoize the chart component to prevent unnecessary re-renders
   const chartComponent = useMemo(() => {
@@ -111,6 +115,7 @@ export default function AzTempEvaluation() {
         loading={isLoading}
         getRowId={(row) => `${row.heating_id}-${row.date}`}
         columnVisibilityModel={commonHiddenColumns}
+        onFilterChange={handleFilterChange}
         {...dataGridComparisonProps}
       />
     </PageLayout>

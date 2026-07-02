@@ -1,5 +1,5 @@
 import { type GridApiCommon, gridFilteredSortedRowIdsSelector } from "@mui/x-data-grid";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 interface GridFilterModel {
   items: Array<{
@@ -18,14 +18,35 @@ interface GridFilterModel {
 export function useDataGridFilter<T>(
   apiRef: React.MutableRefObject<GridApiCommon>,
   sourceData: T[],
+  getRowId: (row: T) => string | number,
 ): [T[], (model: GridFilterModel) => void] {
   const [filteredData, setFilteredData] = useState<T[]>([]);
   const [filterVersion, setFilterVersion] = useState(0);
+  const filterUpdateTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const getRowIdRef = useRef(getRowId);
+  getRowIdRef.current = getRowId;
 
   const handleFilterModelChange = useCallback((_model: GridFilterModel) => {
-    // Trigger a re-filter by incrementing version
-    setFilterVersion((v) => v + 1);
+    // MUI emits the model change before its internal filtered-row state is
+    // committed. Read the row IDs in the next task so chart consumers receive
+    // the same rows that are already visible in the grid.
+    if (filterUpdateTimerRef.current) {
+      clearTimeout(filterUpdateTimerRef.current);
+    }
+    filterUpdateTimerRef.current = setTimeout(() => {
+      setFilterVersion((version) => version + 1);
+      filterUpdateTimerRef.current = null;
+    }, 0);
   }, []);
+
+  useEffect(
+    () => () => {
+      if (filterUpdateTimerRef.current) {
+        clearTimeout(filterUpdateTimerRef.current);
+      }
+    },
+    [],
+  );
 
   // Update filtered data when filter changes or source data changes
   useEffect(() => {
@@ -33,10 +54,13 @@ export function useDataGridFilter<T>(
       try {
         // Get filtered and sorted row IDs from DataGrid
         const filteredRowIds = gridFilteredSortedRowIdsSelector(apiRef);
+        const sourceRowsById = new Map(
+          sourceData.map((row) => [getRowIdRef.current(row), row] as const),
+        );
 
         const visibleRows: T[] = [];
         for (const id of filteredRowIds) {
-          const row = apiRef.current?.getRow(id);
+          const row = sourceRowsById.get(id) ?? apiRef.current?.getRow(id);
           if (row) {
             visibleRows.push(row as T);
           }
