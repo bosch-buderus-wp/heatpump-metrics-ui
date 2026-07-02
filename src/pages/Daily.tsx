@@ -8,6 +8,7 @@ import { ChartUtilityFrame, PageLayout } from "../components/common/layout";
 import { ConfirmDialog, MetricModeToggle, ViewModeToggle } from "../components/ui";
 import { useComparisonMode } from "../hooks/useComparisonMode";
 import { useDeleteMeasurement } from "../hooks/useDeleteOperations";
+import { useSystemConsumptionRows } from "../hooks/useSystemConsumptionMode";
 import { filterRealisticDataForCharts } from "../lib/dataQuality";
 import { createFilterValueResolver } from "../lib/filterValueResolver";
 import { supabase } from "../lib/supabaseClient";
@@ -120,18 +121,19 @@ export default function Daily() {
       return data as MeasurementDeltaRow[];
     },
   });
+  const displayData = useSystemConsumptionRows(data, "hour");
 
   // Add hour field for chart grouping
   const sortedData = useMemo(() => {
-    if (!data) return [];
+    if (!displayData) return [];
 
     // View already provides deltas, AZ calculations, and temperature corrections
     // Just add hour field for chart grouping
-    return data.map((row) => ({
+    return displayData.map((row) => ({
       ...row,
       hour: dayjs(row.created_at).hour().toString(),
     }));
-  }, [data]);
+  }, [displayData]);
 
   // Comparison mode hook - handles all filter logic
   const {
@@ -210,6 +212,7 @@ export default function Daily() {
       infoKey="daily.info"
       error={error}
       isLoading={isLoading}
+      showSystemConsumptionToggle
       chartControls={filterSection}
       chart={
         viewMode === "timeSeries" ? (

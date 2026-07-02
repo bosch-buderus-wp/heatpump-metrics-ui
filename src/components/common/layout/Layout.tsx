@@ -2,6 +2,7 @@ import type { Session } from "@supabase/supabase-js";
 import { createContext, useContext, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, NavLink } from "react-router-dom";
+import { SystemConsumptionModeProvider } from "../../../hooks/useSystemConsumptionMode";
 import { supabase } from "../../../lib/supabaseClient";
 
 interface SessionContextType {
@@ -40,62 +41,64 @@ export function Layout({ children }: LayoutProps) {
 
   return (
     <SessionContext.Provider value={{ session }}>
-      <div className="app-container">
-        {!isEmbedded && (
-          <header className="app-header">
-            <Link to="/" className="brand">
-              {t("appTitle")}
-            </Link>
-            <nav className="nav">
-              <NavLink to="/" end>
-                {t("nav.home")}
-              </NavLink>
-              <NavLink to="/yearly">{t("nav.yearly")}</NavLink>
-              <NavLink to="/monthly">{t("nav.monthly")}</NavLink>
-              <NavLink to="/daily">{t("nav.daily")}</NavLink>
-              <NavLink to="/measurements">{t("nav.measurements")}</NavLink>
-              <NavLink to="/systems">{t("nav.systems")}</NavLink>
-              <NavLink to="/az-temp-evaluation">{t("nav.azTempEvaluation")}</NavLink>
-              <NavLink to="/az-energy-evaluation">{t("nav.azEnergyEvaluation")}</NavLink>
-              <NavLink to="/heating-curve">{t("nav.heatingCurve")}</NavLink>
-              <NavLink to="/my-account">{t("nav.myAccount")}</NavLink>
-            </nav>
-            <div className="actions">
-              <select
-                aria-label="Language"
-                value={i18n.language}
-                onChange={(e) => i18n.changeLanguage(e.target.value)}
-              >
-                <option value="de">DE</option>
-                <option value="en">EN</option>
-              </select>
-              {session ? (
-                <button
-                  type="button"
-                  className="btn"
-                  onClick={async () => {
-                    await supabase.auth.signOut();
-                  }}
-                >
-                  {t("nav.logout")}
-                </button>
-              ) : (
-                <NavLink to="/login" className="btn">
-                  {t("nav.login")}
+      <SystemConsumptionModeProvider>
+        <div className="app-container">
+          {!isEmbedded && (
+            <header className="app-header">
+              <Link to="/" className="brand">
+                {t("appTitle")}
+              </Link>
+              <nav className="nav">
+                <NavLink to="/" end>
+                  {t("nav.home")}
                 </NavLink>
-              )}
-            </div>
-          </header>
-        )}
-        <main className="app-main">{children}</main>
-        <footer className="app-footer">
-          <span>© {new Date().getFullYear()} Heatpump Metrics</span>
-          <span className="footer-separator">|</span>
-          <Link to="/terms">{t("legal.terms")}</Link>
-          <span className="footer-separator">|</span>
-          <Link to="/privacy">{t("legal.privacy")}</Link>
-        </footer>
-      </div>
+                <NavLink to="/yearly">{t("nav.yearly")}</NavLink>
+                <NavLink to="/monthly">{t("nav.monthly")}</NavLink>
+                <NavLink to="/daily">{t("nav.daily")}</NavLink>
+                <NavLink to="/measurements">{t("nav.measurements")}</NavLink>
+                <NavLink to="/systems">{t("nav.systems")}</NavLink>
+                <NavLink to="/az-temp-evaluation">{t("nav.azTempEvaluation")}</NavLink>
+                <NavLink to="/az-energy-evaluation">{t("nav.azEnergyEvaluation")}</NavLink>
+                <NavLink to="/heating-curve">{t("nav.heatingCurve")}</NavLink>
+                <NavLink to="/my-account">{t("nav.myAccount")}</NavLink>
+              </nav>
+              <div className="actions">
+                <select
+                  aria-label="Language"
+                  value={i18n.language}
+                  onChange={(e) => i18n.changeLanguage(e.target.value)}
+                >
+                  <option value="de">DE</option>
+                  <option value="en">EN</option>
+                </select>
+                {session ? (
+                  <button
+                    type="button"
+                    className="btn"
+                    onClick={async () => {
+                      await supabase.auth.signOut();
+                    }}
+                  >
+                    {t("nav.logout")}
+                  </button>
+                ) : (
+                  <NavLink to="/login" className="btn">
+                    {t("nav.login")}
+                  </NavLink>
+                )}
+              </div>
+            </header>
+          )}
+          <main className="app-main">{children}</main>
+          <footer className="app-footer">
+            <span>© {new Date().getFullYear()} Heatpump Metrics</span>
+            <span className="footer-separator">|</span>
+            <Link to="/terms">{t("legal.terms")}</Link>
+            <span className="footer-separator">|</span>
+            <Link to="/privacy">{t("legal.privacy")}</Link>
+          </footer>
+        </div>
+      </SystemConsumptionModeProvider>
     </SessionContext.Provider>
   );
 }

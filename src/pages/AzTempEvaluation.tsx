@@ -6,6 +6,7 @@ import { DataGridWrapper } from "../components/common/data-grid";
 import { PageLayout } from "../components/common/layout";
 import { useComparisonMode } from "../hooks/useComparisonMode";
 import { useDebouncedValue } from "../hooks/useDebouncedValue";
+import { useSystemConsumptionRows } from "../hooks/useSystemConsumptionMode";
 import { createFilterValueResolver } from "../lib/filterValueResolver";
 import { sanitizeGridFilterModel } from "../lib/serverFilterModel";
 import { supabase } from "../lib/supabaseClient";
@@ -73,10 +74,11 @@ export default function AzTempEvaluation() {
     },
     placeholderData: (previousData) => previousData,
   });
+  const displayData = useSystemConsumptionRows(data, "day");
 
   // Prepare scatter plot data (use filtered data if available)
   const scatterData: ScatterDataPoint[] = useMemo(() => {
-    const dataToUse = data ?? [];
+    const dataToUse = displayData ?? [];
     return dataToUse.map((row) => ({
       heating_id: row.heating_id,
       user_id: row.user_id,
@@ -87,7 +89,7 @@ export default function AzTempEvaluation() {
       outdoor_temperature_c: row.outdoor_temperature_c,
       flow_temperature_c: row.flow_temperature_c,
     }));
-  }, [data]);
+  }, [displayData]);
 
   // Memoize the chart component to prevent unnecessary re-renders
   const chartComponent = useMemo(() => {
@@ -100,10 +102,11 @@ export default function AzTempEvaluation() {
       infoKey="azTempEvaluation.info"
       error={error}
       isLoading={isLoading}
+      showSystemConsumptionToggle
       chart={chartComponent}
     >
       <DataGridWrapper
-        rows={data || []}
+        rows={displayData || []}
         columns={columns}
         loading={isLoading}
         getRowId={(row) => `${row.heating_id}-${row.date}`}

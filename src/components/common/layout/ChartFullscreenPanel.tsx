@@ -7,12 +7,14 @@ import { useTranslation } from "react-i18next";
 interface ChartFullscreenPanelProps {
   title: string;
   controls?: ReactNode;
+  showSystemConsumptionToggle?: boolean;
   children: ReactNode;
 }
 
 interface ChartFullscreenPanelContextValue {
   open: boolean;
   setOpen: (open: boolean) => void;
+  showSystemConsumptionToggle: boolean;
 }
 
 const ChartFullscreenPanelContext = createContext<ChartFullscreenPanelContextValue | null>(null);
@@ -21,7 +23,12 @@ export function useChartFullscreenPanel() {
   return useContext(ChartFullscreenPanelContext);
 }
 
-export function ChartFullscreenPanel({ title, controls, children }: ChartFullscreenPanelProps) {
+export function ChartFullscreenPanel({
+  title,
+  controls,
+  showSystemConsumptionToggle = false,
+  children,
+}: ChartFullscreenPanelProps) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
 
@@ -59,7 +66,7 @@ export function ChartFullscreenPanel({ title, controls, children }: ChartFullscr
   );
 
   return (
-    <ChartFullscreenPanelContext.Provider value={{ open, setOpen }}>
+    <ChartFullscreenPanelContext.Provider value={{ open, setOpen, showSystemConsumptionToggle }}>
       {!open ? <div className="chart-panel">{surface}</div> : null}
       {open
         ? createPortal(

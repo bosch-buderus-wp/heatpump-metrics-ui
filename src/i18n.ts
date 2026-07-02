@@ -100,6 +100,9 @@ const resources = {
         electricalEnergyHeating: "Stromverbrauch (Heizung)",
         openFullscreen: "Diagramm vergrößern",
         closeFullscreen: "Vollbild schließen",
+        excludeSystemConsumption: "AZ ohne Systemverbrauch",
+        systemConsumptionHint:
+          "Zieht geschätzte 25 W Systemverbrauch vom gesamten und vom Heizstrom ab.",
       },
       toolbar: {
         columns: "Spalten anzeigen/verbergen",
@@ -601,6 +604,9 @@ const resources = {
         electricalEnergyHeating: "Energy Consumption (heating)",
         openFullscreen: "Enlarge chart",
         closeFullscreen: "Close fullscreen",
+        excludeSystemConsumption: "COP without system consumption",
+        systemConsumptionHint:
+          "Subtracts an estimated 25 W system consumption from total and heating electricity.",
       },
       toolbar: {
         columns: "Show/hide columns",

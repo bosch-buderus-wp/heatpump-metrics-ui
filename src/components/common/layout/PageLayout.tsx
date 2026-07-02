@@ -11,6 +11,7 @@ interface PageLayoutProps {
   children: ReactNode;
   error?: Error | null;
   isLoading?: boolean;
+  showSystemConsumptionToggle?: boolean;
 }
 
 export function PageLayout({
@@ -22,6 +23,7 @@ export function PageLayout({
   children,
   error,
   isLoading = false,
+  showSystemConsumptionToggle = false,
 }: PageLayoutProps) {
   const { t } = useTranslation();
 
@@ -33,7 +35,11 @@ export function PageLayout({
       {filters && <div className="filters">{filters}</div>}
 
       {chart && (
-        <ChartFullscreenPanel title={t(titleKey)} controls={chartControls}>
+        <ChartFullscreenPanel
+          title={t(titleKey)}
+          controls={chartControls}
+          showSystemConsumptionToggle={showSystemConsumptionToggle}
+        >
           {chart}
         </ChartFullscreenPanel>
       )}

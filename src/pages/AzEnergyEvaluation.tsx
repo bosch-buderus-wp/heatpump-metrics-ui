@@ -8,12 +8,17 @@ import {
 import { DataGridWrapper } from "../components/common/data-grid";
 import { PageLayout } from "../components/common/layout";
 import { useComparisonMode } from "../hooks/useComparisonMode";
+import { useSystemConsumptionRows } from "../hooks/useSystemConsumptionMode";
 import { createFilterValueResolver } from "../lib/filterValueResolver";
 import { supabase } from "../lib/supabaseClient";
 import { commonHiddenColumns, getTimeSeriesColumns } from "../lib/tableHelpers";
 import type { Database } from "../types/database.types";
 
 type MonthlyValue = Database["public"]["Views"]["monthly_values_view"]["Row"];
+
+function getMonthlyValueKey(row: MonthlyValue) {
+  return row.id ?? `${row.heating_id}-${row.month}-${row.year}`;
+}
 
 export default function AzEnergyEvaluation() {
   const { t } = useTranslation();
@@ -69,13 +74,18 @@ export default function AzEnergyEvaluation() {
       return data as MonthlyValue[];
     },
   });
+  const displayData = useSystemConsumptionRows(data, "month");
 
   // Use comparison mode hook
-  const { dataGridComparisonProps } = useComparisonMode(data, filterValueResolver);
+  const { dataGridComparisonProps } = useComparisonMode(displayData, filterValueResolver);
 
   // Prepare scatter plot data (use filtered data if available)
   const scatterData: YearlyEnergyScatterDataPoint[] = useMemo(() => {
-    const dataToUse = filteredData !== null ? filteredData : data || [];
+    const filteredKeys =
+      filteredData !== null ? new Set(filteredData.map((row) => getMonthlyValueKey(row))) : null;
+    const dataToUse = filteredKeys
+      ? (displayData || []).filter((row) => filteredKeys.has(getMonthlyValueKey(row)))
+      : displayData || [];
     return dataToUse.map((row) => ({
       heating_id: row.heating_id,
       user_id: row.user_id,
@@ -86,7 +96,7 @@ export default function AzEnergyEvaluation() {
       thermal_energy_heating_kwh: row.thermal_energy_heating_kwh,
       electrical_energy_heating_kwh: row.electrical_energy_heating_kwh,
     }));
-  }, [data, filteredData]);
+  }, [displayData, filteredData]);
 
   // Memoize the chart component to prevent unnecessary re-renders
   const chartComponent = useMemo(() => {
@@ -99,10 +109,11 @@ export default function AzEnergyEvaluation() {
       infoKey="azEnergyEvaluation.info"
       error={error}
       isLoading={isLoading}
+      showSystemConsumptionToggle
       chart={chartComponent}
     >
       <DataGridWrapper
-        rows={data || []}
+        rows={displayData || []}
         columns={columns}
         loading={isLoading}
         getRowId={(row) =>

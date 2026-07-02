@@ -200,6 +200,15 @@
   flex: 0 0 auto;
 }
 
+.chart-utility-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--spacing-md);
+  min-height: 30px;
+  margin-left: auto;
+}
+
 .chart-container-relative-attached {
   border-top-left-radius: 0;
   border-top-right-radius: 0;
@@ -339,8 +348,11 @@
 
 @media (max-width: 768px) {
   .chart-utility-bar {
-    align-items: stretch;
-    flex-direction: column;
+    align-items: center;
+  }
+
+  .chart-utility-actions {
+    gap: var(--spacing-sm);
   }
 
   .chart-stats-grid-4,
@@ -476,4 +488,20 @@
   fill: white;
   pointer-events: none;
   user-select: none;
+}
+.chart-utility-actions .system-consumption-toggle {
+  margin: 0;
+  padding: 0.2rem 0.55rem 0.2rem 0.25rem;
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--bg-white) 92%, var(--primary-color));
+}
+
+.system-consumption-toggle .MuiFormControlLabel-label > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
 }

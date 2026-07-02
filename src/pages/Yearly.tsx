@@ -8,6 +8,7 @@ import { DataGridWrapper } from "../components/common/data-grid";
 import { ChartUtilityFrame, PageLayout } from "../components/common/layout";
 import { MetricModeToggle, ViewModeToggle } from "../components/ui";
 import { useComparisonMode } from "../hooks/useComparisonMode";
+import { useSystemConsumptionRows } from "../hooks/useSystemConsumptionMode";
 import { createFilterValueResolver } from "../lib/filterValueResolver";
 import { supabase } from "../lib/supabaseClient";
 import { commonHiddenColumns, getTimeSeriesColumns } from "../lib/tableHelpers";
@@ -61,6 +62,7 @@ export default function Yearly() {
       return data as MonthlyValueViewRow[];
     },
   });
+  const displayData = useSystemConsumptionRows(data, "month");
 
   const years = useMemo(() => {
     const y = [];
@@ -87,13 +89,13 @@ export default function Yearly() {
 
   // Filter data to only include systems with complete data
   const completeDataFilteredData = useMemo(() => {
-    if (!data) return data;
-    if (!completeDataOnly) return data;
+    if (!displayData) return displayData;
+    if (!completeDataOnly) return displayData;
 
     // Count months per system
     const systemMonthCounts = new Map<string, Set<number>>();
 
-    for (const row of data) {
+    for (const row of displayData) {
       const heatingId = row.heating_id;
       const month = row.month;
 
@@ -113,11 +115,13 @@ export default function Yearly() {
       }
     });
 
-    const filtered = data.filter((row) => row.heating_id && completeSystemIds.has(row.heating_id));
+    const filtered = displayData.filter(
+      (row) => row.heating_id && completeSystemIds.has(row.heating_id),
+    );
 
     // Return original data if filter didn't remove anything to maintain reference stability
-    return filtered.length === data.length ? data : filtered;
-  }, [data, completeDataOnly, expectedMonths]);
+    return filtered.length === displayData.length ? displayData : filtered;
+  }, [displayData, completeDataOnly, expectedMonths]);
 
   // Memoize filter section to prevent unnecessary re-renders
   const filterSection = useMemo(
@@ -166,14 +170,14 @@ export default function Yearly() {
 
   // Get the data to use for histogram (filtered if available)
   const histogramDataSource = useMemo(() => {
-    return (filteredDataForChart || filteredData || data) as Array<{
+    return (filteredDataForChart || filteredData || displayData) as Array<{
       heating_id: string;
       thermal_energy_kwh?: number | null;
       electrical_energy_kwh?: number | null;
       thermal_energy_heating_kwh?: number | null;
       electrical_energy_heating_kwh?: number | null;
     }>;
-  }, [data, filteredData, filteredDataForChart]);
+  }, [displayData, filteredData, filteredDataForChart]);
 
   return (
     <PageLayout
@@ -181,6 +185,7 @@ export default function Yearly() {
       infoKey="yearly.info"
       error={error}
       isLoading={isLoading}
+      showSystemConsumptionToggle
       chartControls={filterSection}
       chart={
         viewMode === "timeSeries" ? (

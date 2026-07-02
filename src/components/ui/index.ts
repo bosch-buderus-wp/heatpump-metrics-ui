@@ -3,4 +3,5 @@ export { ConfirmDialog } from "./ConfirmDialog";
 export { CopyField } from "./CopyField";
 export { FieldHint } from "./FieldHint";
 export { MetricModeToggle } from "./MetricModeToggle";
+export { SystemConsumptionToggle } from "./SystemConsumptionToggle";
 export { ViewModeToggle } from "./ViewModeToggle";

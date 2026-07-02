@@ -9,6 +9,7 @@ import { ChartUtilityFrame, PageLayout } from "../components/common/layout";
 import { MonthYearPicker } from "../components/form";
 import { MetricModeToggle, ViewModeToggle } from "../components/ui";
 import { useComparisonMode } from "../hooks/useComparisonMode";
+import { useSystemConsumptionRows } from "../hooks/useSystemConsumptionMode";
 import { createFilterValueResolver } from "../lib/filterValueResolver";
 import { supabase } from "../lib/supabaseClient";
 import { commonHiddenColumns, getTimeSeriesColumns } from "../lib/tableHelpers";
@@ -59,6 +60,7 @@ export default function Monthly() {
       return data as DailyValue[];
     },
   });
+  const displayData = useSystemConsumptionRows(data, "day");
 
   const handleMonthYearChange = useCallback((val: { month: number; year: number }) => {
     setMonth(val.month);
@@ -71,18 +73,18 @@ export default function Monthly() {
     comparisonGroupsForChart,
     filteredDataForChart,
     dataGridComparisonProps,
-  } = useComparisonMode(data, filterValueResolver);
+  } = useComparisonMode(displayData, filterValueResolver);
 
   // Get the data to use for histogram (filtered if available)
   const histogramDataSource = useMemo(() => {
-    return (filteredDataForChart || filteredData || data) as Array<{
+    return (filteredDataForChart || filteredData || displayData) as Array<{
       heating_id: string;
       thermal_energy_kwh?: number | null;
       electrical_energy_kwh?: number | null;
       thermal_energy_heating_kwh?: number | null;
       electrical_energy_heating_kwh?: number | null;
     }>;
-  }, [data, filteredData, filteredDataForChart]);
+  }, [displayData, filteredData, filteredDataForChart]);
 
   return (
     <PageLayout
@@ -90,6 +92,7 @@ export default function Monthly() {
       infoKey="monthly.info"
       error={error}
       isLoading={isLoading}
+      showSystemConsumptionToggle
       chartControls={
         <div className="filter-container">
           <MonthYearPicker month={month} year={year} onChange={handleMonthYearChange} />
@@ -125,7 +128,7 @@ export default function Monthly() {
       }
     >
       <DataGridWrapper
-        rows={data || []}
+        rows={displayData || []}
         columns={columns}
         loading={isLoading}
         getRowId={(row) => `${row.heating_id}-${row.date}`}

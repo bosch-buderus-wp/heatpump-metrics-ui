@@ -122,10 +122,8 @@ export function DataGridWrapper<T = Record<string, unknown>>({
     return filteredData.map((row) => getRowId(row)).join(",");
   }, [filteredData, getRowId]);
 
-  // Call onFilterChange callback when filtered data actually changes
-  // Use useEffect to avoid calling setState during render
-  // Note: onFilterChange and filteredData are intentionally NOT in deps to avoid infinite loops
-  // We use filteredDataKey as a stable proxy to detect actual filter changes
+  // Call onFilterChange only when the visible row selection changes. Depending
+  // on complete row objects here creates a feedback loop when parents derive rows.
   useEffect(() => {
     if (onFilterChange) {
       onFilterChange(filteredData);
