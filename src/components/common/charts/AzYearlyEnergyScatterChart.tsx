@@ -37,6 +37,7 @@ interface AzYearlyEnergyScatterChartProps {
 
 const REFERENCE_ENERGY_VALUES = [30, 60, 90, 120] as const;
 const MONTHS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] as const;
+const MIN_YEAR_COVERAGE = 0.4;
 
 function median(values: number[]): number {
   if (values.length === 0) {
@@ -225,7 +226,7 @@ export function AzYearlyEnergyScatterChart({
       }
 
       const coverage = observedMonths.reduce((sum, month) => sum + (finalProfile[month] ?? 0), 0);
-      if (coverage <= 0) {
+      if (coverage < MIN_YEAR_COVERAGE) {
         continue;
       }
 
@@ -243,7 +244,7 @@ export function AzYearlyEnergyScatterChart({
       });
     }
 
-    const loessSource = points.filter((p) => p.coverage >= 0.4);
+    const loessSource = points.filter((p) => p.coverage >= MIN_YEAR_COVERAGE);
     const regressionPoints = loessSource.length >= 3 ? loessSource : points;
 
     const loessBandwidth = regressionPoints.length < 20 ? 1 : 0.8;

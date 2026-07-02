@@ -106,4 +106,38 @@ describe("AzYearlyEnergyScatterChart", () => {
     const series = capturedScatterProps.data as Array<{ id: string; data: unknown[] }>;
     expect(series).toEqual([]);
   });
+
+  it("excludes points below 40 percent weighted year coverage", () => {
+    const data: YearlyEnergyScatterDataPoint[] = [
+      {
+        heating_id: "winter-system",
+        user_id: "user-1",
+        year: 2026,
+        month: 1,
+        heated_area_m2: 100,
+        thermal_energy_heating_kwh: 900,
+        electrical_energy_heating_kwh: 300,
+      },
+      {
+        heating_id: "summer-only-system",
+        user_id: "user-2",
+        year: 2026,
+        month: 6,
+        heated_area_m2: 100,
+        thermal_energy_heating_kwh: 100,
+        electrical_energy_heating_kwh: 25,
+      },
+    ];
+
+    render(<AzYearlyEnergyScatterChart data={data} currentUserId="user-1" />);
+
+    const series = capturedScatterProps.data as Array<{
+      id: string;
+      data: Array<{ heating_id?: string }>;
+    }>;
+    const pointIds = series.flatMap((item) => item.data.map((point) => point.heating_id));
+
+    expect(pointIds).toContain("winter-system");
+    expect(pointIds).not.toContain("summer-only-system");
+  });
 });
