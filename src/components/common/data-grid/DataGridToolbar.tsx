@@ -20,17 +20,19 @@ import {
   ColumnsPanelTrigger,
   ExportCsv,
   ExportPrint,
+  type GridColDef,
+  type GridFilterModel,
   QuickFilter,
   QuickFilterClear,
   QuickFilterControl,
   QuickFilterTrigger,
   Toolbar,
   ToolbarButton,
-  useGridApiContext,
 } from "@mui/x-data-grid";
-import { useEffect, useRef, useState } from "react";
+import { type MouseEvent, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { CHART_COLORS } from "../../../lib/chartTheme";
+import { MultiFilterPanel } from "./MultiFilterPanel";
 
 interface DataGridToolbarInternalProps {
   userId?: string | null;
@@ -42,6 +44,9 @@ interface DataGridToolbarInternalProps {
   onFilterGroup1Click?: () => void;
   onFilterGroup2Click?: () => void;
   onClearFilterGroup2?: () => void;
+  columns?: GridColDef[];
+  filterModel?: GridFilterModel;
+  onFilterModelChange?: (model: GridFilterModel) => void;
 }
 
 type OwnerState = {
@@ -84,55 +89,34 @@ function DataGridToolbarInternal({
   onFilterGroup1Click,
   onFilterGroup2Click,
   onClearFilterGroup2,
+  columns = [],
+  filterModel = { items: [] },
+  onFilterModelChange,
 }: DataGridToolbarInternalProps) {
   const { t } = useTranslation();
-  const apiRef = useGridApiContext();
   const [exportMenuOpen, setExportMenuOpen] = useState(false);
   const exportMenuTriggerRef = useRef<HTMLButtonElement>(null);
-  const [filterActive, setFilterActive] = useState(false);
-
-  // Listen to filter model changes to update our state
-  useEffect(() => {
-    const handleFilterChange = () => {
-      const currentFilterModel = apiRef.current?.state?.filter?.filterModel;
-      const hasUserFilter =
-        currentFilterModel?.items?.some(
-          (item) => item.field === "user_id" && item.value === userId,
-        ) ?? false;
-      setFilterActive(hasUserFilter);
-    };
-
-    const unsubscribe = apiRef.current?.subscribeEvent("filterModelChange", handleFilterChange);
-
-    // Check initial state
-    handleFilterChange();
-
-    return () => {
-      unsubscribe?.();
-    };
-  }, [apiRef, userId]);
-
-  const isFiltered = filterActive;
+  const [filterAnchorEl, setFilterAnchorEl] = useState<HTMLElement | null>(null);
+  const isFiltered = filterModel.items.some(
+    (item) => item.field === "user_id" && item.value === userId,
+  );
 
   const handleToggleUserFilter = () => {
     if (!userId) return;
 
-    const currentModel = apiRef.current.state.filter.filterModel;
-
     if (isFiltered) {
-      // Remove the user filter
-      const newItems = currentModel.items.filter((item) => item.field !== "user_id");
-      apiRef.current.setFilterModel({
-        ...currentModel,
+      const newItems = filterModel.items.filter((item) => item.field !== "user_id");
+      onFilterModelChange?.({
+        ...filterModel,
         items: newItems,
       });
     } else {
-      // Add the user filter
-      apiRef.current.setFilterModel({
-        ...currentModel,
+      onFilterModelChange?.({
+        ...filterModel,
         items: [
-          ...currentModel.items,
+          ...filterModel.items,
           {
+            id: `user-${activeGroup}`,
             field: "user_id",
             operator: "equals",
             value: userId,
@@ -159,7 +143,13 @@ function DataGridToolbarInternal({
             display: "inline-flex",
           }}
         >
-          <ToolbarButton onClick={onFilterGroup1Click}>
+          <ToolbarButton
+            aria-label={comparisonMode ? t("toolbar.filter1") : t("toolbar.filters")}
+            onClick={(event: MouseEvent<HTMLElement>) => {
+              onFilterGroup1Click?.();
+              setFilterAnchorEl(event.currentTarget);
+            }}
+          >
             <Badge badgeContent={filterGroup1Count} color="success" variant="dot">
               <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
                 <FilterListIcon fontSize="small" sx={{ color: CHART_COLORS.group1 }} />
@@ -186,7 +176,14 @@ function DataGridToolbarInternal({
             display: "inline-flex",
           }}
         >
-          <ToolbarButton onClick={onFilterGroup2Click}>
+          <ToolbarButton
+            aria-label={t("toolbar.filter2")}
+            disabled={!onFilterGroup2Click}
+            onClick={(event: MouseEvent<HTMLElement>) => {
+              onFilterGroup2Click?.();
+              setFilterAnchorEl(event.currentTarget);
+            }}
+          >
             <Badge badgeContent={filterGroup2Count} color="success" variant="dot">
               <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
                 <FilterListIcon fontSize="small" sx={{ color: CHART_COLORS.group2 }} />
@@ -316,6 +313,16 @@ function DataGridToolbarInternal({
           )}
         />
       </StyledQuickFilter>
+
+      <MultiFilterPanel
+        anchorEl={filterAnchorEl}
+        columns={columns}
+        groupColor={activeGroup === 1 ? CHART_COLORS.group1 : CHART_COLORS.group2}
+        groupLabel={activeGroup === 1 ? t("multiFilter.group1") : t("multiFilter.group2")}
+        model={filterModel}
+        onChange={(model) => onFilterModelChange?.(model)}
+        onClose={() => setFilterAnchorEl(null)}
+      />
     </Toolbar>
   );
 }

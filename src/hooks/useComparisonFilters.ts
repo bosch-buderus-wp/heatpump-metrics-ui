@@ -1,6 +1,7 @@
 import type { GridFilterModel } from "@mui/x-data-grid";
 import { useMemo, useState } from "react";
 import { CHART_COLORS } from "../lib/chartTheme";
+import { countActiveFilterItems } from "../lib/filterModelUtils";
 
 export interface ComparisonGroup {
   id: 1 | 2;
@@ -42,8 +43,8 @@ export function useComparisonFilters(): UseComparisonFiltersReturn {
 
   // Auto-detect comparison mode: active when group 2 has filters
   const comparisonMode = useMemo(() => {
-    return filterGroup2.items.length > 0;
-  }, [filterGroup2.items.length]);
+    return countActiveFilterItems(filterGroup2) > 0;
+  }, [filterGroup2]);
 
   // Get the active filter model based on current active group
   const activeFilterModel = useMemo(() => {

@@ -5,6 +5,8 @@ import { DataGrid, type GridColDef, type GridFilterModel, useGridApiRef } from "
 import { deDE } from "@mui/x-data-grid/locales";
 import { useEffect, useMemo } from "react";
 import { useDataGridFilter } from "../../../hooks/useDataGridFilter";
+import { applyGridFilterModel, countActiveFilterItems } from "../../../lib/filterModelUtils";
+import { createFilterValueResolver } from "../../../lib/filterValueResolver";
 import { useSession } from "../layout/Layout";
 import { DataGridToolbar } from "./DataGridToolbar";
 
@@ -43,7 +45,6 @@ export function DataGridWrapper<T = Record<string, unknown>>({
   filterGroup1Count = 0,
   filterGroup2Count = 0,
   onFilterModelChange: onFilterModelChangeFromProps,
-  onUpdateFilterGroup,
   onSetActiveGroup,
   onClearFilterGroup2,
   onDeleteRow,
@@ -97,9 +98,24 @@ export function DataGridWrapper<T = Record<string, unknown>>({
     return [...columns, deleteColumn];
   }, [columns, onDeleteRow, session, deleteDisabled]);
 
+  const currentFilterModel = activeFilterModel ?? { items: [] };
+  const resolveFilterValue = useMemo(
+    () => createFilterValueResolver<T & Record<string, unknown>>(columnsWithActions),
+    [columnsWithActions],
+  );
+  const filteredRows = useMemo(
+    () =>
+      applyGridFilterModel(
+        rows as Array<T & Record<string, unknown>>,
+        currentFilterModel,
+        resolveFilterValue,
+      ) as T[],
+    [rows, currentFilterModel, resolveFilterValue],
+  );
+
   // Use custom hook to handle DataGrid filtering
   // biome-ignore lint/suspicious/noExplicitAny: MUI type incompatibility between RefObject and MutableRefObject
-  const [filteredData, handleFilterModelChange] = useDataGridFilter(apiRef as any, rows);
+  const [filteredData, handleFilterModelChange] = useDataGridFilter(apiRef as any, filteredRows);
 
   // Create a stable key based on filtered row IDs to detect actual filter changes
   const filteredDataKey = useMemo(() => {
@@ -111,72 +127,24 @@ export function DataGridWrapper<T = Record<string, unknown>>({
   // Note: onFilterChange and filteredData are intentionally NOT in deps to avoid infinite loops
   // We use filteredDataKey as a stable proxy to detect actual filter changes
   useEffect(() => {
-    if (onFilterChange && filteredData.length > 0) {
+    if (onFilterChange) {
       onFilterChange(filteredData);
     }
   }, [filteredDataKey]);
 
-  // Handle filter model changes - always use comparison mode handler if provided
+  // Store the complete custom filter model outside MUI's single-filter community implementation.
   const handleFilterChange = (model: GridFilterModel) => {
-    // Always call the hook's handler to update filtered data for charts
     handleFilterModelChange(model);
-
-    // Also call the comparison mode handler if provided
-    if (onFilterModelChangeFromProps) {
-      onFilterModelChangeFromProps(model);
-    }
+    onFilterModelChangeFromProps?.(model);
   };
-
-  // Sync filter model when switching groups or when activeFilterModel changes
-  useEffect(() => {
-    if (apiRef.current && activeFilterModel) {
-      apiRef.current.setFilterModel(activeFilterModel);
-    }
-  }, [comparisonMode, activeGroup, activeFilterModel, apiRef]);
 
   // Handle filter group button clicks
   const handleFilterGroup1Click = () => {
-    if (!apiRef.current) return;
-
-    // If in comparison mode, handle group switching
-    if (comparisonMode && onSetActiveGroup) {
-      const currentModel = apiRef.current.state.filter.filterModel;
-
-      // Save current filter model to the CURRENT active group before switching
-      if (onUpdateFilterGroup && activeGroup !== 1) {
-        onUpdateFilterGroup(activeGroup, currentModel);
-      }
-
-      // Always switch to group 1 immediately - the sync effect will handle applying filters
-      onSetActiveGroup(1);
-
-      // Open filter panel after a brief delay to allow state update and sync
-      setTimeout(() => {
-        apiRef.current?.showFilterPanel();
-      }, 100);
-    } else {
-      // Simple mode: just open the filter panel
-      apiRef.current.showFilterPanel();
-    }
+    onSetActiveGroup?.(1);
   };
 
   const handleFilterGroup2Click = () => {
-    if (apiRef.current && onSetActiveGroup) {
-      const currentModel = apiRef.current.state.filter.filterModel;
-
-      // Save current filter model to the CURRENT active group before switching
-      if (onUpdateFilterGroup && activeGroup !== 2) {
-        onUpdateFilterGroup(activeGroup, currentModel);
-      }
-
-      // Always switch to group 2 immediately - the sync effect will handle applying filters
-      onSetActiveGroup(2);
-
-      // Open filter panel after a brief delay to allow state update and sync
-      setTimeout(() => {
-        apiRef.current?.showFilterPanel();
-      }, 100);
-    }
+    onSetActiveGroup?.(2);
   };
 
   const theme = createTheme(
@@ -197,7 +165,7 @@ export function DataGridWrapper<T = Record<string, unknown>>({
         <DataGrid
           apiRef={apiRef}
           rowHeight={20}
-          rows={rows}
+          rows={filteredRows}
           columns={columnsWithActions}
           loading={loading}
           getRowId={getRowId}
@@ -206,7 +174,7 @@ export function DataGridWrapper<T = Record<string, unknown>>({
               columnVisibilityModel: columnVisibilityModel || {},
             },
           }}
-          onFilterModelChange={handleFilterChange}
+          disableColumnFilter
           pageSizeOptions={[10, 25, 50, 100]}
           disableRowSelectionOnClick
           showCellVerticalBorder
@@ -221,11 +189,18 @@ export function DataGridWrapper<T = Record<string, unknown>>({
               userId: session?.user?.id,
               comparisonMode,
               activeGroup,
-              filterGroup1Count,
-              filterGroup2Count,
+              filterGroup1Count:
+                filterGroup1Count ||
+                (activeGroup === 1 ? countActiveFilterItems(currentFilterModel) : 0),
+              filterGroup2Count:
+                filterGroup2Count ||
+                (activeGroup === 2 ? countActiveFilterItems(currentFilterModel) : 0),
               onFilterGroup1Click: handleFilterGroup1Click,
               onFilterGroup2Click: handleFilterGroup2Click,
               onClearFilterGroup2,
+              columns: columnsWithActions,
+              filterModel: currentFilterModel,
+              onFilterModelChange: handleFilterChange,
               // biome-ignore lint/suspicious/noExplicitAny: Custom comparison props not in MUI's type definition
             } as any,
           }}

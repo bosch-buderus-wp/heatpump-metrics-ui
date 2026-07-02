@@ -1,6 +1,7 @@
 import type { GridFilterModel } from "@mui/x-data-grid";
 import { useCallback, useMemo } from "react";
 import type { ChartDataRow, ComparisonDataGroup } from "../components/common/charts";
+import { applyGridFilterModel, countActiveFilterItems } from "../lib/filterModelUtils";
 import type { FilterValueResolver } from "../lib/filterValueResolver";
 import { useComparisonFilters } from "./useComparisonFilters";
 
@@ -43,57 +44,7 @@ export function useComparisonMode<T extends Record<string, unknown>>(
   // Apply filters to data based on filter model
   const applyFiltersToData = useCallback(
     (data: T[], filterModel: GridFilterModel): T[] => {
-      if (!filterModel || filterModel.items.length === 0) return data;
-
-      // Match DataGrid behavior: ignore incomplete items until user provides a value
-      const activeItems = filterModel.items.filter((item) => {
-        if (!item.field || !item.operator) return false;
-        if (item.operator === "isEmpty" || item.operator === "isNotEmpty") return true;
-        return item.value !== undefined && item.value !== null && item.value !== "";
-      });
-
-      if (activeItems.length === 0) return data;
-
-      return data.filter((row) => {
-        return activeItems.every((filterItem) => {
-          const value = resolveValue(row, filterItem.field);
-
-          switch (filterItem.operator) {
-            case "contains":
-              return (
-                value != null &&
-                String(value).toLowerCase().includes(String(filterItem.value).toLowerCase())
-              );
-            case "equals":
-            case "is": // Used by singleSelect columns (enum filters)
-              return value === filterItem.value;
-            case "startsWith":
-              return (
-                value != null &&
-                String(value).toLowerCase().startsWith(String(filterItem.value).toLowerCase())
-              );
-            case "endsWith":
-              return (
-                value != null &&
-                String(value).toLowerCase().endsWith(String(filterItem.value).toLowerCase())
-              );
-            case ">":
-              return Number(value) > Number(filterItem.value);
-            case ">=":
-              return Number(value) >= Number(filterItem.value);
-            case "<":
-              return Number(value) < Number(filterItem.value);
-            case "<=":
-              return Number(value) <= Number(filterItem.value);
-            case "isEmpty":
-              return value == null || value === "";
-            case "isNotEmpty":
-              return value != null && value !== "";
-            default:
-              return true;
-          }
-        });
-      });
+      return applyGridFilterModel(data, filterModel, resolveValue);
     },
     [resolveValue],
   );
@@ -149,8 +100,8 @@ export function useComparisonMode<T extends Record<string, unknown>>(
       comparisonMode,
       activeGroup,
       activeFilterModel,
-      filterGroup1Count: filterGroup1.items.length,
-      filterGroup2Count: filterGroup2.items.length,
+      filterGroup1Count: countActiveFilterItems(filterGroup1),
+      filterGroup2Count: countActiveFilterItems(filterGroup2),
       onFilterModelChange: handleFilterModelChange,
       onUpdateFilterGroup: handleUpdateFilterGroup,
       onSetActiveGroup: setActiveGroup,
@@ -160,8 +111,8 @@ export function useComparisonMode<T extends Record<string, unknown>>(
       comparisonMode,
       activeGroup,
       activeFilterModel,
-      filterGroup1.items.length,
-      filterGroup2.items.length,
+      filterGroup1,
+      filterGroup2,
       handleFilterModelChange,
       handleUpdateFilterGroup,
       setActiveGroup,

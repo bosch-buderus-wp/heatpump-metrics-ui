@@ -42,12 +42,7 @@ export function useDataGridFilter<T>(
           }
         }
 
-        // Only update if we got valid filtered rows, otherwise use source data
-        if (visibleRows.length > 0) {
-          setFilteredData(visibleRows);
-        } else {
-          setFilteredData(sourceData);
-        }
+        setFilteredData(visibleRows);
       } catch {
         // If DataGrid is not ready, fall back to source data
         setFilteredData(sourceData);
