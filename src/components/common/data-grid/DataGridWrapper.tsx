@@ -110,7 +110,6 @@ export function DataGridWrapper<T = Record<string, unknown>>({
   // Use useEffect to avoid calling setState during render
   // Note: onFilterChange and filteredData are intentionally NOT in deps to avoid infinite loops
   // We use filteredDataKey as a stable proxy to detect actual filter changes
-  // biome-ignore lint/correctness/useExhaustiveDependencies: intentional - using filteredDataKey as stable proxy for filteredData changes
   useEffect(() => {
     if (onFilterChange && filteredData.length > 0) {
       onFilterChange(filteredData);
@@ -129,7 +128,6 @@ export function DataGridWrapper<T = Record<string, unknown>>({
   };
 
   // Sync filter model when switching groups or when activeFilterModel changes
-  // biome-ignore lint/correctness/useExhaustiveDependencies: activeGroup is needed to trigger on group switch
   useEffect(() => {
     if (apiRef.current && activeFilterModel) {
       apiRef.current.setFilterModel(activeFilterModel);

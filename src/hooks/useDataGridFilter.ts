@@ -28,7 +28,6 @@ export function useDataGridFilter<T>(
   }, []);
 
   // Update filtered data when filter changes or source data changes
-  // biome-ignore lint/correctness/useExhaustiveDependencies: filterVersion is intentionally used to trigger re-filtering
   useEffect(() => {
     if (apiRef.current && sourceData.length > 0) {
       try {
