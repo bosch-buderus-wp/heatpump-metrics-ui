@@ -5,6 +5,8 @@ import { useTranslation } from "react-i18next";
 import { SystemsGeoMap } from "../components/common/charts";
 import { DataGridWrapper } from "../components/common/data-grid";
 import { PageLayout } from "../components/common/layout";
+import { applyGridFilterModel } from "../lib/filterModelUtils";
+import { createFilterValueResolver } from "../lib/filterValueResolver";
 import { supabase } from "../lib/supabaseClient";
 import { getBaseSystemColumns } from "../lib/tableHelpers";
 import type { HeatingSystemWithLocation } from "../types/database.types";
@@ -14,7 +16,11 @@ export default function Systems() {
   const [filterModel, setFilterModel] = useState<GridFilterModel | undefined>(undefined);
 
   // Define columns for Systems page
-  const columns = getBaseSystemColumns(t);
+  const columns = useMemo(() => getBaseSystemColumns(t), [t]);
+  const resolveFilterValue = useMemo(
+    () => createFilterValueResolver<HeatingSystemWithLocation & Record<string, unknown>>(columns),
+    [columns],
+  );
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["systems-with-location"],
@@ -41,11 +47,21 @@ export default function Systems() {
     });
   }, []);
 
+  const filteredSystems = useMemo(
+    () =>
+      applyGridFilterModel(
+        (data ?? []) as Array<HeatingSystemWithLocation & Record<string, unknown>>,
+        filterModel,
+        resolveFilterValue,
+      ),
+    [data, filterModel, resolveFilterValue],
+  );
+
   // Memoize the map component to prevent unnecessary re-renders
   const mapComponent = useMemo(() => {
     if (!data) return null;
-    return <SystemsGeoMap systems={data} onSystemClick={handleSystemClick} />;
-  }, [data, handleSystemClick]);
+    return <SystemsGeoMap systems={filteredSystems} onSystemClick={handleSystemClick} />;
+  }, [data, filteredSystems, handleSystemClick]);
 
   return (
     <PageLayout
