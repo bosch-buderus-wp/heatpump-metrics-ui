@@ -3,6 +3,7 @@ import {
   type BuildingEnergyComparisonRow,
   createEnergyStandardChartData,
   createEnergyStandardFlowTemperatureData,
+  createHeatingSeasonData,
 } from "../buildingEnergyComparison";
 
 const translate = (key: string) =>
@@ -149,6 +150,104 @@ describe("createEnergyStandardFlowTemperatureData", () => {
           {
             heating_id: "too-low-flow",
             flow_temperature_c: 10,
+            building_energy_standard: "kfw_55",
+          },
+        ],
+        translate,
+      ),
+    ).toEqual([]);
+  });
+});
+
+describe("createHeatingSeasonData", () => {
+  it("marks a month as part of the heating season when at least half of systems heat", () => {
+    const rows = [
+      {
+        heating_id: "system-a",
+        heated_area_m2: 100,
+        thermal_energy_heating_kwh: 300,
+        month: 1,
+        building_energy_standard: "kfw_55" as const,
+      },
+      {
+        heating_id: "system-a",
+        heated_area_m2: 100,
+        thermal_energy_heating_kwh: 300,
+        month: 1,
+        building_energy_standard: "kfw_55" as const,
+      },
+      {
+        heating_id: "system-b",
+        heated_area_m2: 100,
+        thermal_energy_heating_kwh: 200,
+        month: 1,
+        building_energy_standard: "kfw_55" as const,
+      },
+      {
+        heating_id: "system-a",
+        heated_area_m2: 100,
+        thermal_energy_heating_kwh: 500,
+        month: 3,
+        building_energy_standard: "kfw_55" as const,
+      },
+      {
+        heating_id: "system-b",
+        heated_area_m2: 100,
+        thermal_energy_heating_kwh: 0,
+        month: 3,
+        building_energy_standard: "kfw_55" as const,
+      },
+      {
+        heating_id: "system-a",
+        heated_area_m2: 100,
+        thermal_energy_heating_kwh: 200,
+        month: 2,
+        building_energy_standard: "kfw_55" as const,
+      },
+      {
+        heating_id: "system-b",
+        heated_area_m2: 100,
+        thermal_energy_heating_kwh: 200,
+        month: 2,
+        building_energy_standard: "kfw_55" as const,
+      },
+    ];
+
+    const [kfw55] = createHeatingSeasonData(rows, translate);
+
+    expect(kfw55.months.slice(0, 3)).toEqual([
+      { month: 1, active: true, activeShare: 0.5, sampleSize: 2 },
+      { month: 2, active: false, activeShare: 0, sampleSize: 2 },
+      { month: 3, active: true, activeShare: 0.5, sampleSize: 2 },
+    ]);
+    expect(kfw55.months).toHaveLength(12);
+  });
+
+  it("ignores incomplete rows and returns no categories without valid systems", () => {
+    expect(createHeatingSeasonData(undefined, translate)).toEqual([]);
+
+    expect(
+      createHeatingSeasonData(
+        [
+          {
+            heating_id: null,
+            heated_area_m2: 100,
+            thermal_energy_heating_kwh: 400,
+            month: 1,
+            building_energy_standard: "kfw_55",
+          },
+          {
+            heating_id: "invalid-month",
+            heated_area_m2: 100,
+            thermal_energy_heating_kwh: 400,
+            month: 13,
+            building_energy_standard: "kfw_55",
+          },
+          {
+            heating_id: "negative-energy",
+            heated_area_m2: 100,
+            thermal_energy_heating_kwh: -1,
+            month: 1,
             building_energy_standard: "kfw_55",
           },
         ],

@@ -37,6 +37,50 @@ body {
   margin-top: var(--spacing-2xl);
 }
 
+.heating-season-chart {
+  display: grid;
+  gap: var(--spacing-sm);
+  overflow-x: auto;
+  padding: var(--spacing-md);
+}
+
+.heating-season-row {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) repeat(12, minmax(28px, 0.45fr));
+  gap: 2px;
+  min-width: 620px;
+  align-items: center;
+}
+
+.heating-season-row--header {
+  color: var(--text-light-gray);
+  font-size: var(--font-xs);
+  text-align: center;
+}
+
+.heating-season-label {
+  padding-right: var(--spacing-sm);
+  font-size: var(--font-sm);
+  text-align: right;
+}
+
+.heating-season-cell {
+  height: 26px;
+  background: var(--bg-canvas);
+}
+
+.heating-season-cell--active {
+  background: var(--primary-color);
+}
+
+.heating-season-cell--start {
+  border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+}
+
+.heating-season-cell--end {
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
 .error {
   color: #b00020;
 }

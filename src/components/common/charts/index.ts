@@ -8,6 +8,7 @@ export type { CategoryBarChartRow } from "./CategoryBarChart";
 export { CategoryBarChart } from "./CategoryBarChart";
 export type { HeatingCurveDataPoint } from "./HeatingCurveChart";
 export { HeatingCurveChart } from "./HeatingCurveChart";
+export { HeatingSeasonChart } from "./HeatingSeasonChart";
 export type { HistogramBin } from "./HistogramChart";
 export { HistogramChart } from "./HistogramChart";
 export { SystemsGeoMap } from "./SystemsGeoMap";

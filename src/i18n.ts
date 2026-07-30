@@ -222,6 +222,10 @@ const resources = {
         flowTemperatureTitle: "Vorlauftemperatur nach Energiestandard",
         flowTemperatureInfo:
           "Vergleich der mittleren monatlichen Vorlauftemperatur je Anlage. Niedrigere Werte begünstigen meist eine höhere Effizienz.",
+        heatingSeasonTitle: "Heizperiode nach Energiestandard",
+        heatingSeasonInfo:
+          "Im ausgewählten Jahr zählt ein Monat zur Heizperiode, wenn mindestens die Hälfte der Anlagen mindestens 3 kWh Heizwärme pro m² abgibt. Details je Monat erscheinen beim Überfahren.",
+        heatingSeasonTooltip: "{{share}} % der Anlagen heizen (n = {{count}})",
         unknown: "Unbekannt / keine Angabe",
       },
       monthly: {
@@ -531,6 +535,10 @@ const resources = {
         flowTemperatureTitle: "Flow temperature by energy standard",
         flowTemperatureInfo:
           "Comparison of average monthly flow temperature per system. Lower values generally support higher efficiency.",
+        heatingSeasonTitle: "Heating season by energy standard",
+        heatingSeasonInfo:
+          "In the selected year, a month is part of the heating season when at least half of systems provide at least 3 kWh of heating energy per m². Hover a month for details.",
+        heatingSeasonTooltip: "{{share}}% of systems heat (n = {{count}})",
         unknown: "Unknown / not specified",
       },
       monthly: {

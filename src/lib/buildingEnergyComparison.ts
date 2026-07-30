@@ -11,6 +11,28 @@ type BuildingFlowTemperatureRow = Pick<
   "building_energy_standard" | "flow_temperature_c" | "heating_id"
 >;
 
+type BuildingHeatingSeasonRow = Pick<
+  Database["public"]["Views"]["monthly_values_view"]["Row"],
+  | "building_energy_standard"
+  | "heated_area_m2"
+  | "heating_id"
+  | "month"
+  | "thermal_energy_heating_kwh"
+>;
+
+export const HEATING_SEASON_ENERGY_THRESHOLD_KWH_PER_M2 = 3;
+export const HEATING_SEASON_ACTIVE_SHARE_THRESHOLD = 0.5;
+
+export interface HeatingSeasonDataRow {
+  category: string;
+  months: {
+    month: number;
+    active: boolean;
+    activeShare: number;
+    sampleSize: number;
+  }[];
+}
+
 function getEnergyStandardCategory(
   row: Pick<BuildingEnergyComparisonRow, "building_energy_standard">,
   translate: (key: string) => string,
@@ -90,4 +112,54 @@ export function createEnergyStandardFlowTemperatureData(
       };
     })
     .sort((a, b) => b.value - a.value);
+}
+
+export function createHeatingSeasonData(
+  rows: BuildingHeatingSeasonRow[] | undefined,
+  translate: (key: string) => string,
+): HeatingSeasonDataRow[] {
+  const systemsByCategoryAndMonth = new Map<
+    string,
+    Map<number, Map<string, { heatedArea: number; thermalEnergy: number }>>
+  >();
+
+  for (const row of rows ?? []) {
+    if (!row.heating_id || !row.heated_area_m2 || row.heated_area_m2 <= 0) continue;
+    if (row.thermal_energy_heating_kwh == null || row.thermal_energy_heating_kwh < 0) continue;
+    if (!row.month || row.month < 1 || row.month > 12) continue;
+
+    const category = getEnergyStandardCategory(row, translate);
+    const months = systemsByCategoryAndMonth.get(category) ?? new Map();
+    const systems = months.get(row.month) ?? new Map();
+    const system = systems.get(row.heating_id) ?? {
+      heatedArea: row.heated_area_m2,
+      thermalEnergy: 0,
+    };
+    system.thermalEnergy += row.thermal_energy_heating_kwh;
+    systems.set(row.heating_id, system);
+    months.set(row.month, systems);
+    systemsByCategoryAndMonth.set(category, months);
+  }
+
+  return [...systemsByCategoryAndMonth.entries()]
+    .map(([category, months]) => ({
+      category,
+      months: Array.from({ length: 12 }, (_, index) => {
+        const systems = months.get(index + 1);
+        const values = systems ? [...systems.values()] : [];
+        const activeSystems = values.filter(
+          (system) =>
+            system.thermalEnergy / system.heatedArea >= HEATING_SEASON_ENERGY_THRESHOLD_KWH_PER_M2,
+        ).length;
+        const activeShare = values.length > 0 ? activeSystems / values.length : 0;
+
+        return {
+          month: index + 1,
+          active: activeShare >= HEATING_SEASON_ACTIVE_SHARE_THRESHOLD,
+          activeShare,
+          sampleSize: values.length,
+        };
+      }),
+    }))
+    .sort((a, b) => a.category.localeCompare(b.category));
 }

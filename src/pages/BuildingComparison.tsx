@@ -2,13 +2,14 @@ import { useQuery } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { CategoryBarChart } from "../components/common/charts";
+import { CategoryBarChart, HeatingSeasonChart } from "../components/common/charts";
 import { ChartFullscreenPanel, ChartUtilityFrame, PageLayout } from "../components/common/layout";
 import { MonthYearPicker } from "../components/form";
 import { useSystemConsumptionRows } from "../hooks/useSystemConsumptionMode";
 import {
   createEnergyStandardChartData,
   createEnergyStandardFlowTemperatureData,
+  createHeatingSeasonData,
 } from "../lib/buildingEnergyComparison";
 import { supabase } from "../lib/supabaseClient";
 import type { Database } from "../types/database.types";
@@ -32,11 +33,31 @@ export default function BuildingComparison() {
       return data as MonthlyValue[];
     },
   });
+  const {
+    data: heatingSeasonRows,
+    isLoading: isHeatingSeasonLoading,
+    error: heatingSeasonError,
+  } = useQuery<MonthlyValue[]>({
+    queryKey: ["building-comparison-heating-season", year],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("monthly_values_view")
+        .select("*")
+        .eq("year", year);
+
+      if (error) throw error;
+      return data as MonthlyValue[];
+    },
+  });
   const displayData = useSystemConsumptionRows(data, "month");
   const chartData = useMemo(() => createEnergyStandardChartData(displayData, t), [displayData, t]);
   const flowTemperatureData = useMemo(
     () => createEnergyStandardFlowTemperatureData(displayData, t),
     [displayData, t],
+  );
+  const heatingSeasonData = useMemo(
+    () => createHeatingSeasonData(heatingSeasonRows, t),
+    [heatingSeasonRows, t],
   );
 
   const datePicker = (
@@ -57,8 +78,8 @@ export default function BuildingComparison() {
     <PageLayout
       titleKey="buildingComparison.title"
       infoKey="buildingComparison.info"
-      error={error}
-      isLoading={isLoading}
+      error={error ?? heatingSeasonError}
+      isLoading={isLoading || isHeatingSeasonLoading}
       chartControls={datePicker}
       chart={
         <ChartUtilityFrame>
@@ -82,6 +103,14 @@ export default function BuildingComparison() {
               valueLabel={t("buildingComparison.flowTemperature")}
               valueUnit="°C"
             />
+          </ChartUtilityFrame>
+        </ChartFullscreenPanel>
+      </section>
+      <section className="building-comparison-section">
+        <p className="muted">{t("buildingComparison.heatingSeasonInfo")}</p>
+        <ChartFullscreenPanel title={t("buildingComparison.heatingSeasonTitle")}>
+          <ChartUtilityFrame>
+            <HeatingSeasonChart data={heatingSeasonData} />
           </ChartUtilityFrame>
         </ChartFullscreenPanel>
       </section>
