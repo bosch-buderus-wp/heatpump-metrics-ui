@@ -12,6 +12,7 @@ export interface CategoryBarChartRow {
 interface CategoryBarChartProps {
   data: CategoryBarChartRow[];
   valueLabel: string;
+  valueUnit: string;
 }
 
 function SampleSizeLayer({ bars }: BarCustomLayerProps<CategoryBarChartRow>) {
@@ -36,7 +37,7 @@ function SampleSizeLayer({ bars }: BarCustomLayerProps<CategoryBarChartRow>) {
   );
 }
 
-export function CategoryBarChart({ data, valueLabel }: CategoryBarChartProps) {
+export function CategoryBarChart({ data, valueLabel, valueUnit }: CategoryBarChartProps) {
   const { t } = useTranslation();
 
   if (data.length === 0) {
@@ -92,7 +93,10 @@ export function CategoryBarChart({ data, valueLabel }: CategoryBarChartProps) {
             <div className="chart-tooltip-header">{indexValue}</div>
             <div className="chart-tooltip-item">
               <span className="chart-tooltip-text">
-                {valueLabel}: <strong>{Number(value).toFixed(1)} kWh/m²</strong>
+                {valueLabel}:{" "}
+                <strong>
+                  {Number(value).toFixed(1)} {valueUnit}
+                </strong>
               </span>
             </div>
             <div className="chart-tooltip-item">

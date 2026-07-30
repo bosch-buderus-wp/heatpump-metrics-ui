@@ -3,10 +3,13 @@ import dayjs from "dayjs";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { CategoryBarChart } from "../components/common/charts";
-import { ChartUtilityFrame, PageLayout } from "../components/common/layout";
+import { ChartFullscreenPanel, ChartUtilityFrame, PageLayout } from "../components/common/layout";
 import { MonthYearPicker } from "../components/form";
 import { useSystemConsumptionRows } from "../hooks/useSystemConsumptionMode";
-import { createEnergyStandardChartData } from "../lib/buildingEnergyComparison";
+import {
+  createEnergyStandardChartData,
+  createEnergyStandardFlowTemperatureData,
+} from "../lib/buildingEnergyComparison";
 import { supabase } from "../lib/supabaseClient";
 import type { Database } from "../types/database.types";
 
@@ -31,6 +34,24 @@ export default function BuildingComparison() {
   });
   const displayData = useSystemConsumptionRows(data, "month");
   const chartData = useMemo(() => createEnergyStandardChartData(displayData, t), [displayData, t]);
+  const flowTemperatureData = useMemo(
+    () => createEnergyStandardFlowTemperatureData(displayData, t),
+    [displayData, t],
+  );
+
+  const datePicker = (
+    <div className="filter-container">
+      <MonthYearPicker
+        month={month}
+        year={year}
+        allMonthsLabel={t("common.all")}
+        onChange={({ month, year }) => {
+          setMonth(month);
+          setYear(year);
+        }}
+      />
+    </div>
+  );
 
   return (
     <PageLayout
@@ -38,29 +59,32 @@ export default function BuildingComparison() {
       infoKey="buildingComparison.info"
       error={error}
       isLoading={isLoading}
-      chartControls={
-        <div className="filter-container">
-          <MonthYearPicker
-            month={month}
-            year={year}
-            allMonthsLabel={t("common.all")}
-            onChange={({ month, year }) => {
-              setMonth(month);
-              setYear(year);
-            }}
-          />
-        </div>
-      }
+      chartControls={datePicker}
       chart={
         <ChartUtilityFrame>
           <CategoryBarChart
             data={chartData}
             valueLabel={t("buildingComparison.heatingDemandPerArea")}
+            valueUnit="kWh/m²"
           />
         </ChartUtilityFrame>
       }
     >
-      {null}
+      <section className="building-comparison-section">
+        <p className="muted">{t("buildingComparison.flowTemperatureInfo")}</p>
+        <ChartFullscreenPanel
+          title={t("buildingComparison.flowTemperatureTitle")}
+          controls={datePicker}
+        >
+          <ChartUtilityFrame>
+            <CategoryBarChart
+              data={flowTemperatureData}
+              valueLabel={t("buildingComparison.flowTemperature")}
+              valueUnit="°C"
+            />
+          </ChartUtilityFrame>
+        </ChartFullscreenPanel>
+      </section>
     </PageLayout>
   );
 }

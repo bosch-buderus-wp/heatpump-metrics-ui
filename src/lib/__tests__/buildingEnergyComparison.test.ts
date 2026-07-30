@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   type BuildingEnergyComparisonRow,
   createEnergyStandardChartData,
+  createEnergyStandardFlowTemperatureData,
 } from "../buildingEnergyComparison";
 
 const translate = (key: string) =>
@@ -90,5 +91,69 @@ describe("createEnergyStandardChartData", () => {
       "old_building_unrenovated",
       "kfw_55",
     ]);
+  });
+});
+
+describe("createEnergyStandardFlowTemperatureData", () => {
+  it("averages each system before averaging and excludes implausible values", () => {
+    const rows = [
+      {
+        heating_id: "system-a",
+        flow_temperature_c: 30,
+        building_energy_standard: "kfw_55" as const,
+      },
+      {
+        heating_id: "system-a",
+        flow_temperature_c: 34,
+        building_energy_standard: "kfw_55" as const,
+      },
+      {
+        heating_id: "system-b",
+        flow_temperature_c: 40,
+        building_energy_standard: "kfw_55" as const,
+      },
+      {
+        heating_id: "invalid-flow",
+        flow_temperature_c: 90,
+        building_energy_standard: "kfw_55" as const,
+      },
+      {
+        heating_id: "unknown-standard",
+        flow_temperature_c: 35,
+        building_energy_standard: null,
+      },
+    ];
+
+    expect(createEnergyStandardFlowTemperatureData(rows, translate)).toEqual([
+      { category: "kfw_55", value: 36, sampleSize: 2 },
+      { category: "Unbekannt / keine Angabe", value: 35, sampleSize: 1 },
+    ]);
+  });
+
+  it("returns no categories when no usable flow temperatures are available", () => {
+    expect(createEnergyStandardFlowTemperatureData(undefined, translate)).toEqual([]);
+
+    expect(
+      createEnergyStandardFlowTemperatureData(
+        [
+          {
+            heating_id: null,
+            flow_temperature_c: 35,
+            building_energy_standard: "kfw_55",
+          },
+          {
+            heating_id: "missing-flow",
+            flow_temperature_c: null,
+            building_energy_standard: "kfw_55",
+          },
+          {
+            heating_id: "too-low-flow",
+            flow_temperature_c: 10,
+            building_energy_standard: "kfw_55",
+          },
+        ],
+        translate,
+      ),
+    ).toEqual([]);
   });
 });

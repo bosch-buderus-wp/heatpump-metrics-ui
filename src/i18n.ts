@@ -218,6 +218,10 @@ const resources = {
         title: "Gebäude-Energievergleich",
         info: "Vergleiche den Heizwärmebedarf pro Quadratmeter nach Energiestandard anhand der monatlich gemeldeten Daten.",
         heatingDemandPerArea: "Heizwärmebedarf pro m²",
+        flowTemperature: "Mittlere Vorlauftemperatur",
+        flowTemperatureTitle: "Vorlauftemperatur nach Energiestandard",
+        flowTemperatureInfo:
+          "Vergleich der mittleren monatlichen Vorlauftemperatur je Anlage. Niedrigere Werte begünstigen meist eine höhere Effizienz.",
         unknown: "Unbekannt / keine Angabe",
       },
       monthly: {
@@ -523,6 +527,10 @@ const resources = {
         title: "Building energy comparison",
         info: "Compare heating demand per square metre by energy standard using the reported monthly data.",
         heatingDemandPerArea: "Heating demand per m²",
+        flowTemperature: "Average flow temperature",
+        flowTemperatureTitle: "Flow temperature by energy standard",
+        flowTemperatureInfo:
+          "Comparison of average monthly flow temperature per system. Lower values generally support higher efficiency.",
         unknown: "Unknown / not specified",
       },
       monthly: {
