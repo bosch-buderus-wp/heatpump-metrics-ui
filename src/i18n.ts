@@ -21,6 +21,7 @@ const resources = {
         home: "Start",
         monthly: "Monatswerte",
         yearly: "Jahreswerte",
+        buildingComparison: "Gebäudevergleich",
         measurements: "Messwerte",
         systems: "Anlagen",
         daily: "Tageswerte",
@@ -54,6 +55,7 @@ const resources = {
         close: "Schließen",
         yes: "Ja",
         no: "Nein",
+        all: "Alle",
         andMore: "... und {{count}} weitere",
         az_short: "AZ",
         az: "Arbeitszahl",
@@ -211,6 +213,12 @@ const resources = {
       yearly: {
         title: "Jahresübersicht",
         info: "Alle monatlichen Werte aller in der Tabelle ausgewählten Heizungsanlagen. Die monatlichen Werte werden entweder automatisch aus den Stundenwerten berechnet oder können manuell unter 'Meine Anlage' hinzugefügt werden.",
+      },
+      buildingComparison: {
+        title: "Gebäude-Energievergleich",
+        info: "Vergleiche den Heizwärmebedarf pro Quadratmeter nach Energiestandard anhand der monatlich gemeldeten Daten.",
+        heatingDemandPerArea: "Heizwärmebedarf pro m²",
+        unknown: "Unbekannt / keine Angabe",
       },
       monthly: {
         title: "Monatsübersicht",
@@ -489,6 +497,7 @@ const resources = {
         home: "Home",
         monthly: "Monthly Values",
         yearly: "Yearly Values",
+        buildingComparison: "Building comparison",
         measurements: "Measurements",
         systems: "Heating Systems",
         daily: "Daily Values",
@@ -509,6 +518,12 @@ const resources = {
       yearly: {
         title: "Yearly Overview",
         info: "All monthly values of all heating systems selected in the table. Monthly values are either automatically calculated from hourly values or can be added manually under 'My Account'.",
+      },
+      buildingComparison: {
+        title: "Building energy comparison",
+        info: "Compare heating demand per square metre by energy standard using the reported monthly data.",
+        heatingDemandPerArea: "Heating demand per m²",
+        unknown: "Unknown / not specified",
       },
       monthly: {
         title: "Monthly Overview",
@@ -558,6 +573,7 @@ const resources = {
         close: "Close",
         yes: "Yes",
         no: "No",
+        all: "All",
         andMore: "... and {{count}} more",
         az_short: "COP",
         az: "COP",

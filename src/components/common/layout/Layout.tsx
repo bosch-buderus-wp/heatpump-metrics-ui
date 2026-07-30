@@ -53,6 +53,7 @@ export function Layout({ children }: LayoutProps) {
                   {t("nav.home")}
                 </NavLink>
                 <NavLink to="/yearly">{t("nav.yearly")}</NavLink>
+                <NavLink to="/building-comparison">{t("nav.buildingComparison")}</NavLink>
                 <NavLink to="/monthly">{t("nav.monthly")}</NavLink>
                 <NavLink to="/daily">{t("nav.daily")}</NavLink>
                 <NavLink to="/measurements">{t("nav.measurements")}</NavLink>

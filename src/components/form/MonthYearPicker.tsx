@@ -4,9 +4,10 @@ interface MonthYearPickerProps {
   month: number;
   year: number;
   onChange: (val: { month: number; year: number }) => void;
+  allMonthsLabel?: string;
 }
 
-export function MonthYearPicker({ month, year, onChange }: MonthYearPickerProps) {
+export function MonthYearPicker({ month, year, onChange, allMonthsLabel }: MonthYearPickerProps) {
   const { t } = useTranslation();
   const now = new Date();
   const currentYear = now.getFullYear();
@@ -37,6 +38,7 @@ export function MonthYearPicker({ month, year, onChange }: MonthYearPickerProps)
         onChange={(e) => onChange({ month: Number(e.target.value), year })}
         className="form-select"
       >
+        {allMonthsLabel && <option value={0}>{allMonthsLabel}</option>}
         {availableMonths.map((m) => (
           <option key={m} value={m}>
             {m}

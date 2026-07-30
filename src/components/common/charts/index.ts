@@ -4,6 +4,8 @@ export type { ScatterDataPoint } from "./AzScatterChart";
 export { AzScatterChart } from "./AzScatterChart";
 export type { YearlyEnergyScatterDataPoint } from "./AzYearlyEnergyScatterChart";
 export { AzYearlyEnergyScatterChart } from "./AzYearlyEnergyScatterChart";
+export type { CategoryBarChartRow } from "./CategoryBarChart";
+export { CategoryBarChart } from "./CategoryBarChart";
 export type { HeatingCurveDataPoint } from "./HeatingCurveChart";
 export { HeatingCurveChart } from "./HeatingCurveChart";
 export type { HistogramBin } from "./HistogramChart";

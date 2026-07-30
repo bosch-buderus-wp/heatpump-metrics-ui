@@ -4,6 +4,7 @@ import { Layout } from "./components/common/layout";
 import AuthCallback from "./pages/AuthCallback";
 import AzEnergyEvaluation from "./pages/AzEnergyEvaluation";
 import AzTempEvaluation from "./pages/AzTempEvaluation";
+import BuildingComparison from "./pages/BuildingComparison";
 import Daily from "./pages/Daily";
 import HeatingCurve from "./pages/HeatingCurve";
 import Home from "./pages/Home";
@@ -20,6 +21,7 @@ export default function App() {
     <Layout>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/building-comparison" element={<BuildingComparison />} />
         <Route path="/yearly" element={<Yearly />} />
         <Route path="/monthly" element={<Monthly />} />
         <Route path="/daily" element={<Daily />} />
