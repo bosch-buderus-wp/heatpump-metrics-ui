@@ -174,6 +174,7 @@ describe("FieldHint", () => {
     const link = screen.getByRole("link", { name: "this link" });
 
     // Click the link - popover should stay open (stopPropagation prevents close)
+    link.addEventListener("click", (event) => event.preventDefault(), { once: true });
     await user.click(link);
 
     // Popover should still be visible
