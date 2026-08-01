@@ -8,9 +8,14 @@ import { useChartFullscreenPanel } from "./ChartFullscreenPanel";
 interface ChartUtilityFrameProps {
   children: ReactNode;
   utility?: ReactNode;
+  isLoading?: boolean;
 }
 
-export function ChartUtilityFrame({ children, utility }: ChartUtilityFrameProps) {
+export function ChartUtilityFrame({
+  children,
+  utility,
+  isLoading = false,
+}: ChartUtilityFrameProps) {
   const { t } = useTranslation();
   const fullscreenPanel = useChartFullscreenPanel();
 
@@ -34,7 +39,7 @@ export function ChartUtilityFrame({ children, utility }: ChartUtilityFrameProps)
         </div>
       </div>
       <div className="chart-container-relative card chart-container-relative-attached">
-        {children}
+        {isLoading ? <div className="chart-no-data-card">{t("common.loading")}</div> : children}
       </div>
     </div>
   );

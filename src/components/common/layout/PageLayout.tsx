@@ -7,6 +7,7 @@ interface PageLayoutProps {
   infoKey: string;
   filters?: ReactNode;
   chartControls?: ReactNode;
+  infoAfterChartControls?: boolean;
   chart?: ReactNode;
   children: ReactNode;
   error?: Error | null;
@@ -19,6 +20,7 @@ export function PageLayout({
   infoKey,
   filters,
   chartControls,
+  infoAfterChartControls = false,
   chart,
   children,
   error,
@@ -30,7 +32,7 @@ export function PageLayout({
   return (
     <section>
       <h2>{t(titleKey)}</h2>
-      <p className="muted">{t(infoKey)}</p>
+      {!infoAfterChartControls && <p className="muted">{t(infoKey)}</p>}
 
       {filters && <div className="filters">{filters}</div>}
 
@@ -40,6 +42,7 @@ export function PageLayout({
           controls={chartControls}
           showSystemConsumptionToggle={showSystemConsumptionToggle}
         >
+          {infoAfterChartControls && <p className="muted chart-panel-info">{t(infoKey)}</p>}
           {chart}
         </ChartFullscreenPanel>
       )}

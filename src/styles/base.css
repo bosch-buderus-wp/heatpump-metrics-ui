@@ -46,9 +46,12 @@ body {
 
 .heating-season-row {
   display: grid;
-  grid-template-columns: minmax(180px, 1fr) repeat(12, minmax(28px, 0.45fr));
-  gap: 2px;
-  min-width: 620px;
+  grid-template-columns: minmax(180px, 1fr) repeat(
+      var(--heating-season-week-count),
+      minmax(8px, 0.45fr)
+    );
+  gap: 1px;
+  min-width: 760px;
   align-items: center;
 }
 
@@ -60,12 +63,12 @@ body {
 
 .heating-season-label {
   padding-right: var(--spacing-sm);
-  font-size: var(--font-sm);
+  font-size: 12px;
   text-align: right;
 }
 
 .heating-season-cell {
-  height: 26px;
+  height: 22px;
   background: var(--bg-canvas);
 }
 

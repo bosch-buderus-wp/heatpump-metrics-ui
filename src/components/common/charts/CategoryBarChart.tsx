@@ -13,6 +13,7 @@ interface CategoryBarChartProps {
   data: CategoryBarChartRow[];
   valueLabel: string;
   valueUnit: string;
+  axisLabel?: string;
 }
 
 function SampleSizeLayer({ bars }: BarCustomLayerProps<CategoryBarChartRow>) {
@@ -37,7 +38,12 @@ function SampleSizeLayer({ bars }: BarCustomLayerProps<CategoryBarChartRow>) {
   );
 }
 
-export function CategoryBarChart({ data, valueLabel, valueUnit }: CategoryBarChartProps) {
+export function CategoryBarChart({
+  data,
+  valueLabel,
+  valueUnit,
+  axisLabel,
+}: CategoryBarChartProps) {
   const { t } = useTranslation();
 
   if (data.length === 0) {
@@ -62,7 +68,7 @@ export function CategoryBarChart({ data, valueLabel, valueUnit }: CategoryBarCha
         axisBottom={{
           tickSize: 5,
           tickPadding: 5,
-          legend: valueLabel,
+          legend: axisLabel ?? valueLabel,
           legendPosition: "middle",
           legendOffset: 38,
         }}

@@ -3,7 +3,8 @@ import {
   type BuildingEnergyComparisonRow,
   createEnergyStandardChartData,
   createEnergyStandardFlowTemperatureData,
-  createHeatingSeasonData,
+  createHeatingSeasonWeekData,
+  filterHeatingDemandRows,
 } from "../buildingEnergyComparison";
 
 const translate = (key: string) =>
@@ -95,6 +96,57 @@ describe("createEnergyStandardChartData", () => {
   });
 });
 
+describe("filterHeatingDemandRows", () => {
+  const now = new Date("2026-07-31T12:00:00Z");
+  const baseRow = {
+    heating_id: "system-a",
+    heated_area_m2: 100,
+    thermal_energy_heating_kwh: 100,
+    building_energy_standard: "kfw_55" as const,
+    is_manual_override: false,
+    last_auto_calculated_at: "2026-02-01T03:00:00Z",
+    month: 1,
+  };
+
+  it("keeps manual corrections and complete automatic values", () => {
+    expect(
+      filterHeatingDemandRows(
+        [
+          baseRow,
+          {
+            ...baseRow,
+            heating_id: "manual",
+            is_manual_override: true,
+            last_auto_calculated_at: null,
+          },
+          { ...baseRow, heating_id: "incomplete", last_auto_calculated_at: null },
+        ],
+        2026,
+        1,
+        now,
+      ).map((row) => row.heating_id),
+    ).toEqual(["system-a", "manual"]);
+  });
+
+  it("excludes the running month only when all months are selected", () => {
+    expect(
+      filterHeatingDemandRows(
+        [
+          { ...baseRow, heating_id: "june", month: 6 },
+          { ...baseRow, heating_id: "july", month: 7 },
+        ],
+        2026,
+        0,
+        now,
+      ).map((row) => row.heating_id),
+    ).toEqual(["june"]);
+
+    expect(
+      filterHeatingDemandRows([{ ...baseRow, heating_id: "july", month: 7 }], 2026, 7, now),
+    ).toHaveLength(1);
+  });
+});
+
 describe("createEnergyStandardFlowTemperatureData", () => {
   it("averages each system before averaging and excludes implausible values", () => {
     const rows = [
@@ -159,98 +211,133 @@ describe("createEnergyStandardFlowTemperatureData", () => {
   });
 });
 
-describe("createHeatingSeasonData", () => {
-  it("marks a month as part of the heating season when at least half of systems heat", () => {
+describe("createHeatingSeasonWeekData", () => {
+  it("marks a week as part of the heating season when at least half of systems heat", () => {
     const rows = [
       {
         heating_id: "system-a",
         heated_area_m2: 100,
-        thermal_energy_heating_kwh: 300,
-        month: 1,
+        thermal_energy_heating_kwh: 10,
+        date: "2026-01-01",
         building_energy_standard: "kfw_55" as const,
       },
       {
         heating_id: "system-a",
         heated_area_m2: 100,
-        thermal_energy_heating_kwh: 300,
-        month: 1,
-        building_energy_standard: "kfw_55" as const,
-      },
-      {
-        heating_id: "system-b",
-        heated_area_m2: 100,
-        thermal_energy_heating_kwh: 200,
-        month: 1,
+        thermal_energy_heating_kwh: 10,
+        date: "2026-01-02",
         building_energy_standard: "kfw_55" as const,
       },
       {
         heating_id: "system-a",
         heated_area_m2: 100,
-        thermal_energy_heating_kwh: 500,
-        month: 3,
+        thermal_energy_heating_kwh: 10,
+        date: "2026-01-03",
         building_energy_standard: "kfw_55" as const,
       },
       {
         heating_id: "system-b",
         heated_area_m2: 100,
         thermal_energy_heating_kwh: 0,
-        month: 3,
-        building_energy_standard: "kfw_55" as const,
-      },
-      {
-        heating_id: "system-a",
-        heated_area_m2: 100,
-        thermal_energy_heating_kwh: 200,
-        month: 2,
+        date: "2026-01-01",
         building_energy_standard: "kfw_55" as const,
       },
       {
         heating_id: "system-b",
         heated_area_m2: 100,
-        thermal_energy_heating_kwh: 200,
-        month: 2,
+        thermal_energy_heating_kwh: 0,
+        date: "2026-01-02",
+        building_energy_standard: "kfw_55" as const,
+      },
+      {
+        heating_id: "system-b",
+        heated_area_m2: 100,
+        thermal_energy_heating_kwh: 0,
+        date: "2026-01-03",
+        building_energy_standard: "kfw_55" as const,
+      },
+      {
+        heating_id: "system-a",
+        heated_area_m2: 100,
+        thermal_energy_heating_kwh: 0,
+        date: "2026-01-08",
+        building_energy_standard: "kfw_55" as const,
+      },
+      {
+        heating_id: "system-a",
+        heated_area_m2: 100,
+        thermal_energy_heating_kwh: 0,
+        date: "2026-01-09",
+        building_energy_standard: "kfw_55" as const,
+      },
+      {
+        heating_id: "system-a",
+        heated_area_m2: 100,
+        thermal_energy_heating_kwh: 0,
+        date: "2026-01-10",
+        building_energy_standard: "kfw_55" as const,
+      },
+      {
+        heating_id: "system-b",
+        heated_area_m2: 100,
+        thermal_energy_heating_kwh: 0,
+        date: "2026-01-08",
+        building_energy_standard: "kfw_55" as const,
+      },
+      {
+        heating_id: "system-b",
+        heated_area_m2: 100,
+        thermal_energy_heating_kwh: 0,
+        date: "2026-01-09",
+        building_energy_standard: "kfw_55" as const,
+      },
+      {
+        heating_id: "system-b",
+        heated_area_m2: 100,
+        thermal_energy_heating_kwh: 0,
+        date: "2026-01-10",
         building_energy_standard: "kfw_55" as const,
       },
     ];
 
-    const [kfw55] = createHeatingSeasonData(rows, translate);
+    const [kfw55] = createHeatingSeasonWeekData(rows, 2026, translate);
 
-    expect(kfw55.months.slice(0, 3)).toEqual([
-      { month: 1, active: true, activeShare: 0.5, sampleSize: 2 },
-      { month: 2, active: false, activeShare: 0, sampleSize: 2 },
-      { month: 3, active: true, activeShare: 0.5, sampleSize: 2 },
+    expect(kfw55.weeks.slice(0, 2)).toMatchObject([
+      { active: true, activeShare: 0.5, sampleSize: 2 },
+      { active: false, activeShare: 0, sampleSize: 2 },
     ]);
-    expect(kfw55.months).toHaveLength(12);
+    expect(kfw55.weeks).toHaveLength(53);
   });
 
   it("ignores incomplete rows and returns no categories without valid systems", () => {
-    expect(createHeatingSeasonData(undefined, translate)).toEqual([]);
+    expect(createHeatingSeasonWeekData(undefined, 2026, translate)).toEqual([]);
 
     expect(
-      createHeatingSeasonData(
+      createHeatingSeasonWeekData(
         [
           {
             heating_id: null,
             heated_area_m2: 100,
             thermal_energy_heating_kwh: 400,
-            month: 1,
+            date: "2026-01-01",
             building_energy_standard: "kfw_55",
           },
           {
-            heating_id: "invalid-month",
+            heating_id: "invalid-date",
             heated_area_m2: 100,
             thermal_energy_heating_kwh: 400,
-            month: 13,
+            date: "invalid-date",
             building_energy_standard: "kfw_55",
           },
           {
             heating_id: "negative-energy",
             heated_area_m2: 100,
             thermal_energy_heating_kwh: -1,
-            month: 1,
+            date: "2026-01-01",
             building_energy_standard: "kfw_55",
           },
         ],
+        2026,
         translate,
       ),
     ).toEqual([]);
