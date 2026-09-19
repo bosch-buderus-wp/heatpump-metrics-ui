@@ -134,7 +134,10 @@ describe("HistogramChart", () => {
 
   it("renders tooltip with correct format", () => {
     render(<HistogramChart data={mockData} metricMode="cop" />);
-    expect(screen.getByTestId("tooltip")).toBeInTheDocument();
+    const tooltip = screen.getByTestId("tooltip");
+    expect(tooltip).toBeInTheDocument();
+    expect(tooltip).toHaveTextContent("COP (heating)");
+    expect(tooltip.querySelector(".chart-tooltip-histogram-range")).toHaveTextContent("–");
   });
 
   it("has correct accessibility attributes", () => {

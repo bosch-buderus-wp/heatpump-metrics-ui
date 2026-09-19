@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { HistogramChart } from "../HistogramChart";
 
@@ -331,6 +331,12 @@ describe("HistogramChart - Energy Mode", () => {
 
       const tooltip = screen.getByTestId("tooltip");
       expect(tooltip.textContent).toContain("kWh");
+      expect(tooltip.textContent).toContain("charts.electricalEnergyHeating");
+      expect(tooltip.textContent).not.toContain("charts.electricalEnergyTotal");
+
+      fireEvent.click(screen.getByTestId("legend-charts.electricalEnergyTotal"));
+
+      expect(screen.getByTestId("tooltip").textContent).toContain("charts.electricalEnergyTotal");
     });
   });
 

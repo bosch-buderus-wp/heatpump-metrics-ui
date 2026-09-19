@@ -274,11 +274,15 @@ export function HistogramChart({
               "annotations",
             ]}
             tooltip={({ indexValue, value }) => (
-              <div className="chart-tooltip">
-                <div className="chart-tooltip-header">
-                  {metricMode === "energy" ? t("charts.electricalEnergyTotal") : t("common.az")}:{" "}
-                  {indexValue}
-                  {metricMode === "energy" ? " kWh" : ""}
+              <div
+                className={`chart-tooltip chart-tooltip-histogram${metricMode === "energy" ? " chart-tooltip-histogram-energy" : ""}`}
+              >
+                <div className="chart-tooltip-header chart-tooltip-histogram-header">
+                  <span className="chart-tooltip-histogram-label">{activeKey}</span>
+                  <span className="chart-tooltip-histogram-range">
+                    {String(indexValue).replace("-", "–")}
+                    {metricMode === "energy" ? " kWh" : ""}
+                  </span>
                 </div>
                 <div className="chart-tooltip-item">
                   <div

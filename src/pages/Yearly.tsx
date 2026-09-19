@@ -127,7 +127,7 @@ export default function Yearly() {
   const filterSection = useMemo(
     () => (
       <div className="filter-container">
-        <div className="flex-center-gap-sm">
+        <div className="flex-center-gap-sm page-year-filter-group">
           <select
             id="yearly-year-select"
             value={year}

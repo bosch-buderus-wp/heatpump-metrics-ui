@@ -2,16 +2,36 @@
 
 /* Filter and Selection Controls */
 .page-filter-select-year {
-  min-width: 100px;
+  width: 96px;
+  min-width: 96px;
+  padding-left: 0.55rem;
+  padding-right: 1rem;
 }
 
-.page-complete-data-checkbox {
+.page-year-filter-group {
+  gap: var(--spacing-md);
+}
+
+.page-complete-data-checkbox.MuiFormControlLabel-root {
   display: flex;
   align-items: center;
-  gap: var(--spacing-xs);
-  font-size: var(--font-sm);
+  gap: 0.125rem;
+  margin-left: 0;
+  margin-right: 0;
   cursor: pointer;
   white-space: nowrap;
+}
+
+.page-complete-data-checkbox .MuiCheckbox-root {
+  padding: 0.1rem;
+}
+
+.page-complete-data-checkbox .MuiCheckbox-root .MuiSvgIcon-root {
+  font-size: 1rem;
+}
+
+.page-complete-data-checkbox .MuiFormControlLabel-label {
+  font-size: 0.7rem;
 }
 
 .page-complete-data-checkbox input {
