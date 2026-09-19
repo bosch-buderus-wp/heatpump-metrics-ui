@@ -1,5 +1,6 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
+import { languageFromPath } from "./lib/language";
 
 const resources = {
   de: {
@@ -8,7 +9,7 @@ const resources = {
       home: {
         title: "Willkommen",
         intro:
-          "Dieses Projekt sammelt und visualisiert Leistungsdaten von Bosch CS5800/6800i und Buderus WLW176/186i Wärmepumpen, um Wärmepumpenbesitzern bei der Optimierung zu helfen und Wärmepumpeninteressierten bei der Entscheidung zu helfen.",
+          "Dieses Projekt sammelt und visualisiert Leistungsdaten von Bosch CS5800/6800i und Buderus WLW176/186i Wärmepumpen, um Besitzer bei der Optimierung ihrer Anlage und Interessierte bei ihrer Entscheidung zu unterstützen.",
         stats: {
           systems: "Erfasste Anlagen",
           monthly: "Monatswerte",
@@ -996,7 +997,7 @@ const resources = {
 
 i18n.use(initReactI18next).init({
   resources,
-  lng: "de",
+  lng: languageFromPath(window.location.pathname),
   fallbackLng: "en",
   interpolation: {
     escapeValue: false,
