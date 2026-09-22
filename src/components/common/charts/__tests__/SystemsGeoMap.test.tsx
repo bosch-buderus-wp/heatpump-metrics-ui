@@ -147,13 +147,16 @@ describe("SystemsGeoMap", () => {
 
   it("should open popover with system details when a marker is clicked", async () => {
     const user = userEvent.setup();
+    const onSystemClick = vi.fn();
     const system = createMockSystem("1", "Super Heatpump", 52.0, 13.0, {
       postal_code: "12345",
       building_construction_year: 1995,
       heated_area_m2: 120,
     });
 
-    const { container } = render(<SystemsGeoMap systems={[system]} />);
+    const { container } = render(
+      <SystemsGeoMap systems={[system]} onSystemClick={onSystemClick} />,
+    );
 
     // Click any marker in the markers group
     const marker = container.querySelector(".markers g[role='button']");
@@ -163,6 +166,27 @@ describe("SystemsGeoMap", () => {
     // Check popover content
     expect(screen.getByText("Super Heatpump")).toBeInTheDocument();
     expect(screen.getByText("1995")).toBeInTheDocument();
+    expect(onSystemClick).toHaveBeenCalledWith(["1"]);
+  });
+
+  it("should show system details on hover without activating the filter", async () => {
+    const user = userEvent.setup();
+    const onSystemClick = vi.fn();
+    const system = createMockSystem("1", "Hover Heatpump", 52.0, 13.0, {
+      building_construction_year: 2005,
+    });
+
+    const { container } = render(
+      <SystemsGeoMap systems={[system]} onSystemClick={onSystemClick} />,
+    );
+
+    const marker = container.querySelector(".markers g[role='button']");
+    expect(marker).not.toBeNull();
+    await user.hover(marker!);
+
+    expect(screen.getByText("Hover Heatpump")).toBeInTheDocument();
+    expect(screen.getByText("2005")).toBeInTheDocument();
+    expect(onSystemClick).not.toHaveBeenCalled();
   });
 
   it("should handle zoom buttons", async () => {

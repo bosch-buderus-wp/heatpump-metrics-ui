@@ -115,12 +115,35 @@ const Markers = ({
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [selectedPoint, setSelectedPoint] = useState<MapPoint | null>(null);
   const [selectedSystemIndex, setSelectedSystemIndex] = useState<number>(0);
+  const [isPopoverPinned, setIsPopoverPinned] = useState(false);
+
+  const handlePointEnter = (event: React.MouseEvent<SVGGElement>, point: MapPoint) => {
+    setHoveredPointId(point.id);
+
+    if (isPopoverPinned) return;
+
+    setSelectedPoint(point);
+    setSelectedSystemIndex(0);
+    // biome-ignore lint/suspicious/noExplicitAny: SVGGElement doesn't directly match HTMLElement for Popover anchor
+    setAnchorEl(event.currentTarget as any);
+  };
+
+  const handlePointLeave = () => {
+    setHoveredPointId(null);
+
+    if (!isPopoverPinned) {
+      setAnchorEl(null);
+      setSelectedPoint(null);
+      setSelectedSystemIndex(0);
+    }
+  };
 
   const handlePointClick = (event: React.MouseEvent<SVGGElement>, point: MapPoint) => {
     // Prevent event from bubbling if needed, but here we want it to potentially bubble
     onSystemClick?.(point.heatingIds);
     setSelectedPoint(point);
     setSelectedSystemIndex(0); // Reset to first system when opening popover
+    setIsPopoverPinned(true);
     // biome-ignore lint/suspicious/noExplicitAny: SVGGElement doesn't directly match HTMLElement for Popover anchor
     setAnchorEl(event.currentTarget as any);
   };
@@ -129,6 +152,7 @@ const Markers = ({
     setAnchorEl(null);
     setSelectedPoint(null);
     setSelectedSystemIndex(0);
+    setIsPopoverPinned(false);
   };
 
   const handleSystemSelect = (index: number) => {
@@ -153,8 +177,8 @@ const Markers = ({
               key={point.id}
               style={{ cursor: "pointer" }}
               onClick={(e) => handlePointClick(e, point)}
-              onMouseEnter={() => setHoveredPointId(point.id)}
-              onMouseLeave={() => setHoveredPointId(null)}
+              onMouseEnter={(e) => handlePointEnter(e, point)}
+              onMouseLeave={handlePointLeave}
               role="button"
               tabIndex={0}
               onKeyDown={(e) => {
@@ -215,6 +239,9 @@ const Markers = ({
         open={Boolean(anchorEl)}
         anchorEl={anchorEl}
         onClose={handleClosePopover}
+        disableAutoFocus
+        disableEnforceFocus
+        disableRestoreFocus
         anchorOrigin={{
           vertical: "top",
           horizontal: "center",
@@ -224,8 +251,16 @@ const Markers = ({
           horizontal: "center",
         }}
         slotProps={{
+          root: {
+            style: {
+              pointerEvents: isPopoverPinned ? "auto" : "none",
+            },
+          },
           paper: {
             className: "geo-map-popover",
+            style: {
+              pointerEvents: isPopoverPinned ? "auto" : "none",
+            },
           },
         }}
       >
