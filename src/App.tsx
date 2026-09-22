@@ -1,4 +1,6 @@
 import { Navigate, Route, Routes } from "react-router-dom";
+import { ModelFamilyProvider, useModelFamily } from "./hooks/useModelFamily";
+import { familyPath } from "./lib/modelFamilies";
 import "./i18n";
 import { Layout } from "./components/common/layout";
 import AuthCallback from "./pages/AuthCallback";
@@ -18,8 +20,18 @@ import Yearly from "./pages/Yearly";
 
 export default function App() {
   return (
+    <ModelFamilyProvider>
+      <FamilyApp />
+    </ModelFamilyProvider>
+  );
+}
+
+function FamilyApp() {
+  const { family } = useModelFamily();
+  return (
     <Layout>
-      <Routes>
+      {/* A new family must not retain local chart selections or comparison filters. */}
+      <Routes key={family}>
         <Route path="/" element={<Home />} />
         <Route path="/building-comparison" element={<BuildingComparison />} />
         <Route path="/yearly" element={<Yearly />} />
@@ -35,8 +47,11 @@ export default function App() {
         <Route path="/terms" element={<Terms />} />
         <Route path="/privacy" element={<Privacy />} />
         {/* Redirect old dashboard route to new my-account route */}
-        <Route path="/dashboard" element={<Navigate to="/my-account" replace />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route
+          path="/dashboard"
+          element={<Navigate to={familyPath("/my-account", family)} replace />}
+        />
+        <Route path="*" element={<Navigate to={familyPath("/", family)} replace />} />
       </Routes>
     </Layout>
   );

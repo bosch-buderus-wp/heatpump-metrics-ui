@@ -12,7 +12,7 @@ vi.mock("../../lib/supabaseClient", () => ({
   supabase: {
     from: () => ({
       select: () => ({
-        order: () => Promise.resolve({ data: systems, error: null }),
+        eq: () => ({ order: () => Promise.resolve({ data: systems, error: null }) }),
       }),
     }),
   },

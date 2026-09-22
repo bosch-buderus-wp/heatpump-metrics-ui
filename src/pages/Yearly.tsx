@@ -8,6 +8,7 @@ import { DataGridWrapper } from "../components/common/data-grid";
 import { ChartUtilityFrame, PageLayout } from "../components/common/layout";
 import { MetricModeToggle, ViewModeToggle } from "../components/ui";
 import { useComparisonMode } from "../hooks/useComparisonMode";
+import { useModelFamily } from "../hooks/useModelFamily";
 import { useSystemConsumptionRows } from "../hooks/useSystemConsumptionMode";
 import { createFilterValueResolver } from "../lib/filterValueResolver";
 import { supabase } from "../lib/supabaseClient";
@@ -19,6 +20,7 @@ type ViewMode = "timeSeries" | "distribution";
 type MetricMode = "cop" | "energy";
 
 export default function Yearly() {
+  const { family } = useModelFamily();
   const { t } = useTranslation();
   const defaultYear = Number(dayjs().subtract(1, "month").format("YYYY"));
   const [year, setYear] = useState(defaultYear);
@@ -51,11 +53,12 @@ export default function Yearly() {
   );
 
   const { data, isLoading, error } = useQuery<MonthlyValueViewRow[]>({
-    queryKey: ["yearly", year],
+    queryKey: ["yearly", year, family],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("monthly_values_view")
         .select("*")
+        .eq("model_family_id", family)
         .eq("year", year);
 
       if (error) throw error;

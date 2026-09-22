@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { SystemsGeoMap } from "../components/common/charts";
 import { DataGridWrapper } from "../components/common/data-grid";
 import { PageLayout } from "../components/common/layout";
+import { useModelFamily } from "../hooks/useModelFamily";
 import { applyGridFilterModel } from "../lib/filterModelUtils";
 import { createFilterValueResolver } from "../lib/filterValueResolver";
 import { supabase } from "../lib/supabaseClient";
@@ -12,6 +13,7 @@ import { getBaseSystemColumns } from "../lib/tableHelpers";
 import type { HeatingSystemWithLocation } from "../types/database.types";
 
 export default function Systems() {
+  const { family } = useModelFamily();
   const { t } = useTranslation();
   const [filterModel, setFilterModel] = useState<GridFilterModel | undefined>(undefined);
 
@@ -23,11 +25,12 @@ export default function Systems() {
   );
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ["systems-with-location"],
+    queryKey: ["systems-with-location", family],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("heating_systems_with_location_view")
         .select("*")
+        .eq("model_family_id", family)
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data as HeatingSystemWithLocation[];

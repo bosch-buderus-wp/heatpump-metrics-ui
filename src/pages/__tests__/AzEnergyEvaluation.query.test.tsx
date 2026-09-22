@@ -24,6 +24,7 @@ const orderMock = vi.fn();
 vi.mock("../../lib/supabaseClient", () => {
   const queryBuilder = {
     select: vi.fn(() => queryBuilder),
+    eq: vi.fn(() => queryBuilder),
     not: (...args: unknown[]) => {
       notMock(...args);
       return queryBuilder;

@@ -6,6 +6,7 @@ import { MonthlyValuesSection } from "../components/features/monthly";
 import { ProfileSection } from "../components/features/profile";
 import { SystemSection } from "../components/features/system";
 import { getDeleteAccountCounts, useDeleteAccount } from "../hooks/useDeleteOperations";
+import { useModelFamily } from "../hooks/useModelFamily";
 import {
   useCreateMonthlyValue,
   useDeleteMonthlyValue,
@@ -14,6 +15,7 @@ import {
 } from "../hooks/useMonthlyValues";
 import { useProfile, useUpdateProfile } from "../hooks/useProfile";
 import { useCreateSystem, useDeleteSystem, useSystem, useUpdateSystem } from "../hooks/useSystem";
+import { familyPath } from "../lib/modelFamilies";
 import { supabase } from "../lib/supabaseClient";
 import type { Database } from "../types/database.types";
 
@@ -21,6 +23,7 @@ type HeatingSystemInsert = Database["public"]["Tables"]["heating_systems"]["Inse
 type MonthlyValueInsert = Database["public"]["Tables"]["monthly_values"]["Insert"];
 
 export default function MyAccount() {
+  const { family } = useModelFamily();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -34,10 +37,10 @@ export default function MyAccount() {
       setUserId(session?.user?.id);
       setSessionChecked(true);
       if (!session) {
-        navigate("/login");
+        navigate(familyPath("/login", family));
       }
     });
-  }, [navigate]);
+  }, [navigate, family]);
 
   // Data queries
   const profileQuery = useProfile(userId);
@@ -124,7 +127,7 @@ export default function MyAccount() {
   const handleLogout = async () => {
     await supabase.auth.signOut();
     queryClient.clear();
-    navigate("/login");
+    navigate(familyPath("/login", family));
   };
 
   if (!sessionChecked) return null;

@@ -134,3 +134,32 @@
   max-width: var(--max-content-width);
   box-shadow: var(--shadow-sm);
 }
+
+/* Family selection remains visible independently of the embedded header. */
+.app-main > .model-family-selector {
+  gap: var(--spacing-sm);
+  text-align: left;
+}
+.model-family-choice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+.model-family-choice label {
+  font-weight: 600;
+}
+.model-family-choice select {
+  min-width: 0;
+  max-width: 100%;
+  padding: var(--spacing-sm);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background: var(--bg-color, white);
+  color: inherit;
+  font: inherit;
+}
+.model-family-selector p {
+  margin: 0;
+  font-size: var(--font-sm);
+}

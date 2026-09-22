@@ -8,6 +8,7 @@ import { ChartUtilityFrame, PageLayout } from "../components/common/layout";
 import { ConfirmDialog, MetricModeToggle, ViewModeToggle } from "../components/ui";
 import { useComparisonMode } from "../hooks/useComparisonMode";
 import { useDeleteMeasurement } from "../hooks/useDeleteOperations";
+import { useModelFamily } from "../hooks/useModelFamily";
 import { useSystemConsumptionRows } from "../hooks/useSystemConsumptionMode";
 import { filterRealisticDataForCharts } from "../lib/dataQuality";
 import { createFilterValueResolver } from "../lib/filterValueResolver";
@@ -20,6 +21,7 @@ type ViewMode = "timeSeries" | "distribution";
 type MetricMode = "cop" | "energy";
 
 export default function Daily() {
+  const { family } = useModelFamily();
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [date, setDate] = useState(dayjs().format("YYYY-MM-DD"));
@@ -92,14 +94,14 @@ export default function Daily() {
     try {
       await deleteMutation.mutateAsync(measurementToDelete);
       // Invalidate and refetch the measurement_deltas_view query
-      await queryClient.invalidateQueries({ queryKey: ["measurement_deltas_view", date] });
+      await queryClient.invalidateQueries({ queryKey: ["measurement_deltas_view", date, family] });
       setDeleteDialogOpen(false);
       setMeasurementToDelete(null);
     } catch (error) {
       console.error("Failed to delete measurement:", error);
       // Error handling - the mutation will handle error display
     }
-  }, [measurementToDelete, deleteMutation, queryClient, date]);
+  }, [measurementToDelete, deleteMutation, queryClient, date, family]);
 
   const handleDeleteCancel = useCallback(() => {
     setDeleteDialogOpen(false);
@@ -107,13 +109,14 @@ export default function Daily() {
   }, []);
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ["measurement_deltas_view", date],
+    queryKey: ["measurement_deltas_view", date, family],
     queryFn: async () => {
       const start = dayjs(date).startOf("day").toISOString();
       const end = dayjs(date).endOf("day").toISOString();
       const { data, error } = await supabase
         .from("measurement_deltas_view")
         .select("*")
+        .eq("model_family_id", family)
         .gte("created_at", start)
         .lte("created_at", end)
         .order("created_at", { ascending: false });

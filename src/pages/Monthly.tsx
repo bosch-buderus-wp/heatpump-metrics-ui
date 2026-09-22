@@ -9,6 +9,7 @@ import { ChartUtilityFrame, PageLayout } from "../components/common/layout";
 import { MonthYearPicker } from "../components/form";
 import { MetricModeToggle, ViewModeToggle } from "../components/ui";
 import { useComparisonMode } from "../hooks/useComparisonMode";
+import { useModelFamily } from "../hooks/useModelFamily";
 import { useSystemConsumptionRows } from "../hooks/useSystemConsumptionMode";
 import { createFilterValueResolver } from "../lib/filterValueResolver";
 import { supabase } from "../lib/supabaseClient";
@@ -20,6 +21,7 @@ type ViewMode = "timeSeries" | "distribution";
 type MetricMode = "cop" | "energy";
 
 export default function Monthly() {
+  const { family } = useModelFamily();
   const { t } = useTranslation();
   const defaultMonth = Number(dayjs().format("M"));
   const defaultYear = Number(dayjs().format("YYYY"));
@@ -42,7 +44,7 @@ export default function Monthly() {
   );
 
   const { data, isLoading, error } = useQuery<DailyValue[]>({
-    queryKey: ["daily", month, year],
+    queryKey: ["daily", month, year, family],
     queryFn: async () => {
       const start = dayjs(`${year}-${month}-01`).startOf("month").format("YYYY-MM-DD");
       const end = dayjs(`${year}-${month}-01`).endOf("month").format("YYYY-MM-DD");
@@ -50,6 +52,7 @@ export default function Monthly() {
       const { data, error } = await supabase
         .from("daily_values_view")
         .select("*")
+        .eq("model_family_id", family)
         .gte("date", start)
         .lte("date", end)
         .order("date", { ascending: false });

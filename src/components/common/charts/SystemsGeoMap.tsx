@@ -323,10 +323,7 @@ const Markers = ({
                     <InfoRow
                       icon={<HeatPumpIcon />}
                       label={t("tableHeaders.modelIdu")}
-                      value={[
-                        currentDetails.modelIdu,
-                        currentDetails.modelOdu ? `${currentDetails.modelOdu} kW` : null,
-                      ]
+                      value={[currentDetails.modelIdu, currentDetails.modelOdu]
                         .filter(Boolean)
                         .join(" / ")}
                       tooltip={`${t("tableHeaders.modelIdu")} / ${t("tableHeaders.modelOdu")}`}

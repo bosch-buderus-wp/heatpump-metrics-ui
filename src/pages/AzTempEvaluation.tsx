@@ -6,6 +6,7 @@ import { DataGridWrapper } from "../components/common/data-grid";
 import { PageLayout } from "../components/common/layout";
 import { useComparisonMode } from "../hooks/useComparisonMode";
 import { useDebouncedValue } from "../hooks/useDebouncedValue";
+import { useModelFamily } from "../hooks/useModelFamily";
 import { useSystemConsumptionRows } from "../hooks/useSystemConsumptionMode";
 import { createFilterValueResolver } from "../lib/filterValueResolver";
 import { sanitizeGridFilterModel } from "../lib/serverFilterModel";
@@ -20,6 +21,7 @@ const OUTDOOR_TEMPERATURE_BIN_WIDTH_K = 2;
 const FILTER_REQUEST_DEBOUNCE_MS = 700;
 
 export default function AzTempEvaluation() {
+  const { family } = useModelFamily();
   const { t } = useTranslation();
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [filteredData, setFilteredData] = useState<DailyValue[] | null>(null);
@@ -60,12 +62,14 @@ export default function AzTempEvaluation() {
       currentUserId,
       MAX_SAMPLE_ROWS,
       OUTDOOR_TEMPERATURE_BIN_WIDTH_K,
+      family,
     ],
     queryFn: async () => {
       const { data, error } = await supabase.rpc(
         "sample_daily_values_view_by_outdoor_temperature",
         {
           filter_model: serverFilterModel,
+          model_family: family,
           max_rows: MAX_SAMPLE_ROWS,
           outdoor_temperature_bin_width_k: OUTDOOR_TEMPERATURE_BIN_WIDTH_K,
           current_user_id: currentUserId,
@@ -76,7 +80,6 @@ export default function AzTempEvaluation() {
 
       return (data ?? []) as DailyValue[];
     },
-    placeholderData: (previousData) => previousData,
   });
   const displayData = useSystemConsumptionRows(data, "day");
 

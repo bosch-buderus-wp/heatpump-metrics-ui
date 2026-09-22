@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { CategoryBarChart, HeatingSeasonChart } from "../components/common/charts";
 import { ChartFullscreenPanel, ChartUtilityFrame, PageLayout } from "../components/common/layout";
 import { MonthYearPicker } from "../components/form";
+import { useModelFamily } from "../hooks/useModelFamily";
 import { useSystemConsumptionRows } from "../hooks/useSystemConsumptionMode";
 import {
   createEnergyStandardChartData,
@@ -22,13 +23,14 @@ const DAILY_VALUES_PAGE_SIZE = 1_500;
 const DAILY_VALUES_SELECT =
   "date,heating_id,heated_area_m2,thermal_energy_heating_kwh,building_energy_standard";
 
-async function fetchHeatingSeasonRows(year: number): Promise<DailyValue[]> {
+async function fetchHeatingSeasonRows(year: number, family: string): Promise<DailyValue[]> {
   const rows: DailyValue[] = [];
 
   for (let from = 0; ; from += DAILY_VALUES_PAGE_SIZE) {
     const { data, error } = await supabase
       .from("daily_values_view")
       .select(DAILY_VALUES_SELECT)
+      .eq("model_family_id", family)
       .gte("date", `${year}-01-01`)
       .lt("date", `${year + 1}-01-01`)
       .order("date", { ascending: true })
@@ -45,16 +47,18 @@ async function fetchHeatingSeasonRows(year: number): Promise<DailyValue[]> {
 }
 
 export default function BuildingComparison() {
+  const { family } = useModelFamily();
   const { t, i18n } = useTranslation();
   const [month, setMonth] = useState(0);
   const [year, setYear] = useState(dayjs().year());
 
   const { data, isLoading, error } = useQuery<MonthlyValue[]>({
-    queryKey: ["building-comparison", year],
+    queryKey: ["building-comparison", year, family],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("monthly_values_view")
         .select("*")
+        .eq("model_family_id", family)
         .eq("year", year);
 
       if (error) throw error;
@@ -67,8 +71,8 @@ export default function BuildingComparison() {
     isLoading: isHeatingSeasonLoading,
     error: heatingSeasonError,
   } = useQuery<DailyValue[]>({
-    queryKey: ["building-comparison-heating-season", year],
-    queryFn: () => fetchHeatingSeasonRows(year),
+    queryKey: ["building-comparison-heating-season", year, family],
+    queryFn: () => fetchHeatingSeasonRows(year, family),
   });
   const chartData = useMemo(
     () => createEnergyStandardChartData(filterHeatingDemandRows(displayData, year, month), t),

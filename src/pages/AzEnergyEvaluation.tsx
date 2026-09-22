@@ -8,6 +8,7 @@ import {
 import { DataGridWrapper } from "../components/common/data-grid";
 import { PageLayout } from "../components/common/layout";
 import { useComparisonMode } from "../hooks/useComparisonMode";
+import { useModelFamily } from "../hooks/useModelFamily";
 import { useSystemConsumptionRows } from "../hooks/useSystemConsumptionMode";
 import { createFilterValueResolver } from "../lib/filterValueResolver";
 import { supabase } from "../lib/supabaseClient";
@@ -21,6 +22,7 @@ function getMonthlyValueKey(row: MonthlyValue) {
 }
 
 export default function AzEnergyEvaluation() {
+  const { family } = useModelFamily();
   const { t } = useTranslation();
   const [filteredData, setFilteredData] = useState<MonthlyValue[] | null>(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
@@ -58,11 +60,12 @@ export default function AzEnergyEvaluation() {
 
   // Fetch monthly values except the current (potentially incomplete) month
   const { data, isLoading, error } = useQuery<MonthlyValue[]>({
-    queryKey: ["monthly_all_for_az_energy", currentYear, currentMonth],
+    queryKey: ["monthly_all_for_az_energy", currentYear, currentMonth, family],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("monthly_values_view")
         .select("*")
+        .eq("model_family_id", family)
         .not("year", "is", null)
         .not("month", "is", null)
         .or(`year.lt.${currentYear},and(year.eq.${currentYear},month.lt.${currentMonth})`)

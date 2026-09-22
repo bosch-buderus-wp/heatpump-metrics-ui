@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { useModelFamily } from "../hooks/useModelFamily";
+import { familyPath } from "../lib/modelFamilies";
 import { supabase } from "../lib/supabaseClient";
 
 export default function AuthCallback() {
+  const { family } = useModelFamily();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -32,7 +35,7 @@ export default function AuthCallback() {
         if (verifyError) throw verifyError;
 
         // Successfully authenticated, redirect to home/dashboard
-        navigate("/", { replace: true });
+        navigate(familyPath("/", family), { replace: true });
       } catch (err) {
         console.error("Auth callback error:", err);
         const message = err instanceof Error ? err.message : "Authentication failed";
@@ -42,7 +45,7 @@ export default function AuthCallback() {
     };
 
     verifyOtp();
-  }, [searchParams, navigate]);
+  }, [searchParams, navigate, family]);
 
   if (loading) {
     return (
@@ -58,7 +61,11 @@ export default function AuthCallback() {
       <section className="auth">
         <h2>{t("auth.authenticationFailed")}</h2>
         <div className="error">{error}</div>
-        <button className="btn" type="button" onClick={() => navigate("/login", { replace: true })}>
+        <button
+          className="btn"
+          type="button"
+          onClick={() => navigate(familyPath("/login", family), { replace: true })}
+        >
           {t("auth.backToLogin")}
         </button>
       </section>

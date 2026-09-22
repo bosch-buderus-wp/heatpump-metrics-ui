@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { PUBLIC_FAMILY_QUERY_KEYS } from "../lib/modelFamilies";
 import { supabase } from "../lib/supabaseClient";
 import type { Database } from "../types/database.types";
 
@@ -38,6 +39,9 @@ export function useCreateSystem(userId: string | undefined) {
       return data;
     },
     onSuccess: () => {
+      queryClient.removeQueries({
+        predicate: (query) => PUBLIC_FAMILY_QUERY_KEYS.has(String(query.queryKey[0])),
+      });
       queryClient.invalidateQueries({ queryKey: ["heating_system", userId] });
     },
   });
@@ -59,6 +63,9 @@ export function useUpdateSystem(userId: string | undefined, heatingId: string | 
       return data;
     },
     onSuccess: () => {
+      queryClient.removeQueries({
+        predicate: (query) => PUBLIC_FAMILY_QUERY_KEYS.has(String(query.queryKey[0])),
+      });
       queryClient.invalidateQueries({ queryKey: ["heating_system", userId] });
     },
   });
@@ -74,6 +81,9 @@ export function useDeleteSystem(userId: string | undefined, heatingId: string | 
       if (error) throw error;
     },
     onSuccess: () => {
+      queryClient.removeQueries({
+        predicate: (query) => PUBLIC_FAMILY_QUERY_KEYS.has(String(query.queryKey[0])),
+      });
       queryClient.invalidateQueries({ queryKey: ["heating_system", userId] });
       queryClient.invalidateQueries({ queryKey: ["monthly_values"] });
       queryClient.invalidateQueries({ queryKey: ["measurements"] });

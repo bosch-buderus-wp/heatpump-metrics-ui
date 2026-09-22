@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useModelCatalog } from "../../../hooks/useModelCatalog";
 import {
   BUILDING_ENERGY_STANDARD_VALUES,
   BUILDING_TYPE_VALUES,
   getEnumOptions,
-  MODEL_IDU_VALUES,
-  MODEL_ODU_VALUES,
   SW_IDU_VALUES,
   SW_ODU_VALUES,
 } from "../../../lib/enumCatalog";
+import { DEFAULT_MODEL_FAMILY } from "../../../lib/modelFamilies";
 import type { Database } from "../../../types/database.types";
 import {
   EnumSelectField,
@@ -31,9 +31,10 @@ interface SystemFormProps {
 export function SystemForm({ system, onSubmit }: SystemFormProps) {
   const { t } = useTranslation();
 
+  const catalog = useModelCatalog();
+  const [modelError, setModelError] = useState(false);
+
   // Generate options from i18n translations
-  const modelIduOptions = getEnumOptions(t, "models.model_idu", MODEL_IDU_VALUES);
-  const modelOduOptions = getEnumOptions(t, "models.model_odu", MODEL_ODU_VALUES);
   const swIduOptions = getEnumOptions(t, "models.sw_idu", SW_IDU_VALUES);
   const swOduOptions = getEnumOptions(t, "models.sw_odu", SW_ODU_VALUES);
 
@@ -43,13 +44,14 @@ export function SystemForm({ system, onSubmit }: SystemFormProps) {
   const isOtherCountry = initialCountry && !predefinedCountries.includes(initialCountry);
 
   const [form, setForm] = useState<Partial<HeatingSystem>>({
+    model_family_id: system?.model_family_id ?? DEFAULT_MODEL_FAMILY,
     name: system?.name ?? "",
     postal_code: system?.postal_code ?? "",
     heating_type: system?.heating_type ?? "underfloorheating",
-    model_idu: system?.model_idu ?? "CS5800i_E",
-    model_odu: system?.model_odu ?? "5",
-    sw_idu: system?.sw_idu ?? "12.11.1",
-    sw_odu: system?.sw_odu ?? "9.15.0",
+    model_idu: system ? system.model_idu : "CS5800i_E",
+    model_odu: system ? system.model_odu : "5",
+    sw_idu: system ? system.sw_idu : "12.11.1",
+    sw_odu: system ? system.sw_odu : "9.15.0",
     heating_load_kw: system?.heating_load_kw ?? null,
     heated_area_m2: system?.heated_area_m2 ?? null,
     notes: system?.notes ?? "",
@@ -64,6 +66,28 @@ export function SystemForm({ system, onSubmit }: SystemFormProps) {
     used_for_cooling: system?.used_for_cooling ?? false,
   });
 
+  const family = form.model_family_id ?? DEFAULT_MODEL_FAMILY;
+  const combinations =
+    catalog.data?.combinations.filter((item) => item.model_family_id === family) ?? [];
+  const modelIduOptions = [
+    ...new Map(
+      combinations.map((item) => [
+        item.model_idu,
+        { value: item.model_idu, label: item.idu_label },
+      ]),
+    ).values(),
+  ];
+  const modelOduOptions = combinations
+    .filter((item) => item.model_idu === form.model_idu)
+    .map((item) => ({ value: item.model_odu, label: item.model_odu }))
+    .sort((a, b) => Number(a.value) - Number(b.value));
+  const unchangedModel =
+    !!system &&
+    family === (system.model_family_id ?? DEFAULT_MODEL_FAMILY) &&
+    form.model_idu === system.model_idu &&
+    form.model_odu === system.model_odu;
+  const requiresCompleteModel = !unchangedModel;
+
   const [countryMode, setCountryMode] = useState<"dropdown" | "text">(
     isOtherCountry ? "text" : "dropdown",
   );
@@ -77,7 +101,21 @@ export function SystemForm({ system, onSubmit }: SystemFormProps) {
       id="system-form"
       onSubmit={(e) => {
         e.preventDefault();
-        onSubmit(form as HeatingSystemInsert);
+        if (
+          !catalog.data ||
+          (!unchangedModel &&
+            !combinations.some(
+              (item) => item.model_idu === form.model_idu && item.model_odu === form.model_odu,
+            ))
+        ) {
+          setModelError(true);
+          return;
+        }
+        setModelError(false);
+        onSubmit({
+          ...form,
+          ...(family !== DEFAULT_MODEL_FAMILY ? { sw_idu: null, sw_odu: null } : {}),
+        } as HeatingSystemInsert);
       }}
     >
       <TextField
@@ -239,11 +277,46 @@ export function SystemForm({ system, onSubmit }: SystemFormProps) {
       </div>
 
       <SelectField
+        label={t("modelFamily.label")}
+        value={family}
+        options={
+          catalog.data?.families.map((item) => ({ value: item.id, label: item.label })) ?? []
+        }
+        emptyOption={false}
+        required
+        onChange={(value) => {
+          if (value && value !== family) {
+            setForm((previous) => ({
+              ...previous,
+              model_family_id: value,
+              model_idu: null,
+              model_odu: null,
+              sw_idu: null,
+              sw_odu: null,
+            }));
+            setModelError(false);
+          }
+        }}
+      />
+      {catalog.isLoading && <p>{t("common.loading")}</p>}
+      {catalog.error && <p role="alert">{t("modelFamily.catalogError")}</p>}
+      {modelError && <p role="alert">{t("modelFamily.invalidCombination")}</p>}
+      <SelectField
         label={t("systemForm.indoorUnit")}
         value={form.model_idu}
-        onChange={(v) => set("model_idu", (v as typeof form.model_idu) ?? null)}
+        onChange={(v) =>
+          setForm((previous) => ({
+            ...previous,
+            model_idu: v as HeatingSystem["model_idu"],
+            model_odu: combinations.some(
+              (item) => item.model_idu === v && item.model_odu === previous.model_odu,
+            )
+              ? previous.model_odu
+              : null,
+          }))
+        }
         options={modelIduOptions}
-        emptyOption={false}
+        required={requiresCompleteModel}
         hint={t("systemForm.hints.modelIndoor")}
       />
 
@@ -252,27 +325,29 @@ export function SystemForm({ system, onSubmit }: SystemFormProps) {
         value={form.model_odu}
         onChange={(v) => set("model_odu", (v as typeof form.model_odu) ?? null)}
         options={modelOduOptions}
-        emptyOption={false}
+        required={requiresCompleteModel}
         hint={t("systemForm.hints.modelOutdoor")}
       />
 
-      <SelectField
-        label={t("systemForm.softwareIndoor")}
-        value={form.sw_idu}
-        onChange={(v) => set("sw_idu", (v as typeof form.sw_idu) ?? null)}
-        options={swIduOptions}
-        emptyOption={false}
-        hint={t("systemForm.hints.softwareIndoor")}
-      />
+      {family === DEFAULT_MODEL_FAMILY && (
+        <>
+          <SelectField
+            label={t("systemForm.softwareIndoor")}
+            value={form.sw_idu}
+            onChange={(v) => set("sw_idu", (v as typeof form.sw_idu) ?? null)}
+            options={swIduOptions}
+            hint={t("systemForm.hints.softwareIndoor")}
+          />
 
-      <SelectField
-        label={t("systemForm.softwareOutdoor")}
-        value={form.sw_odu}
-        onChange={(v) => set("sw_odu", (v as typeof form.sw_odu) ?? null)}
-        options={swOduOptions}
-        emptyOption={false}
-        hint={t("systemForm.hints.softwareOutdoor")}
-      />
+          <SelectField
+            label={t("systemForm.softwareOutdoor")}
+            value={form.sw_odu}
+            onChange={(v) => set("sw_odu", (v as typeof form.sw_odu) ?? null)}
+            options={swOduOptions}
+            hint={t("systemForm.hints.softwareOutdoor")}
+          />
+        </>
+      )}
 
       <div className="row">
         <span>{t("systemForm.usageLabel")}</span>

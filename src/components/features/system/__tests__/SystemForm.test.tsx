@@ -1,3 +1,8 @@
+vi.mock("../../../../hooks/useModelCatalog", async () => {
+  const { modelCatalogFixture } = await import("../../../../test/modelCatalogFixture");
+  return { useModelCatalog: () => ({ data: modelCatalogFixture, isLoading: false, error: null }) };
+});
+
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import type { Database } from "../../../../types/database.types";
@@ -126,6 +131,7 @@ describe("SystemForm", () => {
     postal_code: "12345",
     country: "Deutschland",
     heating_type: "underfloorheating",
+    model_family_id: "cs5800_6800",
     model_idu: "CS5800i_E",
     model_odu: "5",
     sw_idu: "12.11.1",

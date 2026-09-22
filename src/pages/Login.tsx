@@ -1,12 +1,15 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router-dom";
+import { useModelFamily } from "../hooks/useModelFamily";
+import { familyPath } from "../lib/modelFamilies";
 import { supabase } from "../lib/supabaseClient";
 
 const AUTH_METHOD = window.VITE_AUTH_METHOD || import.meta.env.VITE_AUTH_METHOD || "magic-link";
 const AUTH_CALLBACK_URL = window.VITE_AUTH_CALLBACK_URL || import.meta.env.VITE_AUTH_CALLBACK_URL;
 
 export default function Login() {
+  const { family } = useModelFamily();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
@@ -50,7 +53,7 @@ export default function Login() {
           const { error: authError } = await supabase.auth.signUp({ email, password });
           if (authError) throw authError;
         }
-        navigate("/my-account");
+        navigate(familyPath("/my-account", family));
       }
     } catch (err) {
       const message = err instanceof Error ? err.message : "Authentication error";
@@ -111,7 +114,7 @@ export default function Login() {
             />
             <span className="consent-text">
               {t("auth.acceptTerms1")}{" "}
-              <Link to="/terms" target="_blank" className="consent-link">
+              <Link to={familyPath("/terms", family)} target="_blank" className="consent-link">
                 {t("legal.terms")}
               </Link>{" "}
               {t("auth.acceptTerms2")}
@@ -127,7 +130,7 @@ export default function Login() {
             />
             <span className="consent-text">
               {t("auth.acceptPrivacy1")}{" "}
-              <Link to="/privacy" target="_blank" className="consent-link">
+              <Link to={familyPath("/privacy", family)} target="_blank" className="consent-link">
                 {t("legal.privacy")}
               </Link>{" "}
               {t("auth.acceptPrivacy2")}

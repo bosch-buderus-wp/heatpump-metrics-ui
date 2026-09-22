@@ -1,9 +1,11 @@
 import { createContext, type ReactNode, useContext, useMemo, useState } from "react";
+import { DEFAULT_MODEL_FAMILY } from "../lib/modelFamilies";
 import {
   type EnergyDataRow,
   type EnergyPeriod,
   removeSystemConsumptionFromRows,
 } from "../lib/systemConsumption";
+import { useModelFamily } from "./useModelFamily";
 
 interface SystemConsumptionModeValue {
   excludeSystemConsumption: boolean;
@@ -30,7 +32,12 @@ export function SystemConsumptionModeProvider({ children }: { children: ReactNod
 }
 
 export function useSystemConsumptionMode() {
-  return useContext(SystemConsumptionModeContext);
+  const value = useContext(SystemConsumptionModeContext);
+  const { family } = useModelFamily();
+  return {
+    ...value,
+    excludeSystemConsumption: family === DEFAULT_MODEL_FAMILY && value.excludeSystemConsumption,
+  };
 }
 
 export function useSystemConsumptionRows<T extends EnergyDataRow>(

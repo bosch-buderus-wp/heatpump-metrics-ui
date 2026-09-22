@@ -1,4 +1,5 @@
 import type { TFunction } from "i18next";
+import { Constants } from "../types/database.types";
 
 // Central enum label helpers that use i18n for translations.
 // These functions provide translated labels for Supabase enum-like codes.
@@ -37,7 +38,12 @@ export function getEnumOptions(
 ): Array<{ value: string; label: string }> {
   return values.map((value) => ({
     value,
-    label: getLabel(t, namespace, value),
+    label:
+      namespace === "models.model_odu"
+        ? value
+        : namespace === "models.model_idu"
+          ? getModelIduLabel(t, value)
+          : getLabel(t, namespace, value),
   }));
 }
 
@@ -50,7 +56,10 @@ export function getHeatingTypeLabel(
 }
 
 export function getModelIduLabel(t: TFunction, code: string | number | null | undefined): string {
-  return getLabel(t, "models.model_idu", code);
+  return getLabel(t, "models.model_idu", code)
+    .replace(/_/g, " ")
+    .replace("MBE PLUS", "MBE+")
+    .replace("S PLUS", "S+");
 }
 
 export function getModelOduLabel(t: TFunction, code: string | number | null | undefined): string {
@@ -82,22 +91,9 @@ export function getBuildingEnergyStandardLabel(
 // Enum value arrays (keys only, labels come from i18n)
 export const HEATING_TYPE_VALUES = ["underfloorheating", "radiators", "mixed"];
 
-export const MODEL_IDU_VALUES = [
-  "CS5800i_E",
-  "CS5800i_MB",
-  "CS5800i_M",
-  "CS6800i_E",
-  "CS6800i_MB",
-  "CS6800i_M",
-  "WLW176i_E",
-  "WLW176i_TP70",
-  "WLW176i_T180",
-  "WLW186i_E",
-  "WLW186i_TP70",
-  "WLW186i_T180",
-];
+export const MODEL_IDU_VALUES = [...Constants.public.Enums.model_idu];
 
-export const MODEL_ODU_VALUES = ["4", "5", "7", "10", "12"];
+export const MODEL_ODU_VALUES = [...Constants.public.Enums.model_odu];
 
 export const SW_IDU_VALUES = ["5.27", "5.35", "7.10.0", "9.6.1", "9.7.0", "12.11.1"];
 

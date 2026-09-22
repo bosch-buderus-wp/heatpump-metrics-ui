@@ -6,6 +6,13 @@ const resources = {
   de: {
     translation: {
       appTitle: "Wärmepumpen Metriken",
+      modelFamily: {
+        label: "Modellfamilie",
+        hint: "Auswertungen zeigen ausschließlich diese Modellfamilie. Unterschiedliche Familien erfassen den Stromverbrauch teilweise unterschiedlich und werden deshalb nicht gemeinsam verglichen.",
+        catalogError: "Der Modellkatalog konnte nicht geladen werden. Bitte erneut versuchen.",
+        invalidCombination:
+          "Bitte wähle eine gültige Kombination aus Inneneinheit und Außeneinheiten-Typklasse.",
+      },
       home: {
         title: "Willkommen",
         intro:
@@ -167,7 +174,7 @@ const resources = {
         system: "Anlage",
         heatingType: "Wärmeverteilung",
         modelIdu: "Inneneinheit",
-        modelOdu: "Außeneinheit",
+        modelOdu: "Außeneinheiten-Typklasse",
         swIdu: "SW IDU",
         swOdu: "SW ODU",
         postalCode: "PLZ",
@@ -375,11 +382,11 @@ const resources = {
           WLW186i_T180: "Buderus WLW186i AR 12 T180 (16l Puffer + 180l WW)",
         },
         model_odu: {
-          "4": "4 kW",
-          "5": "5 kW",
-          "7": "7 kW",
-          "10": "10 kW",
-          "12": "12 kW",
+          "4": "4",
+          "5": "5",
+          "7": "7",
+          "10": "10",
+          "12": "12",
         },
         sw_idu: {
           "5.27": "5.27",
@@ -409,7 +416,7 @@ const resources = {
         notes: "Notizen",
         notesPlaceholder: "z.B. 3-fach Verglasung, ...",
         indoorUnit: "Inneneinheit",
-        outdoorUnit: "Außeneinheit",
+        outdoorUnit: "Außeneinheiten-Typklasse",
         softwareIndoor: "Software Inneneinheit",
         softwareOutdoor: "Software Außeneinheit",
         heatingId: "Anlagen-ID",
@@ -451,7 +458,8 @@ const resources = {
           thermometerOffset:
             "Korrekturwert für deinen Außentemperatursensor. Verwende dies, wenn der Sensor eine zu hohe oder zu niedrige Temperatur misst. Ein positiver Wert bedeutet, dass der Sensor zu hoch misst, ein negativer Wert bedeutet, dass der Sensor zu niedrig misst, z.B. 2 K wenn der Sensor 2 °C zu hoch misst. Mit diesem Wert werden alle deine Messwerte korrigiert.",
           modelIndoor: "Das Modell deiner Inneneinheit.",
-          modelOutdoor: "Das Modell deiner Außeneinheit.",
+          modelOutdoor:
+            "Herstellerspezifische Typklasse deiner Außeneinheit; keine direkt vergleichbare kW-Angabe.",
           softwareIndoor:
             "Die Softwareversion deiner Inneneinheit. Diese findest du im Servicemenü deiner Wärmepumpe oder in der App.",
           softwareOutdoor:
@@ -497,6 +505,12 @@ const resources = {
   en: {
     translation: {
       appTitle: "Heatpump Metrics",
+      modelFamily: {
+        label: "Model family",
+        hint: "Results show only this model family. Families can account for electricity consumption differently and are therefore compared separately.",
+        catalogError: "The model catalog could not be loaded. Please try again.",
+        invalidCombination: "Please select a valid indoor unit and outdoor unit type class.",
+      },
       home: {
         title: "Welcome",
         intro:
@@ -714,7 +728,7 @@ const resources = {
         system: "System",
         heatingType: "Heat Distribution",
         modelIdu: "Indoor Unit",
-        modelOdu: "Outdoor Unit",
+        modelOdu: "Outdoor unit type class",
         swIdu: "SW IDU",
         swOdu: "SW ODU",
         postalCode: "Postal Code",
@@ -874,11 +888,11 @@ const resources = {
           WLW186i_T180: "Buderus WLW186i AR 12 T180 (16l buffer + 180l DHW)",
         },
         model_odu: {
-          "4": "4 kW",
-          "5": "5 kW",
-          "7": "7 kW",
-          "10": "10 kW",
-          "12": "12 kW",
+          "4": "4",
+          "5": "5",
+          "7": "7",
+          "10": "10",
+          "12": "12",
         },
         sw_idu: {
           "5.27": "5.27",
@@ -908,7 +922,7 @@ const resources = {
         notes: "Notes",
         notesPlaceholder: "e.g. triple glazing, ...",
         indoorUnit: "Indoor unit",
-        outdoorUnit: "Outdoor unit",
+        outdoorUnit: "Outdoor unit type class",
         softwareIndoor: "Indoor unit software",
         softwareOutdoor: "Outdoor unit software",
         heatingId: "Heating ID",
@@ -950,7 +964,8 @@ const resources = {
           thermometerOffset:
             "Correction value for your outdoor temperature sensor. Use this if the sensor measures too high or too low. A positive value means the sensor reads too high, a negative value means it reads too low, e.g., 2 K if the sensor reads 2°C too high. This value will be used to correct all your measurements.",
           modelIndoor: "The model of your indoor unit.",
-          modelOutdoor: "The model of your outdoor unit.",
+          modelOutdoor:
+            "Manufacturer-specific outdoor unit type class; not a directly comparable kW rating.",
           softwareIndoor:
             "The software version of your indoor unit. You can find this in the service menu of your heat pump or in the app.",
           softwareOutdoor:

@@ -91,6 +91,7 @@ describe("SystemsGeoMap", () => {
     country: "DE",
     postal_code: "12345",
     heating_type: "mixed",
+    model_family_id: "cs5800_6800",
     model_idu: "CS6800i_M",
     model_odu: "7",
     sw_idu: "9.7.0",

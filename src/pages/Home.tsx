@@ -1,6 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { Trans, useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import { useModelFamily } from "../hooks/useModelFamily";
+import { familyPath } from "../lib/modelFamilies";
 import { supabase } from "../lib/supabaseClient";
 
 interface StatsCardProps {
@@ -44,18 +46,31 @@ function StatsCard({ label, count, isLoading, error, onClick }: StatsCardProps) 
 }
 
 export default function Home() {
+  const { family } = useModelFamily();
   const { t } = useTranslation();
   const navigate = useNavigate();
 
   const statsQ = useQuery({
-    queryKey: ["homeStats"],
+    queryKey: ["homeStats", family],
     queryFn: async () => {
       const [systems, measurements, monthly] = await Promise.all([
-        supabase.from("heating_systems").select("heating_id", { count: "exact", head: true }),
-        supabase.from("measurements").select("id", { count: "exact", head: true }),
-        supabase.from("monthly_values").select("id", { count: "exact", head: true }),
+        supabase
+          .from("heating_systems")
+          .select("heating_id", { count: "exact", head: true })
+          .eq("model_family_id", family),
+        supabase
+          .from("measurements")
+          .select("id,heating_systems!inner(model_family_id)", { count: "exact", head: true })
+          .eq("heating_systems.model_family_id", family),
+        supabase
+          .from("monthly_values")
+          .select("id,heating_systems!inner(model_family_id)", { count: "exact", head: true })
+          .eq("heating_systems.model_family_id", family),
       ]);
 
+      for (const result of [systems, measurements, monthly]) {
+        if (result.error) throw result.error;
+      }
       return {
         systems: systems.count ?? 0,
         measurements: measurements.count ?? 0,
@@ -76,19 +91,19 @@ export default function Home() {
           label={t("home.stats.systems")}
           count={statsQ.data?.systems}
           isLoading={statsQ.isLoading}
-          onClick={() => navigate("/systems")}
+          onClick={() => navigate(familyPath("/systems", family))}
         />
         <StatsCard
           label={t("home.stats.monthly")}
           count={statsQ.data?.monthly}
           isLoading={statsQ.isLoading}
-          onClick={() => navigate("/monthly")}
+          onClick={() => navigate(familyPath("/monthly", family))}
         />
         <StatsCard
           label={t("home.stats.measurements")}
           count={statsQ.data?.measurements}
           isLoading={statsQ.isLoading}
-          onClick={() => navigate("/daily")}
+          onClick={() => navigate(familyPath("/daily", family))}
         />
       </section>
 
@@ -97,7 +112,7 @@ export default function Home() {
           <Trans
             i18nKey="home.footer"
             components={[
-              <a key="account" href="/metrics/#/my-account">
+              <a key="account" href={`/metrics/#${familyPath("/my-account", family)}`}>
                 Account
               </a>,
               <a key="howto" href="/metrics/howto">
