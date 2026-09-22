@@ -1,0 +1,262 @@
+/* Account forms share the documentation site's quiet, typographic hierarchy. */
+.account-page {
+  --account-ink: #30383c;
+  --account-muted: #626b70;
+  --account-line: #e3e6e7;
+  --account-accent: #c65f50;
+  --account-surface: #f6f7f7;
+  width: 100%;
+  min-width: 0;
+  max-width: 880px;
+  color: var(--account-ink);
+  text-align: left;
+}
+
+.account-heading {
+  padding: 16px 0 28px;
+}
+
+.account-heading h1 {
+  margin: 0;
+  font-size: clamp(1.8rem, 4vw, 2.3rem);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+
+.account-heading::after {
+  content: "";
+  display: block;
+  width: 48px;
+  height: 3px;
+  margin-top: 18px;
+  background: var(--account-accent);
+}
+
+.account-page .section-container {
+  padding: 28px 0 32px;
+  margin: 0;
+  border: 0;
+  border-top: 1px solid var(--account-line);
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.account-page .section-header {
+  padding: 0;
+}
+
+.account-page .section-header h2 {
+  color: var(--account-ink);
+  font-size: 1.35rem;
+  letter-spacing: -0.025em;
+}
+
+.account-page .section-info {
+  margin: 10px 0 24px;
+  padding: 0;
+  max-width: 72ch;
+  color: var(--account-muted);
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+
+.account-page :is(.section-content, .section-form, .card) {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  min-width: 0;
+}
+
+.account-page .row:not(.picker) {
+  grid-template-columns: minmax(150px, 0.85fr) minmax(0, 1.4fr) 24px;
+  gap: 12px;
+  min-width: 0;
+  margin: 0;
+  padding: 10px 0;
+  font-size: 0.9rem;
+}
+
+.account-page .row > * {
+  min-width: 0;
+}
+
+.account-page .row > label,
+.account-page .row > span {
+  line-height: 1.5;
+}
+
+.account-page .row :is(input:not([type="checkbox"]), select, textarea) {
+  width: 100%;
+  min-width: 0;
+  min-height: 40px;
+  margin: 0;
+  padding: 8px 10px;
+  border: 1px solid #cdd2d4;
+  border-radius: 4px;
+  background: white;
+  color: var(--account-ink);
+  font: inherit;
+}
+
+.account-page .row textarea {
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.account-page .row input[readonly] {
+  background: var(--account-surface);
+  color: var(--account-muted);
+  font-family: ui-monospace, monospace;
+  font-size: 0.8rem;
+}
+
+.account-page .row .number-input-with-unit-input {
+  padding-right: 3.5rem;
+}
+
+.account-page .row .number-input-with-unit-input-error {
+  border-color: var(--error-color);
+}
+
+.account-page .row :is(input, select, textarea):focus-visible,
+.account-page button:focus-visible {
+  outline: 2px solid var(--account-ink);
+  outline-offset: 3px;
+}
+
+.account-page .field-hint-container {
+  margin: 0;
+}
+
+.account-page .copy-field-wrapper {
+  grid-column: 2 / -1;
+}
+
+.account-page .copy-field-wrapper button {
+  min-height: 40px;
+  padding: 8px 12px;
+  border: 1px solid #cdd2d4;
+  border-radius: 4px;
+  background: white;
+  color: var(--account-ink);
+  font: inherit;
+  cursor: pointer;
+}
+
+.account-page .flex-center-gap-lg {
+  flex-wrap: wrap;
+  gap: 8px 16px;
+}
+
+.account-page input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--account-ink);
+}
+
+.account-page .action-bar-container {
+  margin-top: 22px;
+}
+
+.account-page .action-btn {
+  min-height: 40px;
+  padding: 9px 16px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  transform: none;
+}
+
+.account-page .action-btn > span {
+  display: none;
+}
+
+.account-page .action-btn-primary {
+  background: var(--account-ink);
+  color: white;
+}
+
+.account-page .action-btn-primary:hover:not(:disabled) {
+  background: #485257;
+}
+
+.account-page .action-btn-secondary {
+  background: white;
+  border-color: #cdd2d4;
+  color: var(--account-ink);
+}
+
+.account-page .action-btn-danger {
+  margin-left: auto;
+  background: transparent;
+  color: #a03f35;
+}
+
+.account-page :is(.action-btn-secondary, .action-btn-danger):hover:not(:disabled),
+.account-page .copy-field-wrapper button:hover {
+  background: var(--account-surface);
+}
+
+.account-page .row.picker {
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+  padding: 12px 16px;
+  background: var(--account-surface);
+  border-radius: 4px;
+}
+
+.account-page .row.picker select {
+  width: auto;
+}
+
+.account-page .monthly-editor-fields-container .row.wide > .monthly-editor-field-wrapper {
+  justify-self: stretch;
+}
+
+.account-page .monthly-editor-field-wrapper .number-input-with-unit-wrapper {
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+}
+
+@media (max-width: 600px) {
+  .account-page .row:not(.picker) {
+    grid-template-columns: minmax(0, 1fr) 24px;
+    gap: 6px 8px;
+    padding: 12px 0;
+  }
+
+  .account-page .row:not(.picker) > :first-child {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .account-page .row:not(.picker) > :nth-child(2) {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .account-page .row:not(.picker) > .field-hint-container {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .account-page .action-bar-buttons {
+    gap: 8px;
+  }
+
+  .account-page .action-btn-danger {
+    margin-left: 0;
+  }
+}
+
+/* Keep the shared footer within the account page on small screens. */
+.app-container:has(.account-page) .app-footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 0;
+}

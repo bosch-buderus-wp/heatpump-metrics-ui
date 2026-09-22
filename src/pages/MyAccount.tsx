@@ -19,6 +19,8 @@ import { familyPath } from "../lib/modelFamilies";
 import { supabase } from "../lib/supabaseClient";
 import type { Database } from "../types/database.types";
 
+import "../styles/account.css";
+
 type HeatingSystemInsert = Database["public"]["Tables"]["heating_systems"]["Insert"];
 type MonthlyValueInsert = Database["public"]["Tables"]["monthly_values"]["Insert"];
 
@@ -133,7 +135,10 @@ export default function MyAccount() {
   if (!sessionChecked) return null;
 
   return (
-    <div>
+    <div className="account-page">
+      <header className="account-heading">
+        <h1>{t("nav.myAccount")}</h1>
+      </header>
       {/* Profile Section */}
       {profileQuery.isLoading ? (
         <div>{t("common.loading")}</div>
