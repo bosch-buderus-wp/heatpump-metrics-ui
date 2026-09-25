@@ -71,10 +71,14 @@ export function SystemForm({ system, onSubmit }: SystemFormProps) {
     catalog.data?.combinations.filter((item) => item.model_family_id === family) ?? [];
   const modelIduOptions = [
     ...new Map(
-      combinations.map((item) => [
-        item.model_idu,
-        { value: item.model_idu, label: item.idu_label },
-      ]),
+      combinations.map((item) => {
+        const key = `models.model_idu.${item.model_idu}`;
+        const translated = t(key);
+        return [
+          item.model_idu,
+          { value: item.model_idu, label: translated === key ? item.idu_label : translated },
+        ];
+      }),
     ).values(),
   ];
   const modelOduOptions = combinations

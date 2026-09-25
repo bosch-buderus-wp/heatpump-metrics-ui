@@ -6,11 +6,38 @@ vi.mock("../../../../hooks/useModelCatalog", async () => {
   const { modelCatalogFixture } = await import("../../../../test/modelCatalogFixture");
   return { useModelCatalog: () => ({ data: modelCatalogFixture, isLoading: false, error: null }) };
 });
-vi.mock("react-i18next", () => ({ useTranslation: () => ({ t: (key: string) => key }) }));
+vi.mock("react-i18next", () => ({
+  useTranslation: () => ({
+    t: (key: string) => {
+      if (key === "models.model_idu.CS6800i_M") {
+        return "Bosch CS6800i AW 12 M (16l Puffer + 180l WW)";
+      }
+      if (key === "models.model_idu.WLW186i_MBE_PLUS_E") {
+        return "Buderus WLW186i MBE+ E (ohne integrierten Speicher)";
+      }
+      return key;
+    },
+  }),
+}));
 function select(label: string, value: string) {
   fireEvent.change(screen.getByLabelText(label), { target: { value } });
 }
 describe("family configuration", () => {
+  it("uses the explanatory indoor-unit translation for the standard family", () => {
+    render(<SystemForm onSubmit={vi.fn()} />);
+    const indoor = screen.getByLabelText("systemForm.indoorUnit") as HTMLSelectElement;
+    const option = [...indoor.options].find((item) => item.value === "CS6800i_M");
+    expect(option?.textContent).toBe("Bosch CS6800i AW 12 M (16l Puffer + 180l WW)");
+  });
+
+  it("uses explanatory labels for additional families as well", () => {
+    render(<SystemForm onSubmit={vi.fn()} />);
+    select("modelFamily.label", "cs8800");
+    const indoor = screen.getByLabelText("systemForm.indoorUnit") as HTMLSelectElement;
+    const option = [...indoor.options].find((item) => item.value === "WLW186i_MBE_PLUS_E");
+    expect(option?.textContent).toBe("Buderus WLW186i MBE+ E (ohne integrierten Speicher)");
+  });
+
   it("clears devices and firmware when changing family, hides firmware, and submits only a valid pair", () => {
     const onSubmit = vi.fn();
     const { container } = render(<SystemForm onSubmit={onSubmit} />);
