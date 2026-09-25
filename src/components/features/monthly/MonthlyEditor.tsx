@@ -73,6 +73,7 @@ export function MonthlyEditor({
     form.electrical_energy_kwh != null &&
     form.thermal_energy_kwh != null &&
     form.electrical_energy_kwh > 0 &&
+    form.thermal_energy_kwh > 0 &&
     form.thermal_energy_kwh < form.electrical_energy_kwh
   ) {
     validationErrors.thermal_energy_kwh = t("monthlyForm.errorCopLessThanOne");
@@ -84,6 +85,7 @@ export function MonthlyEditor({
     form.electrical_energy_heating_kwh != null &&
     form.thermal_energy_heating_kwh != null &&
     form.electrical_energy_heating_kwh > 0 &&
+    form.thermal_energy_heating_kwh > 0 &&
     form.thermal_energy_heating_kwh < form.electrical_energy_heating_kwh
   ) {
     validationErrors.thermal_energy_heating_kwh = t("monthlyForm.errorCopLessThanOne");
