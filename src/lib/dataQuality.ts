@@ -34,56 +34,63 @@ export function isRealisticCOP(cop: number | null | undefined): boolean {
   return cop >= COP_THRESHOLDS.MIN_REALISTIC && cop <= COP_THRESHOLDS.MAX_REALISTIC;
 }
 
-/**
- * Validate measurement data quality
- * Works for hourly, daily, and monthly data
- */
-function validateData(data: {
+interface MeasurementQualityData {
+  month?: number | string | null;
   az?: number | null;
   az_heating?: number | null;
   electrical_energy_kwh?: number | null;
   thermal_energy_kwh?: number | null;
-}): DataQualityResult {
+  electrical_energy_heating_kwh?: number | null;
+  thermal_energy_heating_kwh?: number | null;
+}
+
+function energyRatio(thermal: number | null | undefined, electrical: number | null | undefined) {
+  return thermal != null && electrical != null && electrical > 0 ? thermal / electrical : null;
+}
+
+/** Validate stored AZ, deriving missing monthly AZ from energy pairs. */
+function validateData(data: MeasurementQualityData): DataQualityResult {
   const issues: DataQualityIssue[] = [];
+  const isMonthly = data.month != null && Number(data.month) >= 1 && Number(data.month) <= 12;
+  const totalCop =
+    data.az ??
+    (isMonthly ? energyRatio(data.thermal_energy_kwh, data.electrical_energy_kwh) : null);
+  const heatingCop =
+    data.az_heating ??
+    (isMonthly
+      ? energyRatio(data.thermal_energy_heating_kwh, data.electrical_energy_heating_kwh)
+      : null);
 
-  // Check total COP
-  if (data.az != null && !isRealisticCOP(data.az)) {
-    if (data.az > COP_THRESHOLDS.MAX_REALISTIC) {
+  for (const [label, cop] of [
+    ["COP", totalCop],
+    ["COP Heating", heatingCop],
+  ] as const) {
+    if (cop == null) continue;
+    // Heating-only COP can stay below 1 in summer due to standby consumption.
+    // Apply the monthly lower bound only to positive total COP; zero heat is valid.
+    // Short periods may legitimately have COP below 1 during defrosting.
+    const minimum = isMonthly && label === "COP" && cop > 0 ? 1 : COP_THRESHOLDS.MIN_REALISTIC;
+    if (Number.isNaN(cop)) {
       issues.push({
         type: "unrealistic_cop",
-        message: `COP ${data.az.toFixed(1)} is unrealistically high (>${COP_THRESHOLDS.MAX_REALISTIC})`,
+        message: `${label} is not a valid number (NaN)`,
+        severity: "error",
+      });
+    } else if (cop > COP_THRESHOLDS.MAX_REALISTIC) {
+      issues.push({
+        type: "unrealistic_cop",
+        message: `${label} ${cop.toFixed(1)} is unrealistically high (>${COP_THRESHOLDS.MAX_REALISTIC})`,
         severity: "error",
         translationKey: "dataQuality.unrealisticCopHigh",
-        translationParams: { cop: data.az.toFixed(1), max: COP_THRESHOLDS.MAX_REALISTIC },
+        translationParams: { cop: cop.toFixed(1), max: COP_THRESHOLDS.MAX_REALISTIC },
       });
-    } else if (data.az < COP_THRESHOLDS.MIN_REALISTIC) {
+    } else if (cop < minimum) {
       issues.push({
         type: "unrealistic_cop",
-        message: `COP ${data.az.toFixed(1)} is unrealistically low (<${COP_THRESHOLDS.MIN_REALISTIC})`,
+        message: `${label} ${cop.toFixed(1)} is unrealistically low (<${minimum})`,
         severity: "error",
         translationKey: "dataQuality.unrealisticCopLow",
-        translationParams: { cop: data.az.toFixed(1), min: COP_THRESHOLDS.MIN_REALISTIC },
-      });
-    }
-  }
-
-  // Check heating COP
-  if (data.az_heating != null && !isRealisticCOP(data.az_heating)) {
-    if (data.az_heating > COP_THRESHOLDS.MAX_REALISTIC) {
-      issues.push({
-        type: "unrealistic_cop",
-        message: `COP Heating ${data.az_heating.toFixed(1)} is unrealistically high (>${COP_THRESHOLDS.MAX_REALISTIC})`,
-        severity: "error",
-        translationKey: "dataQuality.unrealisticCopHigh",
-        translationParams: { cop: data.az_heating.toFixed(1), max: COP_THRESHOLDS.MAX_REALISTIC },
-      });
-    } else if (data.az_heating < COP_THRESHOLDS.MIN_REALISTIC) {
-      issues.push({
-        type: "unrealistic_cop",
-        message: `COP Heating ${data.az_heating.toFixed(1)} is unrealistically low (<${COP_THRESHOLDS.MIN_REALISTIC})`,
-        severity: "error",
-        translationKey: "dataQuality.unrealisticCopLow",
-        translationParams: { cop: data.az_heating.toFixed(1), min: COP_THRESHOLDS.MIN_REALISTIC },
+        translationParams: { cop: cop.toFixed(1), min: minimum },
       });
     }
   }
@@ -116,14 +123,9 @@ function validateData(data: {
 
 /**
  * Validate measurement data quality
- * Works for hourly, daily, and monthly data (same validation rules for all)
+ * Monthly values additionally require positive total COP to be at least 1.
  */
-export function validateMeasurementData(data: {
-  az?: number | null;
-  az_heating?: number | null;
-  electrical_energy_kwh?: number | null;
-  thermal_energy_kwh?: number | null;
-}): DataQualityResult {
+export function validateMeasurementData(data: MeasurementQualityData): DataQualityResult {
   return validateData(data);
 }
 
@@ -192,29 +194,13 @@ export function filterSystemsByRealisticCOP<
  * @param data - Array of data rows to filter
  * @param _isHourly - Deprecated parameter, no longer used (kept for backward compatibility)
  */
-export function filterRealisticDataForCharts<
-  T extends {
-    az?: number | null;
-    az_heating?: number | null;
-    electrical_energy_kwh?: number | null;
-  },
->(data: T[], _isHourly = false): T[] {
+export function filterRealisticDataForCharts<T extends MeasurementQualityData>(
+  data: T[],
+  _isHourly = false,
+): T[] {
   return data.filter((row) => {
-    // Exclude if total COP is unrealistic
-    if (row.az != null && !isRealisticCOP(row.az)) {
-      return false;
-    }
-
-    // Exclude if heating COP is unrealistic
-    if (row.az_heating != null && !isRealisticCOP(row.az_heating)) {
-      return false;
-    }
-
-    // Exclude if energy values are negative
-    if (row.electrical_energy_kwh != null && row.electrical_energy_kwh < 0) {
-      return false;
-    }
-
-    return true;
+    const validation = validateData(row);
+    // Preserve existing short-period handling of negative thermal energy.
+    return !validation.issues.some((issue) => issue.severity === "error");
   });
 }

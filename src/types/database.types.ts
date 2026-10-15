@@ -488,6 +488,7 @@ export type Database = {
       };
       measurement_deltas_view: {
         Row: {
+          calculation_exclusion_reason: string | null;
           az: number | null;
           az_heating: number | null;
           building_construction_year: number | null;

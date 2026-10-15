@@ -1,7 +1,7 @@
 import { Checkbox, FormControlLabel } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import dayjs from "dayjs";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AzBarChart, type ChartDataRow, HistogramChart } from "../components/common/charts";
 import { DataGridWrapper } from "../components/common/data-grid";
@@ -10,6 +10,7 @@ import { MetricModeToggle, ViewModeToggle } from "../components/ui";
 import { useComparisonMode } from "../hooks/useComparisonMode";
 import { useModelFamily } from "../hooks/useModelFamily";
 import { useSystemConsumptionRows } from "../hooks/useSystemConsumptionMode";
+import { filterRealisticDataForCharts } from "../lib/dataQuality";
 import { createFilterValueResolver } from "../lib/filterValueResolver";
 import { supabase } from "../lib/supabaseClient";
 import { commonHiddenColumns, getTimeSeriesColumns } from "../lib/tableHelpers";
@@ -27,23 +28,22 @@ export default function Yearly() {
   const [filteredData, setFilteredData] = useState<MonthlyValueViewRow[]>([]);
   const [viewMode, setViewMode] = useState<ViewMode>("timeSeries");
   const [metricMode, setMetricMode] = useState<MetricMode>("cop");
-  const [completeDataOnly, setCompleteDataOnly] = useState(true);
+  const [completeDataOnly, setCompleteDataOnly] = useState(false);
+
+  const handleViewModeChange = useCallback(
+    (nextMode: ViewMode) => {
+      if (nextMode === viewMode) return;
+      setViewMode(nextMode);
+      // Annual distributions need comparable month coverage; time series do not.
+      setCompleteDataOnly(nextMode === "distribution");
+    },
+    [viewMode],
+  );
 
   // Wrap setFilteredData in useCallback to prevent infinite loops in DataGridWrapper
   const handleFilterChange = useCallback((data: MonthlyValueViewRow[]) => {
     setFilteredData(data);
   }, []);
-
-  // Reset completeDataOnly when switching views
-  // - Enable when switching to distribution mode (HistogramChart)
-  // - Disable when switching to timeSeries mode (AzBarChart)
-  useEffect(() => {
-    if (viewMode === "timeSeries") {
-      setCompleteDataOnly(false);
-    } else if (viewMode === "distribution") {
-      setCompleteDataOnly(true);
-    }
-  }, [viewMode]);
 
   // Define columns for Yearly page
   const columns = useMemo(() => getTimeSeriesColumns(t, "month"), [t]);
@@ -93,12 +93,12 @@ export default function Yearly() {
   // Filter data to only include systems with complete data
   const completeDataFilteredData = useMemo(() => {
     if (!displayData) return displayData;
-    if (!completeDataOnly) return displayData;
+    if (viewMode !== "distribution" || !completeDataOnly) return displayData;
 
-    // Count months per system
+    // Count only months that will also be included in chart calculations.
     const systemMonthCounts = new Map<string, Set<number>>();
 
-    for (const row of displayData) {
+    for (const row of filterRealisticDataForCharts(displayData)) {
       const heatingId = row.heating_id;
       const month = row.month;
 
@@ -124,7 +124,7 @@ export default function Yearly() {
 
     // Return original data if filter didn't remove anything to maintain reference stability
     return filtered.length === displayData.length ? displayData : filtered;
-  }, [displayData, completeDataOnly, expectedMonths]);
+  }, [displayData, viewMode, completeDataOnly, expectedMonths]);
 
   // Memoize filter section to prevent unnecessary re-renders
   const filterSection = useMemo(
@@ -156,11 +156,11 @@ export default function Yearly() {
             />
           )}
         </div>
-        <ViewModeToggle viewMode={viewMode} onChange={setViewMode} />
+        <ViewModeToggle viewMode={viewMode} onChange={handleViewModeChange} />
         <MetricModeToggle metricMode={metricMode} onChange={setMetricMode} />
       </div>
     ),
-    [year, years, viewMode, metricMode, completeDataOnly, t],
+    [year, years, viewMode, metricMode, completeDataOnly, handleViewModeChange, t],
   );
 
   // Comparison mode hook - handles all filter logic
