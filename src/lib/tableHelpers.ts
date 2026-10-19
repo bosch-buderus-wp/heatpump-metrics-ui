@@ -333,6 +333,7 @@ export function getAllDataGridColumns(t: TFunction): Record<string, GridColDef> 
       headerName: t("systemForm.buildingConstructionYear"),
       description: t("tableHeaders.hints.buildingConstructionYear"),
       width: 80,
+      type: "number",
       valueGetter: (_value, row) =>
         row.heating_systems?.building_construction_year ?? row.building_construction_year ?? null,
       valueFormatter: (value: number | null) => (value != null ? String(value) : "-"),
