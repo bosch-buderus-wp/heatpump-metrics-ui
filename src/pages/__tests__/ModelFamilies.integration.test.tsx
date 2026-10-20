@@ -111,12 +111,24 @@ function mount(path: string) {
   return client;
 }
 beforeEach(() => {
+  window.localStorage.removeItem("heatpump-metrics.modelFamily");
   requests.length = 0;
   delayed.enabled = false;
   delayed.resolvers.clear();
   window.HEAT_PUMP_METRICS_EMBEDDED = false;
 });
 describe("public model families", () => {
+  it("uses the remembered family for data requests immediately, without fetching the default family", async () => {
+    window.localStorage.setItem("heatpump-metrics.modelFamily", "cs8800");
+    const client = mount("/yearly");
+    await waitFor(() => expect(client.isFetching()).toBe(0));
+    const dataRequests = requests.filter(({ table }) => !table.startsWith("model_"));
+    expect(dataRequests.length).toBeGreaterThan(0);
+    for (const request of dataRequests) {
+      expect(request.filters).toContainEqual(["model_family_id", "cs8800"]);
+    }
+    expect(screen.getByLabelText("Modellfamilie", { selector: "select" })).toHaveValue("cs8800");
+  });
   it("does not render late responses or cached rows from another family", async () => {
     delayed.enabled = true;
     const client = mount("/systems");
