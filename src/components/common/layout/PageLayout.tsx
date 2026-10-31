@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { ChartFullscreenPanel } from "./ChartFullscreenPanel";
 
 interface PageLayoutProps {
+  className?: string;
   titleKey: string;
   infoKey: string;
   filters?: ReactNode;
@@ -16,6 +17,7 @@ interface PageLayoutProps {
 }
 
 export function PageLayout({
+  className,
   titleKey,
   infoKey,
   filters,
@@ -30,7 +32,7 @@ export function PageLayout({
   const { t } = useTranslation();
 
   return (
-    <section>
+    <section className={className}>
       <h2>{t(titleKey)}</h2>
       {!infoAfterChartControls && <p className="muted">{t(infoKey)}</p>}
 

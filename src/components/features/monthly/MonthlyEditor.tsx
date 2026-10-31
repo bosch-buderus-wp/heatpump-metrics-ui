@@ -1,6 +1,7 @@
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { formatDate } from "../../../lib/dateFormatting";
 import type { Database } from "../../../types/database.types";
 import { MonthYearPicker, NumberInputWithUnit } from "../../form";
 import { FieldHint } from "../../ui";
@@ -25,7 +26,7 @@ export function MonthlyEditor({
   onDeleteClick,
   feedback,
 }: MonthlyEditorProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [m, setM] = useState(Number(dayjs().subtract(1, "month").format("M")));
   const [y, setY] = useState(Number(dayjs().subtract(1, "month").format("YYYY")));
 
@@ -158,13 +159,17 @@ export function MonthlyEditor({
         <div className="monthly-editor-info-box">
           ℹ️{" "}
           {t("monthlyForm.autoCalculatedInfo", {
-            date: new Date(existing.last_auto_calculated_at).toLocaleString("de-DE", {
-              year: "numeric",
-              month: "2-digit",
-              day: "2-digit",
-              hour: "2-digit",
-              minute: "2-digit",
-            }),
+            date: formatDate(
+              existing.last_auto_calculated_at,
+              i18n.resolvedLanguage || i18n.language,
+              {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit",
+              },
+            ),
           })}
         </div>
       )}

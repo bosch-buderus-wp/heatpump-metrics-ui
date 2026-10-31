@@ -3,6 +3,7 @@ import dayjs from "dayjs";
 import type { TFunction } from "i18next";
 import React from "react";
 import { type DataQualityIssue, validateMeasurementData } from "./dataQuality";
+import { formatDate } from "./dateFormatting";
 
 /**
  * Common column visibility settings for hiding system details across all pages
@@ -83,7 +84,7 @@ export function computeAz(row: EnergyRow) {
  * All available MUI DataGrid column definitions
  * Use these to build consistent tables across all views with MUI DataGrid
  */
-export function getAllDataGridColumns(t: TFunction): Record<string, GridColDef> {
+export function getAllDataGridColumns(t: TFunction, locale = "de"): Record<string, GridColDef> {
   return {
     // Data quality warning column
     dataQuality: {
@@ -188,6 +189,7 @@ export function getAllDataGridColumns(t: TFunction): Record<string, GridColDef> 
       field: "date",
       headerName: t("common.date"),
       width: 120,
+      valueFormatter: (value: string | null) => (value ? formatDate(value, locale) : "-"),
     },
     time: {
       field: "created_at",
@@ -444,8 +446,9 @@ export function getBaseSystemColumns(t: TFunction): GridColDef[] {
 export function getTimeSeriesColumns(
   t: TFunction,
   timeColumn: "month" | "date" | "time",
+  locale?: string,
 ): GridColDef[] {
-  const cols = getAllDataGridColumns(t);
+  const cols = getAllDataGridColumns(t, locale);
   return [
     ...getBaseSystemColumns(t).slice(0, 1), // user_id
     cols[timeColumn],

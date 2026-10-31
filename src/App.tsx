@@ -9,6 +9,7 @@ import AzTempEvaluation from "./pages/AzTempEvaluation";
 import BuildingComparison from "./pages/BuildingComparison";
 import Daily from "./pages/Daily";
 import HeatingCurve from "./pages/HeatingCurve";
+import HeatingLoad from "./pages/HeatingLoad";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Monthly from "./pages/Monthly";
@@ -41,6 +42,7 @@ function FamilyApp() {
         <Route path="/az-temp-evaluation" element={<AzTempEvaluation />} />
         <Route path="/az-energy-evaluation" element={<AzEnergyEvaluation />} />
         <Route path="/heating-curve" element={<HeatingCurve />} />
+        <Route path="/heating-load" element={<HeatingLoad />} />
         <Route path="/login" element={<Login />} />
         <Route path="/my-account" element={<MyAccount />} />
         <Route path="/auth/callback" element={<AuthCallback />} />

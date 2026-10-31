@@ -1,0 +1,36 @@
+.heating-load-page {
+  min-width: 0;
+}
+
+.chart-fullscreen-content .heating-load-chart {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.heating-load-tooltip {
+  width: max-content;
+  text-align: left;
+}
+
+.heating-load-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.4rem 1rem;
+  margin: 0.6rem 0;
+  font-size: 0.8rem;
+}
+
+.heating-load-legend > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.heating-load-legend-dot {
+  width: 0.65rem;
+  height: 0.65rem;
+  border-radius: 50%;
+}

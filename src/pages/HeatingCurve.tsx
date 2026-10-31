@@ -21,7 +21,8 @@ const FILTER_REQUEST_DEBOUNCE_MS = 700;
 
 export default function HeatingCurve() {
   const { family } = useModelFamily();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const locale = i18n?.resolvedLanguage || i18n?.language || "de";
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [filteredData, setFilteredData] = useState<DailyValue[] | null>(null);
   const handleFilterChange = useCallback((rows: DailyValue[]) => {
@@ -36,7 +37,7 @@ export default function HeatingCurve() {
   }, []);
 
   // Define columns for HeatingCurve page (same as Monthly)
-  const columns = useMemo(() => getTimeSeriesColumns(t, "date"), [t]);
+  const columns = useMemo(() => getTimeSeriesColumns(t, "date", locale), [t, locale]);
   const filterValueResolver = useMemo(
     () => createFilterValueResolver<DailyValue>(columns),
     [columns],

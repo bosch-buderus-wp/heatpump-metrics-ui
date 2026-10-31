@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { computeAzTemperatureRegression } from "../../../lib/chartDataProcessing";
 import { CHART_COLORS } from "../../../lib/chartTheme";
+import { formatDate } from "../../../lib/dateFormatting";
 import type { RegressionResult } from "../../../lib/regressionUtils";
 import { generateCurvePoints } from "../../../lib/regressionUtils";
 import { ChartUtilityFrame } from "../layout/ChartUtilityFrame";
@@ -34,7 +35,8 @@ interface HeatingCurveChartProps {
 }
 
 export function HeatingCurveChart({ data, currentUserId }: HeatingCurveChartProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const locale = i18n?.resolvedLanguage || i18n?.language || "de";
   const barColor = CHART_COLORS.primary;
   const userColor = CHART_COLORS.user;
 
@@ -311,7 +313,7 @@ export function HeatingCurveChart({ data, currentUserId }: HeatingCurveChartProp
               <div className="chart-tooltip-header">{pointData.name || pointData.heating_id}</div>
               {pointData.date && (
                 <div className="chart-tooltip-item">
-                  <span className="chart-tooltip-text">{pointData.date}</span>
+                  <span className="chart-tooltip-text">{formatDate(pointData.date, locale)}</span>
                 </div>
               )}
               <div className="chart-tooltip-item">

@@ -11,6 +11,7 @@ import { MetricModeToggle, ViewModeToggle } from "../components/ui";
 import { useComparisonMode } from "../hooks/useComparisonMode";
 import { useModelFamily } from "../hooks/useModelFamily";
 import { useSystemConsumptionRows } from "../hooks/useSystemConsumptionMode";
+import { formatDate } from "../lib/dateFormatting";
 import { createFilterValueResolver } from "../lib/filterValueResolver";
 import { supabase } from "../lib/supabaseClient";
 import { commonHiddenColumns, getTimeSeriesColumns } from "../lib/tableHelpers";
@@ -22,7 +23,8 @@ type MetricMode = "cop" | "energy";
 
 export default function Monthly() {
   const { family } = useModelFamily();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const locale = i18n?.resolvedLanguage || i18n?.language || "de";
   const defaultMonth = Number(dayjs().format("M"));
   const defaultYear = Number(dayjs().format("YYYY"));
   const [month, setMonth] = useState(defaultMonth);
@@ -37,7 +39,7 @@ export default function Monthly() {
   }, []);
 
   // Define columns for Monthly page
-  const columns = useMemo(() => getTimeSeriesColumns(t, "date"), [t]);
+  const columns = useMemo(() => getTimeSeriesColumns(t, "date", locale), [t, locale]);
   const filterValueResolver = useMemo(
     () => createFilterValueResolver<DailyValue>(columns),
     [columns],
@@ -109,7 +111,7 @@ export default function Monthly() {
               comparisonGroups={comparisonGroupsForChart}
               indexField="date"
               indexLabel="common.date"
-              indexFormatter={(date) => dayjs(date).format("DD")}
+              indexFormatter={(date) => formatDate(date, locale, { day: "2-digit" })}
               aggregateData={true}
               metricMode={metricMode}
             />

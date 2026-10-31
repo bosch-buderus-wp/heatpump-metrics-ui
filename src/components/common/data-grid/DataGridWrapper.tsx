@@ -30,6 +30,8 @@ interface DataGridWrapperProps<T = Record<string, unknown>> {
   // Delete action props
   onDeleteRow?: (rowId: string | number) => void;
   deleteDisabled?: boolean;
+  selectedRowId?: string | null;
+  onSelectRow?: (row: T) => void;
 }
 
 export function DataGridWrapper<T = Record<string, unknown>>({
@@ -49,6 +51,8 @@ export function DataGridWrapper<T = Record<string, unknown>>({
   onClearFilterGroup2,
   onDeleteRow,
   deleteDisabled = false,
+  selectedRowId,
+  onSelectRow,
 }: DataGridWrapperProps<T>) {
   const { session } = useSession();
   const apiRef = useGridApiRef();
@@ -197,7 +201,20 @@ export function DataGridWrapper<T = Record<string, unknown>>({
           disableColumnFilter
           onFilterModelChange={handleFilterModelChange}
           pageSizeOptions={[10, 25, 50, 100]}
-          disableRowSelectionOnClick
+          disableRowSelectionOnClick={!onSelectRow}
+          {...(onSelectRow
+            ? {
+                rowSelectionModel: {
+                  type: "include" as const,
+                  ids: new Set(selectedRowId ? [selectedRowId] : []),
+                },
+                onRowSelectionModelChange: (model) => {
+                  const selectedId = model.type === "include" ? [...model.ids][0] : undefined;
+                  const row = rows.find((item) => getRowId(item) === selectedId);
+                  if (row) onSelectRow(row);
+                },
+              }
+            : {})}
           showCellVerticalBorder
           showColumnVerticalBorder
           showToolbar

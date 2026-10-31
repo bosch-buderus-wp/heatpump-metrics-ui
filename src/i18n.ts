@@ -36,6 +36,7 @@ const resources = {
         azTempEvaluation: "AZ-Temperatur",
         azEnergyEvaluation: "AZ-Jahresenergie",
         heatingCurve: "Heizkurve",
+        heatingLoad: "Heizlast",
         myAccount: "Mein Konto",
         login: "Anmelden",
         logout: "Abmelden",
@@ -245,7 +246,7 @@ const resources = {
       },
       monthly: {
         title: "Monatsübersicht",
-        info: "Alle täglichen Werte aller in der Tabelle ausgewählten Heizungsanlagen. Tägliche Werte werden aus den Stundenwerten berechnet und sind somit nur für Anlagen verfügbar, die stündliche Daten liefern.",
+        info: "Alle täglichen Werte aller in der Tabelle ausgewählten Heizungsanlagen. Tageswerte werden aus den übermittelten Messwerten berechnet.",
       },
       daily: {
         title: "Tagesübersicht",
@@ -268,6 +269,25 @@ const resources = {
         predictedFlowTooltip: "Vorhergesagte Vorlauftemperatur basierend auf der Regressionskurve",
         myRegressionCurve: "Meine Heizkurve",
         regressionCurve: "Durchschnittliche Heizkurve",
+      },
+      heatingLoad: {
+        title: "Heizlastschätzung",
+        info: "Zusammenhang zwischen Außentemperatur und mittlerer Heizleistung einer ausgewählten Anlage.",
+        selectSystem: "Bitte eine Anlage in der Tabelle auswählen.",
+        noData: "Für diese Anlage sind keine geeigneten Tageswerte verfügbar.",
+        dataSummary:
+          "{{name}}: {{count}} Heiztage von {{start}} bis {{end}}, Außentemperatur {{min}} bis {{max}} °C.",
+        insufficient:
+          "Keine belastbare Trendlinie: Mindestens 10 geeignete Heiztage, 5 °C Temperaturspanne und ein Tag bei höchstens 5 °C sowie ein fallender Trend sind erforderlich.",
+        noDesignTemperature:
+          "Keine Normaußentemperatur hinterlegt; eine Schätzung für den Auslegungspunkt ist nicht möglich.",
+        measurements: "Heiztage",
+        regression: "Trendlinie",
+        extrapolation: "Hochrechnung",
+        estimated: "Geschätzt bei NAT",
+        declared: "Angegebene Heizlast",
+        difference: "Differenz",
+        powerAxis: "Mittlere Heizleistung (kW)",
       },
       auth: {
         email: "E-Mail",
@@ -565,6 +585,7 @@ const resources = {
         azTempEvaluation: "COP-Temperature",
         azEnergyEvaluation: "COP-Yearly Energy",
         heatingCurve: "Heating Curve",
+        heatingLoad: "Heating Load",
         myAccount: "My Account",
         login: "Login",
         logout: "Logout",
@@ -603,7 +624,7 @@ const resources = {
       },
       monthly: {
         title: "Monthly Overview",
-        info: "All daily values of all heating systems selected in the table. Daily values are calculated from hourly values and are therefore only available for systems that provide hourly data.",
+        info: "All daily values of the heating systems selected in the table. Daily values are calculated from the submitted measurements.",
       },
       daily: {
         title: "Daily Overview",
@@ -824,6 +845,25 @@ const resources = {
         azHeating: "COP (heating)",
         infoRls:
           "Public data requires appropriate RLS policies in the database. If missing, you may see no data here.",
+      },
+      heatingLoad: {
+        title: "Heating load estimate",
+        info: "Relationship between outdoor temperature and average heating power for a selected system.",
+        selectSystem: "Select a system in the table.",
+        noData: "No suitable daily values are available for this system.",
+        dataSummary:
+          "{{name}}: {{count}} heating days from {{start}} to {{end}}, outdoor temperature {{min}} to {{max}} °C.",
+        insufficient:
+          "No reliable trend line: At least 10 suitable heating days, a 5 °C temperature range, one day at or below 5 °C, and a decreasing trend are required.",
+        noDesignTemperature:
+          "No design outdoor temperature is recorded, so the design-point estimate is unavailable.",
+        measurements: "Heating days",
+        regression: "Trend line",
+        extrapolation: "Extrapolation",
+        estimated: "Estimated at DOT",
+        declared: "Declared heating load",
+        difference: "Difference",
+        powerAxis: "Average heating power (kW)",
       },
       auth: {
         email: "Email",

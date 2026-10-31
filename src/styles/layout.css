@@ -7,6 +7,7 @@
 
 .app-header {
   display: flex;
+  flex-wrap: wrap;
   gap: var(--spacing-lg);
   align-items: center;
   justify-content: space-between;
@@ -22,6 +23,9 @@
 
 .nav {
   display: flex;
+  flex-wrap: wrap;
+  flex-basis: 100%;
+  order: 1;
   gap: var(--spacing-md);
 }
 

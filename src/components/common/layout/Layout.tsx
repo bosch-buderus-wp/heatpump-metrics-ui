@@ -75,6 +75,7 @@ export function Layout({ children }: LayoutProps) {
                   {t("nav.azEnergyEvaluation")}
                 </NavLink>
                 <NavLink to={familyPath("/heating-curve", family)}>{t("nav.heatingCurve")}</NavLink>
+                <NavLink to={familyPath("/heating-load", family)}>{t("nav.heatingLoad")}</NavLink>
                 <NavLink to={familyPath("/my-account", family)}>{t("nav.myAccount")}</NavLink>
               </nav>
               <div className="actions">

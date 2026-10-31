@@ -1,17 +1,15 @@
 import { Tooltip } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import type { HeatingSeasonWeekDataRow } from "../../../lib/buildingEnergyComparison";
+import { formatDate } from "../../../lib/dateFormatting";
 
 interface HeatingSeasonChartProps {
   data: HeatingSeasonWeekDataRow[];
 }
 
-function getMonthLabel(month: number, locale: string) {
-  return new Intl.DateTimeFormat(locale, { month: "short" }).format(new Date(2026, month - 1, 1));
-}
-
 export function HeatingSeasonChart({ data }: HeatingSeasonChartProps) {
   const { t, i18n } = useTranslation();
+  const locale = i18n.resolvedLanguage || i18n.language;
 
   if (data.length === 0) {
     return <div className="chart-no-data-card">{t("charts.noData")}</div>;
@@ -39,7 +37,7 @@ export function HeatingSeasonChart({ data }: HeatingSeasonChartProps) {
         <div />
         {monthGroups.map((group) => (
           <div key={group.month} style={{ gridColumn: `span ${group.count}` }}>
-            {getMonthLabel(group.month, i18n.language)}
+            {formatDate(new Date(2026, group.month - 1, 1), locale, { month: "short" })}
           </div>
         ))}
       </div>
@@ -75,8 +73,8 @@ export function HeatingSeasonChart({ data }: HeatingSeasonChartProps) {
                   <div className="chart-tooltip">
                     <div className="chart-tooltip-header">
                       {t("buildingComparison.heatingSeasonTooltipDate", {
-                        start: week.startDate,
-                        end: week.endDate,
+                        start: formatDate(week.startDate, locale),
+                        end: formatDate(week.endDate, locale),
                       })}
                     </div>
                     <div className="chart-tooltip-item">

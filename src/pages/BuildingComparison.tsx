@@ -13,6 +13,7 @@ import {
   createHeatingSeasonWeekData,
   filterHeatingDemandRows,
 } from "../lib/buildingEnergyComparison";
+import { formatDate } from "../lib/dateFormatting";
 import { supabase } from "../lib/supabaseClient";
 import type { Database } from "../types/database.types";
 
@@ -92,11 +93,11 @@ export default function BuildingComparison() {
   );
   const heatingDemandPeriod = useMemo(() => {
     const now = new Date();
-    const monthFormatter = new Intl.DateTimeFormat(i18n.language, { month: "long" });
+    const locale = i18n.resolvedLanguage || i18n.language;
 
     if (month !== 0) {
       return t("buildingComparison.heatingDemandPeriodMonth", {
-        month: monthFormatter.format(new Date(year, month - 1, 1)),
+        month: formatDate(new Date(year, month - 1, 1), locale, { month: "long" }),
         year,
       });
     }
@@ -105,10 +106,10 @@ export default function BuildingComparison() {
     if (lastCompletedMonth < 0) return t("buildingComparison.heatingDemandPeriodNone", { year });
 
     return t("buildingComparison.heatingDemandPeriodAll", {
-      month: monthFormatter.format(new Date(year, lastCompletedMonth, 1)),
+      month: formatDate(new Date(year, lastCompletedMonth, 1), locale, { month: "long" }),
       year,
     });
-  }, [i18n.language, month, t, year]);
+  }, [i18n.language, i18n.resolvedLanguage, month, t, year]);
 
   const timePicker = (
     <div className="filter-container">

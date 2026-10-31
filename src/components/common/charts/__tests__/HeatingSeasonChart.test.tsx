@@ -29,8 +29,8 @@ vi.mock("react-i18next", () => ({
 }));
 
 const weeks = Array.from({ length: 53 }, (_, index) => ({
-  startDate: `2026-01-${String(index + 1).padStart(2, "0")}`,
-  endDate: `2026-01-${String(index + 7).padStart(2, "0")}`,
+  startDate: new Date(Date.UTC(2026, 0, 1 + index * 7)).toISOString().slice(0, 10),
+  endDate: new Date(Date.UTC(2026, 0, 7 + index * 7)).toISOString().slice(0, 10),
   month: index < 5 ? 1 : 2,
   active: index === 0 || index === 1,
   activeShare: index < 2 ? 0.75 : 0,
@@ -45,6 +45,7 @@ describe("HeatingSeasonChart", () => {
     expect(container.querySelectorAll(".heating-season-cell")).toHaveLength(53);
     expect(container.querySelectorAll(".heating-season-cell--active")).toHaveLength(2);
     expect(screen.getAllByText("75% of systems heat (n = 4)")).not.toHaveLength(0);
+    expect(screen.getByText("01/01/2026 to 01/07/2026")).toBeInTheDocument();
   });
 
   it("renders a no-data state", () => {
