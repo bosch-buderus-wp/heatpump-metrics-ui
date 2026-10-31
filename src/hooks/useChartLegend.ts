@@ -36,11 +36,12 @@ export function useChartLegend(options: UseChartLegendOptions) {
     showTemperatureLines = true,
   } = options;
 
-  const [activeKey, setActiveKey] = useState<string>("");
+  // Keep the selection independent of metric-specific and translated labels.
+  const [activeSeries, setActiveSeries] = useState<"total" | "heating">("heating");
   const [showOutdoorTemp, setShowOutdoorTemp] = useState<boolean>(true);
   const [showFlowTemp, setShowFlowTemp] = useState<boolean>(true);
 
-  const currentActiveKey = activeKey || azHeatingKey;
+  const currentActiveKey = activeSeries === "total" ? azTotalKey : azHeatingKey;
 
   // Handle legend item clicks
   const handleLegendClick = useCallback(
@@ -61,10 +62,13 @@ export function useChartLegend(options: UseChartLegendOptions) {
         setShowFlowTemp((prev) => !prev);
         return;
       }
-      // Toggle to the clicked key for AZ bars
-      setActiveKey(id);
+      if (id === azTotalKey) {
+        setActiveSeries("total");
+      } else if (id === azHeatingKey) {
+        setActiveSeries("heating");
+      }
     },
-    [clickableIds],
+    [clickableIds, azTotalKey, azHeatingKey],
   );
 
   // Generate legend items based on mode
