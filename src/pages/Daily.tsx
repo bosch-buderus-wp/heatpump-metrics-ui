@@ -10,7 +10,11 @@ import { useComparisonMode } from "../hooks/useComparisonMode";
 import { useDeleteMeasurement } from "../hooks/useDeleteOperations";
 import { useModelFamily } from "../hooks/useModelFamily";
 import { useSystemConsumptionRows } from "../hooks/useSystemConsumptionMode";
-import { filterRealisticDataForCharts } from "../lib/dataQuality";
+import {
+  excludeSystemsWithHighEnergyDelta,
+  filterRealisticDataForCharts,
+  hasHighEnergyDelta,
+} from "../lib/dataQuality";
 import { createFilterValueResolver } from "../lib/filterValueResolver";
 import { supabase } from "../lib/supabaseClient";
 import { commonHiddenColumns, getTimeSeriesColumns } from "../lib/tableHelpers";
@@ -124,7 +128,16 @@ export default function Daily() {
       return data as MeasurementDeltaRow[];
     },
   });
-  const displayData = useSystemConsumptionRows(data, "hour");
+  const qualityData = useMemo(
+    () =>
+      data?.map((row) => ({
+        ...row,
+        qualityPeriod: "hour" as const,
+        highEnergyDelta: hasHighEnergyDelta(row),
+      })),
+    [data],
+  );
+  const displayData = useSystemConsumptionRows(qualityData, "hour");
 
   // Add hour field for chart grouping
   const sortedData = useMemo(() => {
@@ -163,7 +176,9 @@ export default function Daily() {
   // We can sum the deltas to get the same result as (last - first) cumulative values
   const histogramDataSource = useMemo(() => {
     // Determine which filtered data to use
-    const sourceData = filteredData;
+    // A partial sum would be misleading, so omit a system's entire daily total
+    // if one of its intervals is outside the energy limit.
+    const sourceData = excludeSystemsWithHighEnergyDelta(filteredData, sortedData);
 
     // Group deltas by heating_id and sum them
     const systemTotals = new Map<
@@ -205,7 +220,7 @@ export default function Daily() {
       electrical_energy_heating_kwh: totals.electrical_energy_heating_kwh,
       created_at: null, // Not needed for aggregated data
     }));
-  }, [filteredData]);
+  }, [filteredData, sortedData]);
 
   return (
     <PageLayout

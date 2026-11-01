@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { filterRealisticDataForCharts, validateMeasurementData } from "../dataQuality";
+import {
+  excludeSystemsWithHighEnergyDelta,
+  filterRealisticDataForCharts,
+  validateMeasurementData,
+} from "../dataQuality";
 
 const octoberOutlier = {
   month: 10,
@@ -80,5 +84,46 @@ describe("monthly data quality", () => {
       expect(validateMeasurementData(row).isValid).toBe(true);
       expect(filterRealisticDataForCharts([row])).toEqual([row]);
     }
+  });
+});
+
+describe("hourly energy plausibility", () => {
+  it("excludes an incomplete system total even when the spike is hidden by a table filter", () => {
+    const good = { heating_id: "good", thermal_energy_kwh: 4 };
+    const partial = { heating_id: "bad", thermal_energy_kwh: 3 };
+    const spike = { heating_id: "bad", thermal_energy_kwh: 1253.48 };
+    expect(excludeSystemsWithHighEnergyDelta([good, partial], [good, partial, spike])).toEqual([
+      good,
+    ]);
+    expect(
+      excludeSystemsWithHighEnergyDelta(
+        [partial],
+        [partial, { ...spike, thermal_energy_kwh: 14.99, highEnergyDelta: true }],
+      ),
+    ).toEqual([]);
+  });
+  it("flags the February jump and excludes it from hourly charts", () => {
+    const row = {
+      qualityPeriod: "hour" as const,
+      thermal_energy_kwh: 1253.48,
+      electrical_energy_kwh: 504.15,
+      az: 2.49,
+    };
+    expect(validateMeasurementData(row).isValid).toBe(false);
+    expect(filterRealisticDataForCharts([row], true)).toEqual([]);
+  });
+
+  it("allows zero and checks each energy delta against the exclusive 15 kWh limit only for hourly data", () => {
+    expect(validateMeasurementData({ qualityPeriod: "hour", thermal_energy_kwh: 0 }).isValid).toBe(
+      true,
+    );
+    expect(
+      validateMeasurementData({ qualityPeriod: "hour", thermal_energy_heating_kwh: 14.99 }).isValid,
+    ).toBe(true);
+    expect(
+      validateMeasurementData({ qualityPeriod: "hour", electrical_energy_heating_kwh: 15 }).isValid,
+    ).toBe(false);
+    expect(validateMeasurementData({ thermal_energy_kwh: 100 }).isValid).toBe(true);
+    expect(filterRealisticDataForCharts([{ thermal_energy_kwh: 15 }], true)).toEqual([]);
   });
 });

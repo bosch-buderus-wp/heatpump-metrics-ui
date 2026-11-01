@@ -158,6 +158,8 @@ const resources = {
         },
       },
       dataQuality: {
+        highEnergyDelta:
+          "Ungewöhnlich hoher Energiesprung (≥ {{max}} kWh). Für Auswertungen ausgeschlossen.",
         unrealisticCopHigh:
           "Unrealistische Arbeitszahl: {{cop}} ist zu hoch (>{{max}}) - Wert wird nicht berücksichtigt",
         unrealisticCopLow:
@@ -763,6 +765,7 @@ const resources = {
         },
       },
       dataQuality: {
+        highEnergyDelta: "Unusually high energy change (≥ {{max}} kWh). Excluded from analysis.",
         unrealisticCopHigh:
           "Unrealistic COP: {{cop}} is too high (>{{max}}) - value will not be considered",
         unrealisticCopLow:

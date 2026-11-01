@@ -4,7 +4,7 @@
  */
 
 export interface DataQualityIssue {
-  type: "unrealistic_cop" | "negative_value";
+  type: "unrealistic_cop" | "negative_value" | "high_energy_delta";
   message: string;
   severity: "error" | "warning";
   // Additional data for translation
@@ -35,6 +35,8 @@ export function isRealisticCOP(cop: number | null | undefined): boolean {
 }
 
 interface MeasurementQualityData {
+  qualityPeriod?: "hour";
+  highEnergyDelta?: boolean;
   month?: number | string | null;
   az?: number | null;
   az_heating?: number | null;
@@ -44,6 +46,27 @@ interface MeasurementQualityData {
   thermal_energy_heating_kwh?: number | null;
 }
 
+const MAX_ENERGY_DELTA_KWH = 15;
+
+export function hasHighEnergyDelta(data: MeasurementQualityData): boolean {
+  return (
+    Boolean(data.highEnergyDelta) ||
+    [
+      data.thermal_energy_kwh,
+      data.electrical_energy_kwh,
+      data.thermal_energy_heating_kwh,
+      data.electrical_energy_heating_kwh,
+    ].some((value) => value != null && value >= MAX_ENERGY_DELTA_KWH)
+  );
+}
+
+export function excludeSystemsWithHighEnergyDelta<
+  T extends MeasurementQualityData & { heating_id: string | null },
+>(filteredRows: T[], allRows: T[]): T[] {
+  const invalidSystems = new Set(allRows.filter(hasHighEnergyDelta).map((row) => row.heating_id));
+  return filteredRows.filter((row) => !invalidSystems.has(row.heating_id));
+}
+
 function energyRatio(thermal: number | null | undefined, electrical: number | null | undefined) {
   return thermal != null && electrical != null && electrical > 0 ? thermal / electrical : null;
 }
@@ -51,6 +74,15 @@ function energyRatio(thermal: number | null | undefined, electrical: number | nu
 /** Validate stored AZ, deriving missing monthly AZ from energy pairs. */
 function validateData(data: MeasurementQualityData): DataQualityResult {
   const issues: DataQualityIssue[] = [];
+  if (data.qualityPeriod === "hour" && (data.highEnergyDelta || hasHighEnergyDelta(data))) {
+    issues.push({
+      type: "high_energy_delta",
+      message: "Energy change between measurements is at least 15 kWh; excluded from statistics",
+      severity: "error",
+      translationKey: "dataQuality.highEnergyDelta",
+      translationParams: { max: MAX_ENERGY_DELTA_KWH },
+    });
+  }
   const isMonthly = data.month != null && Number(data.month) >= 1 && Number(data.month) <= 12;
   const totalCop =
     data.az ??
@@ -192,14 +224,14 @@ export function filterSystemsByRealisticCOP<
  * This excludes data that would skew charts and make them misleading
  *
  * @param data - Array of data rows to filter
- * @param _isHourly - Deprecated parameter, no longer used (kept for backward compatibility)
+ * @param isHourly - Apply the energy-delta limit to hourly measurements.
  */
 export function filterRealisticDataForCharts<T extends MeasurementQualityData>(
   data: T[],
-  _isHourly = false,
+  isHourly = false,
 ): T[] {
   return data.filter((row) => {
-    const validation = validateData(row);
+    const validation = validateData(isHourly ? { ...row, qualityPeriod: "hour" } : row);
     // Preserve existing short-period handling of negative thermal energy.
     return !validation.issues.some((issue) => issue.severity === "error");
   });
