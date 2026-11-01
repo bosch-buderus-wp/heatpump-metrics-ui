@@ -11,6 +11,10 @@ import { MetricModeToggle, ViewModeToggle } from "../components/ui";
 import { useComparisonMode } from "../hooks/useComparisonMode";
 import { useModelFamily } from "../hooks/useModelFamily";
 import { useSystemConsumptionRows } from "../hooks/useSystemConsumptionMode";
+import {
+  excludeSystemsWithHighDailyConsumption,
+  hasHighDailyConsumption,
+} from "../lib/dataQuality";
 import { formatDate } from "../lib/dateFormatting";
 import { createFilterValueResolver } from "../lib/filterValueResolver";
 import { supabase } from "../lib/supabaseClient";
@@ -65,7 +69,16 @@ export default function Monthly() {
       return data as DailyValue[];
     },
   });
-  const displayData = useSystemConsumptionRows(data, "day");
+  const qualityData = useMemo(
+    () =>
+      data?.map((row) => ({
+        ...row,
+        qualityPeriod: "day" as const,
+        highDailyConsumption: hasHighDailyConsumption(row),
+      })),
+    [data],
+  );
+  const displayData = useSystemConsumptionRows(qualityData, "day");
 
   const handleMonthYearChange = useCallback((val: { month: number; year: number }) => {
     setMonth(val.month);
@@ -80,14 +93,14 @@ export default function Monthly() {
 
   // Get the data to use for histogram (filtered if available)
   const histogramDataSource = useMemo(() => {
-    return filteredData as Array<{
+    return excludeSystemsWithHighDailyConsumption(filteredData, displayData ?? []) as Array<{
       heating_id: string;
       thermal_energy_kwh?: number | null;
       electrical_energy_kwh?: number | null;
       thermal_energy_heating_kwh?: number | null;
       electrical_energy_heating_kwh?: number | null;
     }>;
-  }, [filteredData]);
+  }, [filteredData, displayData]);
 
   return (
     <PageLayout

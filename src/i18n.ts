@@ -158,6 +158,8 @@ const resources = {
         },
       },
       dataQuality: {
+        highDailyConsumption:
+          "Ungewöhnlich hoher Stromverbrauch (> {{max}} kWh pro Tag). Für Auswertungen ausgeschlossen.",
         highEnergyDelta:
           "Ungewöhnlich hoher Energiesprung (≥ {{max}} kWh). Für Auswertungen ausgeschlossen.",
         unrealisticCopHigh:
@@ -765,6 +767,8 @@ const resources = {
         },
       },
       dataQuality: {
+        highDailyConsumption:
+          "Unusually high electricity consumption (> {{max}} kWh per day). Excluded from analysis.",
         highEnergyDelta: "Unusually high energy change (≥ {{max}} kWh). Excluded from analysis.",
         unrealisticCopHigh:
           "Unrealistic COP: {{cop}} is too high (>{{max}}) - value will not be considered",

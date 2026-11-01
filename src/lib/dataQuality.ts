@@ -4,7 +4,7 @@
  */
 
 export interface DataQualityIssue {
-  type: "unrealistic_cop" | "negative_value" | "high_energy_delta";
+  type: "unrealistic_cop" | "negative_value" | "high_energy_delta" | "high_daily_consumption";
   message: string;
   severity: "error" | "warning";
   // Additional data for translation
@@ -35,8 +35,9 @@ export function isRealisticCOP(cop: number | null | undefined): boolean {
 }
 
 interface MeasurementQualityData {
-  qualityPeriod?: "hour";
+  qualityPeriod?: "hour" | "day";
   highEnergyDelta?: boolean;
+  highDailyConsumption?: boolean;
   month?: number | string | null;
   az?: number | null;
   az_heating?: number | null;
@@ -47,6 +48,25 @@ interface MeasurementQualityData {
 }
 
 const MAX_ENERGY_DELTA_KWH = 15;
+const MAX_DAILY_ELECTRICAL_KWH = 120;
+
+export function hasHighDailyConsumption(data: MeasurementQualityData): boolean {
+  return (
+    Boolean(data.highDailyConsumption) ||
+    [data.electrical_energy_kwh, data.electrical_energy_heating_kwh].some(
+      (value) => value != null && value > MAX_DAILY_ELECTRICAL_KWH,
+    )
+  );
+}
+
+export function excludeSystemsWithHighDailyConsumption<
+  T extends MeasurementQualityData & { heating_id: string | null },
+>(filteredRows: T[], allRows: T[]): T[] {
+  const invalidSystems = new Set(
+    allRows.filter(hasHighDailyConsumption).map((row) => row.heating_id),
+  );
+  return filteredRows.filter((row) => !invalidSystems.has(row.heating_id));
+}
 
 export function hasHighEnergyDelta(data: MeasurementQualityData): boolean {
   return (
@@ -74,6 +94,15 @@ function energyRatio(thermal: number | null | undefined, electrical: number | nu
 /** Validate stored AZ, deriving missing monthly AZ from energy pairs. */
 function validateData(data: MeasurementQualityData): DataQualityResult {
   const issues: DataQualityIssue[] = [];
+  if (data.qualityPeriod === "day" && hasHighDailyConsumption(data)) {
+    issues.push({
+      type: "high_daily_consumption",
+      message: "Daily electricity consumption exceeds 120 kWh; excluded from statistics",
+      severity: "error",
+      translationKey: "dataQuality.highDailyConsumption",
+      translationParams: { max: MAX_DAILY_ELECTRICAL_KWH },
+    });
+  }
   if (data.qualityPeriod === "hour" && (data.highEnergyDelta || hasHighEnergyDelta(data))) {
     issues.push({
       type: "high_energy_delta",

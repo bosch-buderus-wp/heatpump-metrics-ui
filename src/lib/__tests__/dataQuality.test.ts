@@ -1,9 +1,42 @@
 import { describe, expect, it } from "vitest";
 import {
+  excludeSystemsWithHighDailyConsumption,
   excludeSystemsWithHighEnergyDelta,
   filterRealisticDataForCharts,
   validateMeasurementData,
 } from "../dataQuality";
+
+describe("daily electrical consumption", () => {
+  it("flags values above 120 kWh, while allowing 120 kWh and high thermal energy", () => {
+    for (const row of [
+      {
+        qualityPeriod: "day" as const,
+        electrical_energy_kwh: 517.89,
+        thermal_energy_kwh: 1296.95,
+        az: 2.5,
+      },
+      { qualityPeriod: "day" as const, electrical_energy_heating_kwh: 120.01 },
+    ]) {
+      expect(validateMeasurementData(row).isValid).toBe(false);
+      expect(filterRealisticDataForCharts([row])).toEqual([]);
+    }
+    for (const row of [
+      { qualityPeriod: "day" as const, electrical_energy_kwh: 120, thermal_energy_kwh: 400 },
+      { qualityPeriod: "day" as const, electrical_energy_kwh: 0 },
+      { month: 2, electrical_energy_kwh: 500, thermal_energy_kwh: 1500 },
+    ])
+      expect(validateMeasurementData(row).isValid).toBe(true);
+  });
+
+  it("excludes incomplete system totals even if a table filter hides the outlier", () => {
+    const good = { heating_id: "good", electrical_energy_kwh: 20 };
+    const partial = { heating_id: "bad", electrical_energy_kwh: 30 };
+    const outlier = { heating_id: "bad", electrical_energy_kwh: 121 };
+    expect(
+      excludeSystemsWithHighDailyConsumption([good, partial], [good, partial, outlier]),
+    ).toEqual([good]);
+  });
+});
 
 const octoberOutlier = {
   month: 10,
