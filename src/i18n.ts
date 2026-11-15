@@ -1123,6 +1123,7 @@ i18n.use(initReactI18next).init({
   resources,
   lng: languageFromPath(window.location.pathname),
   fallbackLng: "en",
+  returnEmptyString: true,
   interpolation: {
     escapeValue: false,
   },
