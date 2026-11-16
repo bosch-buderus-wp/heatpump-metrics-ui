@@ -33,7 +33,7 @@ const outlier = {
 describe("monthly outliers in tables and charts", () => {
   it("keeps a warning with the exclusion reason in the table", () => {
     const t = ((_key: string, params?: { cop: string; min: number }) =>
-      params ? `AZ ${params.cop} < ${params.min}: excluded` : _key) as TFunction;
+      params ? `AZ ${params.cop} < ${params.min}: excluded` : _key) as unknown as TFunction;
     const cell = getAllDataGridColumns(t).dataQuality.renderCell?.({
       row: outlier,
     } as GridRenderCellParams);

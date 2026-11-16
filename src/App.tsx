@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { ModelFamilyProvider, useModelFamily } from "./hooks/useModelFamily";
 import { familyPath } from "./lib/modelFamilies";
 import "./i18n";
@@ -29,6 +29,7 @@ export default function App() {
 
 function FamilyApp() {
   const { family } = useModelFamily();
+  const { key: locationKey } = useLocation();
   return (
     <Layout>
       {/* A new family must not retain local chart selections or comparison filters. */}
@@ -48,12 +49,11 @@ function FamilyApp() {
         <Route path="/auth/callback" element={<AuthCallback />} />
         <Route path="/terms" element={<Terms />} />
         <Route path="/privacy" element={<Privacy />} />
-        {/* Redirect old dashboard route to new my-account route */}
+        {/* Remount the redirect when family normalization replaces the current location. */}
         <Route
-          path="/dashboard"
-          element={<Navigate to={familyPath("/my-account", family)} replace />}
+          path="*"
+          element={<Navigate key={locationKey} to={familyPath("/", family)} replace />}
         />
-        <Route path="*" element={<Navigate to={familyPath("/", family)} replace />} />
       </Routes>
     </Layout>
   );

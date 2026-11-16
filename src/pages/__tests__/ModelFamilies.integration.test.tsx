@@ -1,7 +1,7 @@
 import type { GridFilterModel } from "@mui/x-data-grid";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter, useLocation, useNavigate } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import App from "../../App";
 
@@ -110,6 +110,20 @@ function mount(path: string) {
   );
   return client;
 }
+
+function NavigationProbe({ destination }: { destination: string }) {
+  const navigate = useNavigate();
+  const location = useLocation();
+  return (
+    <>
+      <button type="button" onClick={() => navigate(destination)}>
+        Navigate
+      </button>
+      <output data-testid="location">{location.pathname + location.search}</output>
+    </>
+  );
+}
+
 beforeEach(() => {
   window.localStorage.removeItem("heatpump-metrics.modelFamily");
   requests.length = 0;
@@ -118,6 +132,22 @@ beforeEach(() => {
   window.HEAT_PUMP_METRICS_EMBEDDED = false;
 });
 describe("public model families", () => {
+  it("redirects unknown routes without a family to the home page", async () => {
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    render(
+      <QueryClientProvider client={client}>
+        <MemoryRouter initialEntries={["/yearly?family=cs8800"]}>
+          <App />
+          <NavigationProbe destination="/unknown" />
+        </MemoryRouter>
+      </QueryClientProvider>,
+    );
+
+    fireEvent.click(screen.getByText("Navigate"));
+    await waitFor(() =>
+      expect(screen.getByTestId("location")).toHaveTextContent("/?family=cs8800"),
+    );
+  });
   it("uses the remembered family for data requests immediately, without fetching the default family", async () => {
     window.localStorage.setItem("heatpump-metrics.modelFamily", "cs8800");
     const client = mount("/yearly");
